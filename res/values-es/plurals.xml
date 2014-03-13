@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+
+  <plurals name="notify_new_messages_title">
+    <item quantity="one">Nuevo mensaje recibido</item>
+    <item quantity="other"><xliff:g id="quantity">%1$d</xliff:g> mensajes nuevos</item>
+  </plurals>
+
+  <plurals name="notify_new_messages_subtitle">
+    <item quantity="one"><xliff:g id="number_of_people">%1$d</xliff:g> persona le ha enviado <xliff:g id="number_of_messages" example="2 messages">%2$s</xliff:g>.</item>
+    <item quantity="other"><xliff:g id="number_of_people">%1$d</xliff:g> personas le han enviado <xliff:g id="number_of_messages" example="2 messages">%2$s</xliff:g>.</item>
+  </plurals>
+
+  <plurals name="n_messages">
+      <item quantity="one">un mensaje</item>
+      <item quantity="other"><xliff:g id="count">%1$d</xliff:g> mensajes</item>
+  </plurals>
+
+  <plurals name="notify_unread_messages_from_individual">
+    <item quantity="one"><xliff:g id="count">%1$d</xliff:g> mensaje no leídos de <xliff:g id="contact_name" example="droidman">%2$s</xliff:g></item>
+    <item quantity="other"><xliff:g id="count">%1$d</xliff:g> mensajes no leídos de <xliff:g id="contact_name" example="droidman">%2$s</xliff:g></item>
+  </plurals>
+
+</resources>

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+
+  <style name="ActivationLayout">
+    <item name="android:layout_width">fill_parent</item>
+    <item name="android:layout_height">fill_parent</item>
+  </style>
+
+  <style name="_Activation">
+    <item name="android:layout_width">fill_parent</item>
+    <item name="android:layout_height">fill_parent</item>
+  </style>
+
+  <style name="Activation" parent="_Activation">
+    <item name="android:orientation">vertical</item>
+  </style>
+
+  <style name="ActivationCode">
+    <item name="android:layout_width">fill_parent</item>
+    <item name="android:layout_height">fill_parent</item>
+    <item name="android:layout_weight">1</item>
+    <item name="android:layout_margin">@dimen/spacing_large</item>
+    <item name="android:gravity">center_vertical</item>
+  </style>
+
+  <style name="ActivationCodeText">
+    <item name="android:layout_width">fill_parent</item>
+    <item name="android:layout_height">wrap_content</item>
+    <item name="android:layout_margin">@dimen/spacing_large</item>
+    <item name="android:hint">@string/activation_code</item>
+    <item name="android:imeOptions">actionGo</item>
+    <item name="android:inputType">textCapCharacters|textNoSuggestions</item>
+    <item name="android:padding">@dimen/spacing_normal</item>
+    <item name="android:background">@drawable/bg_text_input</item>
+    <item name="android:textColor">#ffdddddd</item>
+    <item name="android:textSize">@dimen/text_xlarge</item>
+  </style>
+  
+  <style name="ActivationCodeDescription">
+    <item name="android:layout_width">fill_parent</item>
+    <item name="android:layout_height">wrap_content</item>
+    <item name="android:layout_margin">@dimen/spacing_large</item>
+    <item name="android:textSize">@dimen/text_normal</item>
+    <item name="android:textColor">@color/silent_white</item>
+    <item name="android:autoLink">web</item>
+    <item name="android:text">@string/activation_code_description</item>
+    <item name="android:textColorLink">@color/silent_orange</item>
+  </style>
+
+  <style name="ActivationLogo">
+    <item name="android:layout_width">fill_parent</item>
+    <item name="android:layout_height">fill_parent</item>
+    <item name="android:layout_weight">1</item>
+    <item name="android:layout_margin">@dimen/spacing_large</item>
+    <item name="android:src">@drawable/logo_silentcircle</item>
+    <item name="android:scaleType">centerInside</item>
+  </style>
+
+</resources>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android" style="@style/Widget.Silence.RelativeLayout">
+	<LinearLayout style="@style/Widget.Silence.LinearLayout.Vertical" android:layout_height="fill_parent" android:gravity="center" android:layout_above="@+id/navigation">
+		<TextView android:id="@+id/partner_welcome" style="@style/Widget.Silence.TextView.PartnerMessaging" android:visibility="visible" android:text="@string/partner_welcome" android:padding="@dimen/spacing_large"/>
+		<LinearLayout style="@style/Widget.Silence.LinearLayout.Rotatable" android:layout_width="fill_parent" android:gravity="center" android:padding="@dimen/spacing_large">
+			<ImageView style="@style/Widget.Silence.ImageView" android:src="@drawable/logo_silentcircle" android:layout_width="@dimen/avatar_large" android:layout_height="@dimen/avatar_large"/>
+			<TextView android:id="@+id/partner_message" style="@style/Widget.Silence.TextView" android:textSize="@dimen/text_xlarge" android:text="@string/partner_account_creation_prologue" android:padding="@dimen/spacing_large"/>
+		</LinearLayout>
+	</LinearLayout>
+	<include android:id="@+id/navigation" layout="@layout/account_creation_navigation" android:layout_height="wrap_content" android:layout_width="fill_parent" android:layout_alignParentBottom="true"/>
+</RelativeLayout>

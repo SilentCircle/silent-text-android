@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="SilentTextTest" default="all" basedir="..">
+
+  <target name="-set-build-properties">
+    <exec executable="uname" outputproperty="build.arch">
+      <arg value="-m"/>
+    </exec>
+  </target>
+
+  <target name="-set-project-properties" depends="-set-build-properties">
+    <property name="project.dir" value="${basedir}"/>
+    <property name="project.output.dir" value="${project.dir}/bin"/>
+    <property name="project.library.dir" value="${project.dir}/libs"/>
+    <property name="project.support.dir" value="${project.dir}/support"/>
+    <property name="project.classes.dir" value="${project.output.dir}/classes"/>
+    <property name="project.native.dir" value="${project.dir}/jni"/>
+  </target>
+
+  <target name="-set-test-properties" depends="-set-project-properties">
+    <property name="test.dir" value="${project.dir}/test"/>
+    <property name="test.temp.dir" value="${project.dir}/tmp"/>
+    <property name="test.sources.dir" value="${test.dir}/src"/>
+    <property name="test.native.dir" value="${test.dir}/jni"/>
+    <property name="test.library.dir" value="${test.dir}/libs"/>
+    <property name="test.output.dir" value="${test.dir}/bin"/>
+    <property name="test.classes.dir" value="${test.output.dir}/classes"/>
+    <property name="test.reports.dir" value="${test.output.dir}/reports"/>
+  </target>
+
+  <target name="clean" depends="-set-test-properties">
+    <delete dir="${test.output.dir}"/>
+    <delete dir="${test.temp.dir}"/>
+  </target>
+
+  <target name="native-test-compile" depends="-set-test-properties, native-compile">
+
+    <exec executable="ndk-build" failonerror="true" dir="${test.dir}">
+      <arg value="all"/>
+    </exec>
+
+    <exec executable="cc" failonerror="true">
+      <arg value="-Wall"/>
+      <arg value="${test.native.dir}/test.c"/>
+      <arg value="-I${test.native.dir}/scloud-test/src"/>
+      <arg value="-I${project.native.dir}/scloud/src"/>
+      <arg value="-I${project.native.dir}/scloud/shared"/>
+      <arg value="-L${project.library.dir}/${build.arch}"/>
+      <arg value="-L${test.library.dir}/${build.arch}"/>
+      <arg value="-lscloud-test"/>
+      <arg value="-o"/>
+      <arg value="${test.output.dir}/native-test"/>
+    </exec>
+
+  </target>
+
+  <target name="test-compile" depends="-set-debug-files, -set-debug-mode, -compile, -set-test-properties" description="Compiles all tests.">
+
+    <mkdir dir="${test.classes.dir}"/>
+
+    <path id="project.javac.classpath">
+      <path refid="project.all.jars.path"/>
+      <path refid="tested.project.classpath"/>
+    </path>
+
+    <javac
+      encoding="${java.encoding}"
+      source="${java.source}"
+      target="${java.target}"
+      debug="true"
+      extdirs=""
+      destdir="${test.classes.dir}"
+      bootclasspathref="project.target.class.path"
+      verbose="${verbose}"
+      classpathref="project.javac.classpath"
+      includeantruntime="false">
+
+      <src path="${test.sources.dir}"/>
+
+      <classpath>
+        <pathelement path="${project.classes.dir}"/>
+        <fileset dir="${project.library.dir}" includes="**/*.jar"/>
+        <fileset dir="${test.library.dir}" includes="**/*.jar"/>
+      </classpath>
+
+    </javac>
+
+  </target>
+
+  <target name="native-test" depends="native-test-compile" description="Runs all native tests.">
+    <exec executable="${test.output.dir}/native-test"/>
+  </target>
+
+  <target name="unit-test" depends="test-compile" description="Runs all unit tests.">
+
+    <mkdir dir="${test.reports.dir}"/>
+    <mkdir dir="${test.temp.dir}"/>
+
+    <junit showoutput="no" haltonfailure="no" printsummary="yes" fork="yes" forkMode="once" tempdir="${test.temp.dir}">
+
+      <sysproperty key="java.library.path" path="${project.library.dir}/${build.arch}"/>
+
+      <formatter type="plain"/>
+      <formatter type="xml"/>
+
+      <batchtest todir="${test.reports.dir}">
+        <fileset dir="${test.sources.dir}">
+          <include name="**/*Test.java"/>
+          <exclude name="**/Base*Test.java"/>
+        </fileset>
+      </batchtest>
+
+      <classpath>
+        <pathelement path="${project.support.dir}/ActionBarSherlock/library/bin/classes"/>
+        <fileset dir="${project.support.dir}/ActionBarSherlock/library/libs" includes="**/*.jar"/>
+        <pathelement path="${project.classes.dir}"/>
+        <pathelement path="${test.classes.dir}"/>
+        <fileset dir="${project.library.dir}" includes="**/*.jar"/>
+        <fileset dir="${test.library.dir}" includes="**/*.jar"/>
+        <path refid="project.target.class.path"/>
+      </classpath>
+
+    </junit>
+
+  </target>
+
+  <target name="functional-test" depends="test-compile" description="Runs all functional tests."/>
+
+  <target name="all" depends="unit-test, functional-test" description="Runs all unit and functional tests."/>
+
+</project>

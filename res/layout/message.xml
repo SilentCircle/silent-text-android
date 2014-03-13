@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<com.silentcircle.silenttext.view.MessageView
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  style="@style/Message">
+  
+  <LinearLayout
+    style="@style/MessageExtras"
+    android:id="@+id/message_extras">
+
+    <ImageView
+      style="@style/MessageExtra.Thumbnail"
+      android:id="@+id/message_thumbnail"
+      android:contentDescription="@string/thumbnail"/>
+  
+    <ImageView
+      style="@style/MessageExtra.Location"
+      android:id="@+id/message_location"
+      android:contentDescription="@string/location"/>
+
+    <ImageView
+      style="@style/MessageExtra.Burn"
+      android:id="@+id/message_burn"
+      android:contentDescription="@string/burn_notice"/>
+    
+    <ImageView
+      style="@style/MessageExtra.Resend"
+      android:id="@+id/message_resend"
+      android:contentDescription="@string/resend"/>
+
+  </LinearLayout>
+  
+  <LinearLayout
+    style="@style/Widget.Silence.LinearLayout.Vertical"
+    android:layout_toLeftOf="@+id/message_extras"
+    android:id="@+id/message_overview">
+    
+    <TextView
+      style="@style/MessageText"
+      android:id="@+id/message_text"/>
+
+    <TextView
+        style="@style/MessageTime"
+        android:id="@+id/message_time"/>
+
+  </LinearLayout>
+
+</com.silentcircle.silenttext.view.MessageView>

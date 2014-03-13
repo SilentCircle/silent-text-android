@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+    
+    <declare-styleable name="Theme.Silent">
+        <attr name="titleStyle" format="reference"/>
+        <attr name="itemStyle" format="reference"/>
+        <attr name="itemHomeStyle" format="reference"/>
+        <attr name="progressIndicatorStyle" format="reference"/>
+    </declare-styleable>
+    
+    <declare-styleable name="BezelImageView">
+        <attr name="maskDrawable" format="reference"/>
+        <attr name="borderDrawable" format="reference"/>
+    </declare-styleable>
+    
+</resources>

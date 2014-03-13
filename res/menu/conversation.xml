@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+  <item
+    android:id="@+id/action_burn_notice"
+    android:showAsAction="always"
+    android:orderInCategory="1"
+    android:icon="@drawable/ic_burn"
+    android:visible="true"
+    android:title="@string/burn_notice"/>
+  <item
+    android:id="@+id/action_share_location"
+    android:showAsAction="always"
+    android:orderInCategory="2"
+    android:icon="@drawable/ic_location"
+    android:visible="true"
+    android:title="@string/share_location"/>
+  <item
+    android:id="@+id/options"
+    android:showAsAction="always"
+    android:orderInCategory="3"
+    android:icon="@drawable/ic_drawer"
+    android:title="@string/options"/>
+</menu>

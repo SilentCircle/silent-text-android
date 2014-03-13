@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+
+  <!-- Placeholders for the layout designer; not visible in end-user UI -->
+  <string name="sample_duration">Messages expire in 5 minutes</string>
+  <string name="sample_domain">xmpp.silentcircle.com</string>
+  <string name="sample_sas_phrase">Alpha Bravo Charlie Delta</string>
+  <string name="sample_device">Android Device</string>
+  <string name="sample_port">9999</string>
+  <string name="sample_message">This is a good message.</string>
+  <string name="sample_error">You must enter a valid foo with that bar.</string>
+  <string name="sample_sender">Alice Coder</string>
+  <string name="sample_first_name">Alice</string>
+  <string name="sample_last_name">Coder</string>
+  <string name="sample_count">12</string>
+  <string name="sample_recipient">Bob Coder</string>
+  <string name="sample_artist">The Silent Circles</string>
+  <string name="sample_album">Pies are Square</string>
+  <string name="sample_title">Round and Round</string>
+  <string name="sample_version">1.2.3</string>
+  <string name="sample_username">alice_smith</string>
+  <string name="sample_masked_password">************</string>
+  <string name="sample_email_address">you@example.com</string>
+
+</resources>

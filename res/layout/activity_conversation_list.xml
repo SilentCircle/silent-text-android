@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools" android:layout_width="fill_parent" android:layout_height="fill_parent" tools:context=".activity.ConversationListActivity">
+  <com.silentcircle.silenttext.view.ListView style="@style/ConversationList" android:id="@+id/conversations" tools:listitem="@layout/conversation_summary" android:layout_margin="@dimen/spacing_small"/>
+  <TextView style="@style/EmptyList" android:id="@+id/empty" android:text="@string/empty_conversation_list"/>
+  <include layout="@layout/indeterminate_progress" android:visibility="gone" android:id="@+id/progress"/>
+  <View android:id="@+id/blackout" style="@style/Widget.Silence.Blackout"/>
+</RelativeLayout>

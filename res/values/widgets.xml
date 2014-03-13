@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+
+	<style name="Widget"/>
+
+	<style name="Widget.Silence">
+		<item name="android:layout_width">wrap_content</item>
+		<item name="android:layout_height">wrap_content</item>
+	</style>
+
+	<style name="Widget.Silence.Blackout">
+		<item name="android:layout_width">fill_parent</item>
+		<item name="android:layout_height">fill_parent</item>
+		<item name="android:background">@color/silent_black</item>
+		<item name="android:visibility">gone</item>
+	</style>
+
+	<style name="Widget.Silence.CheckBox">
+		<item name="android:layout_width">fill_parent</item>
+	</style>
+
+	<style name="Widget.Silence.ContactView">
+		<item name="android:layout_width">fill_parent</item>
+		<item name="android:layout_height">@dimen/avatar_normal</item>
+		<item name="android:background">@drawable/bg_selectable</item>
+	</style>
+
+	<style name="Widget.Silence.ContactView.Small">
+		<item name="android:layout_height">@dimen/avatar_small</item>
+	</style>
+
+	<style name="Widget.Silence.ImageView"/>
+
+	<style name="Widget.Silence.ImageView.Preview">
+		<item name="android:layout_width">fill_parent</item>
+		<item name="android:layout_height">fill_parent</item>
+		<item name="android:scaleType">fitCenter</item>
+	</style>
+
+	<style name="Widget.Silence.ImageView.Avatar">
+		<item name="android:layout_width">@dimen/avatar_normal</item>
+		<item name="android:layout_height">@dimen/avatar_normal</item>
+		<item name="android:src">@drawable/ic_avatar_placeholder</item>
+		<item name="android:scaleType">centerCrop</item>
+	</style>
+
+	<style name="Widget.Silence.ImageView.Avatar.Small">
+		<item name="android:layout_width">@dimen/avatar_small</item>
+		<item name="android:layout_height">@dimen/avatar_small</item>
+	</style>
+
+	<style name="Widget.Silence.ImageView.ActionButton">
+		<item name="android:background">@drawable/bg_selectable</item>
+		<item name="android:padding">@dimen/spacing_small</item>
+	</style>
+
+	<style name="Widget.Silence.ListView">
+		<item name="android:layout_width">fill_parent</item>
+		<item name="android:layout_height">fill_parent</item>
+	</style>
+
+	<style name="Widget.Silence.TextView">
+		<item name="android:textSize">@dimen/text_normal</item>
+		<item name="android:textColor">@color/text_selectable</item>
+		<item name="android:textColorLink">@color/silent_yellow</item>
+		<item name="android:gravity">center_vertical</item>
+	</style>
+
+	<style name="Widget.Silence.TextView.PartnerMessaging">
+		<item name="android:textColor">@color/silent_blue</item>
+		<item name="android:paddingBottom">@dimen/spacing_large</item>
+		<item name="android:textSize">@dimen/text_xlarge</item>
+		<item name="android:layout_width">fill_parent</item>
+		<item name="android:gravity">center_horizontal</item>
+		<item name="android:visibility">gone</item>
+	</style>
+
+	<style name="Widget.Silence.TextView.Title">
+		<item name="android:textSize">@dimen/text_large</item>
+		<item name="android:textStyle">bold</item>
+	</style>
+
+	<style name="Widget.Silence.TextView.Title.ActionBar">
+		<item name="android:background">@color/silent_dark_orange</item>
+		<item name="android:layout_height">@dimen/abs__action_bar_default_height</item>
+		<item name="android:layout_width">fill_parent</item>
+		<item name="android:gravity">center_vertical</item>
+		<item name="android:padding">@dimen/spacing_normal</item>
+		<item name="android:drawablePadding">@dimen/spacing_normal</item>
+		<item name="android:textColor">@color/silent_glass</item>
+	</style>
+
+	<style name="Widget.Silence.TextView.Error">
+		<item name="android:layout_width">fill_parent</item>
+		<item name="android:padding">@dimen/spacing_normal</item>
+		<item name="android:gravity">center</item>
+		<item name="android:textSize">@dimen/text_small</item>
+		<item name="android:background">@color/silent_dark_orange</item>
+		<item name="android:textStyle">bold</item>
+		<item name="android:text">@string/sample_error</item>
+	</style>
+
+	<style name="Widget.Silence.EditText" parent="Widget.Silence.TextView">
+		<item name="android:layout_width">fill_parent</item>
+		<item name="android:background">@drawable/bg_text_input</item>
+		<item name="android:layout_marginTop">@dimen/spacing_large</item>
+		<item name="android:layout_marginRight">@dimen/spacing_large</item>
+		<item name="android:layout_marginBottom">@dimen/spacing_large</item>
+		<item name="android:layout_marginLeft">@dimen/spacing_large</item>
+		<item name="android:padding">@dimen/spacing_normal</item>
+		<item name="android:textSize">@dimen/text_xlarge</item>
+		<item name="android:imeOptions">flagNoExtractUi</item>
+		<item name="android:focusable">true</item>
+		<item name="android:focusableInTouchMode">true</item>
+	</style>
+
+	<style name="Widget.Silence.EditText.Password">
+		<item name="android:imeOptions">flagNoExtractUi|actionGo</item>
+		<item name="android:inputType">textPassword</item>
+	</style>
+
+	<style name="Widget.Silence.LinearLayout"/>
+
+	<style name="Widget.Silence.LinearLayout.Rotatable" parent="Widget.Silence.LinearLayout.Vertical"/>
+
+	<style name="Widget.Silence.LinearLayout.Vertical">
+		<item name="android:layout_width">fill_parent</item>
+		<item name="android:orientation">vertical</item>
+	</style>
+
+	<style name="Widget.Silence.LinearLayout.Horizontal">
+		<item name="android:orientation">horizontal</item>
+	</style>
+
+	<style name="Widget.Silence.RelativeLayout">
+		<item name="android:layout_width">fill_parent</item>
+		<item name="android:layout_height">fill_parent</item>
+	</style>
+
+	<style name="Widget.Silence.Button">
+		<item name="android:layout_width">fill_parent</item>
+		<item name="android:layout_height">wrap_content</item>
+		<item name="android:layout_margin">@dimen/spacing_small</item>
+		<item name="android:textColor">@color/text_button</item>
+		<item name="android:background">@drawable/bg_button</item>
+		<item name="android:padding">@dimen/spacing_small</item>
+		<item name="android:gravity">center</item>
+	</style>
+
+	<style name="Widget.Silence.__SubtleButton">
+		<item name="android:layout_width">fill_parent</item>
+		<item name="android:layout_height">wrap_content</item>
+		<item name="android:paddingLeft">@dimen/spacing_normal</item>
+		<item name="android:paddingRight">@dimen/spacing_normal</item>
+		<item name="android:paddingTop">@dimen/spacing_normal</item>
+		<item name="android:drawablePadding">@dimen/spacing_normal</item>
+		<item name="android:paddingBottom">0dp</item>
+		<item name="android:layout_marginTop">0dp</item>
+		<item name="android:layout_marginBottom">0dp</item>
+		<item name="android:layout_marginLeft">0dp</item>
+		<item name="android:layout_marginRight">0dp</item>
+		<item name="android:textSize">@dimen/text_large</item>
+		<item name="android:textStyle">bold</item>
+		<item name="android:textColor">@color/text_button</item>
+		<item name="android:drawableBottom">@drawable/divider</item>
+		<item name="android:background">@drawable/bg_subtle_button</item>
+		<item name="android:gravity">start|center_vertical</item>
+	</style>
+
+	<style name="Widget.Silence.SubtleButton" parent="Widget.Silence.__SubtleButton"/>
+
+	<style name="Widget.Silence.Drawer">
+		<item name="android:layout_width">@dimen/drawer_width</item>
+		<item name="android:layout_height">fill_parent</item>
+		<item name="android:orientation">vertical</item>
+		<item name="android:background">@color/silent_black</item>
+	</style>
+
+	<style name="Widget.Silence.ProgressBar">
+		<item name="android:layout_width">fill_parent</item>
+		<item name="android:layout_height">@dimen/progress_height</item>
+		<item name="android:max">100</item>
+		<item name="android:progress">50</item>
+		<item name="android:secondaryProgress">0</item>
+		<item name="android:indeterminateOnly">false</item>
+		<item name="android:progressDrawable">@drawable/progress</item>
+		<item name="android:indeterminateDrawable">@drawable/indeterminate_progress</item>
+	</style>
+
+	<style name="Widget.Silence.RelativeLayout.Overlay">
+		<item name="android:layout_height">wrap_content</item>
+		<item name="android:padding">@dimen/spacing_small</item>
+		<item name="android:gravity">center_vertical</item>
+		<item name="android:background">@drawable/bg_notify</item>
+	</style>
+
+	<style name="Widget.Silence.TextView.Progress">
+		<item name="android:textSize">@dimen/progress_text</item>
+		<item name="android:textColor">@color/silent_glass</item>
+		<item name="android:layout_alignParentRight">true</item>
+	</style>
+
+	<style name="Widget.Silence.LinearLayout.Vertical.Padded">
+		<item name="android:padding">@dimen/spacing_normal</item>
+	</style>
+
+	<style name="Widget.Silence.Divider">
+		<item name="android:layout_width">fill_parent</item>
+		<item name="android:layout_height">1px</item>
+		<item name="android:background">#88888888</item>
+	</style>
+
+	<style name="Widget.Silence.ScrollView">
+		<item name="android:layout_width">fill_parent</item>
+		<item name="android:layout_height">fill_parent</item>
+	</style>
+
+</resources>

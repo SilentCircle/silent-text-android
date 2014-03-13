@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:id="@+id/activity" style="@style/Widget.Silence.LinearLayout.Vertical" android:padding="@dimen/spacing_large" android:layout_gravity="center_vertical">
+  <TextView android:id="@+id/file_action_description" style="@style/Widget.Silence.TextView" android:text="@string/cannot_open_file_not_saved" android:layout_marginBottom="@dimen/spacing_large"/>
+  <LinearLayout style="@style/Widget.Silence.LinearLayout.Horizontal">
+    <TextView android:id="@+id/button_save" style="@style/Widget.Silence.TextView.Title" android:background="@drawable/bg_selectable" android:paddingRight="@dimen/spacing_large" android:drawablePadding="@dimen/spacing_large" android:drawableLeft="@drawable/ic_action_save" android:text="@string/save"/>
+    <TextView android:id="@+id/button_view" style="@style/Widget.Silence.TextView.Title" android:background="@drawable/bg_selectable" android:paddingRight="@dimen/spacing_large" android:drawablePadding="@dimen/spacing_large" android:drawableLeft="@drawable/ic_action_picture" android:text="@string/view"/>
+    <TextView android:id="@+id/button_share" style="@style/Widget.Silence.TextView.Title" android:background="@drawable/bg_selectable" android:paddingRight="@dimen/spacing_large" android:drawablePadding="@dimen/spacing_large" android:drawableLeft="@drawable/ic_action_share" android:text="@string/share"/>
+  </LinearLayout>
+</LinearLayout>

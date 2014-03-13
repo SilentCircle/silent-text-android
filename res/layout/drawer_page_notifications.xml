@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" style="@style/Widget.Silence.LinearLayout.Vertical" android:layout_height="wrap_content">
+  <CheckBox android:id="@+id/enable_notifications" style="@style/Widget.Silence.CheckBox" android:layout_margin="@dimen/spacing_normal" android:text="@string/enable_notifications"/>
+  <LinearLayout android:id="@+id/if_notifications_enabled" style="@style/Widget.Silence.LinearLayout.Vertical" android:paddingLeft="@dimen/spacing_large">
+    <CheckBox android:id="@+id/enable_notification_sound" style="@style/Widget.Silence.CheckBox" android:layout_margin="@dimen/spacing_normal" android:text="@string/enable_notification_sound"/>
+    <CheckBox android:id="@+id/enable_notification_vibrate" style="@style/Widget.Silence.CheckBox" android:layout_margin="@dimen/spacing_normal" android:text="@string/enable_notification_vibrate"/>
+  </LinearLayout>
+  <View style="@style/Widget.Silence.Divider"/>
+</LinearLayout>

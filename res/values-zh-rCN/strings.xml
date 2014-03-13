@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+	<string name="silent_circle"><xliff:g id="company_name">Silent Circle</xliff:g></string>
+	<string name="silent_text">Silent Text</string>
+	<string name="label_push_notifications"><xliff:g id="application_name">Silent Text</xliff:g> GCM 推送通知</string>
+	<string name="new_message">新消息</string>
+	<string name="copy">复制</string>
+	<string name="status">状态</string>
+	<string name="notifications">通知</string>
+	<string name="privacy">隐私</string>
+	<string name="license">许可</string>
+	<string name="about">关于</string>
+	<string name="privacy_statement">隐私声明</string>
+	<string name="license_information">许可信息</string>
+	<string name="terms_and_conditions">条款与细则</string>
+	<string name="advanced">高级</string>
+	<string name="compose_hint">在此输入您的消息</string>
+	<string name="default_hint">(默认)</string>
+	<string name="empty_conversation_list">您没有对话。</string>
+	<string name="empty_contacts">您没有联系人。</string>
+	<string name="burn_notice">黑名单</string>
+	<string name="burn">拉黑</string>
+	<string name="current_passcode">输入您当前的密码并继续。</string>
+	<string name="passcode_warning">重要提示！您的密码丢失后无法修复，因此请牢记密码。</string>
+	<string name="are_you_sure">您确定吗？</string>
+	<string name="cannot_be_undone">此行为无法消除。</string>
+	<string name="save_will_expose_data">保存此对话将对您选择的另一应用显示其全部信息。带附件或黑名单的消息不会输出。</string>
+	<string name="yes">是</string>
+	<string name="cannot_open_file_not_saved"><xliff:g id="application_name">Silent Text</xliff:g> 无法打开文件。要尝试进行查看或与另一应用分享，必须先将其保存到您的下载文件夹。</string>
+	<string name="cannot_open_file_saved"><xliff:g id="application_name">Silent Text</xliff:g> 无法打开文件。您已经将其保存到您的下载文件夹，通过使用外部应用，现在能够进行查看或分享。</string>
+	<string name="conversation">对话</string>
+	<string name="album_artwork">专辑封面</string>
+	<string name="activate">激活</string>
+	<string name="reset_keys">复位键</string>
+	<string name="unverified">未验证</string>
+	<string name="verified">已验证</string>
+	<string name="cancel">取消</string>
+	<string name="save">保存</string>
+	<string name="securing">正在保护<xliff:g id="ellipsis" example="…">&#8230;</xliff:g></string>
+	<string name="downloading">正在下载<xliff:g id="ellipsis" example="…">&#8230;</xliff:g></string>
+	<string name="decrypting">正在解码<xliff:g id="ellipsis" example="…">&#8230;</xliff:g></string>
+	<string name="waiting_for_connection">等待连接<xliff:g id="ellipsis" example="…">&#8230;</xliff:g></string>
+	<string name="view">查看</string>
+	<string name="share">分享</string>
+	<string name="share_location">分享位置</string>
+	<string name="send_to">发送到<xliff:g id="ellipsis" example="…">&#8230;</xliff:g></string>
+	<string name="cancelled">被注销</string>
+	<string name="username_unavailable"><xliff:g id="username">%1$s</xliff:g> 无效。</string>
+	<string name="conversation_with">与 <xliff:g id="username">%1$s</xliff:g>的对话</string>
+	<string name="refreshing_keys">刷新键<xliff:g id="ellipsis" example="…">&#8230;</xliff:g></string>
+	<string name="resend">重发</string>
+	<string name="resend_requested">请求重发</string>
+	<string name="progress_encrypting">正在加密<xliff:g id="ellipsis" example="…">&#8230;</xliff:g> <xliff:g id="progress_percent" example="32%">%1$d%%</xliff:g></string>
+	<string name="progress_preparing">正在准备<xliff:g id="ellipsis" example="…">&#8230;</xliff:g> <xliff:g id="progress_percent" example="32%">%1$d%%</xliff:g></string>
+	<string name="progress_uploading">正在上传<xliff:g id="ellipsis" example="…">&#8230;</xliff:g> <xliff:g id="progress_percent" example="32%">%1$d%%</xliff:g></string>
+	<string name="location">位置</string>
+	<string name="unlock">解锁</string>
+	<string name="autolock">自动锁定</string>
+	<string name="lock_application">锁定应用</string>
+	<string name="options">选项</string>
+	<string name="view_with">打开 <xliff:g id="file_name">%1$s</xliff:g></string>
+	<string name="share_with">分享 <xliff:g id="file_name">%1$s</xliff:g></string>
+	<string name="none">(无)</string>
+	<string name="saved_to">保存到 <xliff:g id="file_path">%1$s</xliff:g></string>
+	<string name="lock_after">自动锁定 <xliff:g id="lock_timeout" example="in 30 seconds">%1$s</xliff:g></string>
+	<string name="never_lock">不要自动锁定</string>
+	<string name="no_expiration">消息不到期</string>
+	<string name="messages_expire">消息到期 <xliff:g id="expire_timeout" example="in 1 minute">%1$s</xliff:g></string>
+	<string name="messages">消息</string>
+	<string name="passcode">密码</string>
+	<string name="new_passcode">新密码</string>
+	<string name="verify_passcode">验证</string>
+	<string name="notify_new_passcode_set">已设置新密码。</string>
+	<string name="notify_passcode_removed">密码已移除。</string>
+	<string name="activation_code">激活码</string>
+	<string name="activation_code_description">在 <xliff:g id="login_url">https://accounts.silentcircle.com</xliff:g>登陆或创建新账户。</string>
+	<string name="dont_have_an_account">没有账户？</string>
+	<string name="review_account_details">创建您的账户前，请核对下列信息是否正确。</string>
+	<string name="previous">前页</string>
+	<string name="next">下页</string>
+	<string name="finish">完成</string>
+	<string name="username">用户名</string>
+	<string name="password">密码</string>
+	<string name="login">登陆</string>
+	<string name="create_account">创建账户</string>
+	<string name="create_an_account">创建一个账户</string>
+	<string name="creating_account">正在创建账户<xliff:g id="ellipsis" example="…">&#8230;</xliff:g></string>
+	<string name="send">发送</string>
+	<string name="thumbnail">缩略图</string>
+	<string name="me">我</string>
+	<string name="sent">以发送</string>
+	<string name="received">已收到</string>
+	<string name="delivered">已提交</string>
+	<string name="send_receipts">发送阅读回执</string>
+	<string name="checkmark"><xliff:g id="checkmark">&#x2713;</xliff:g></string>
+	<string name="set_passcode">设置密码</string>
+	<string name="remove_passcode">移除密码</string>
+	<string name="change_passcode">更改密码</string>
+	<string name="deactivate">停用</string>
+	<string name="sending">正在发送<xliff:g id="ellipsis" example="…">&#8230;</xliff:g></string>
+	<string name="clear_history">清除记录</string>
+	<string name="save_conversation">保存对话</string>
+	<string name="share_from">共享自</string>
+	<string name="reconnect">重新连接</string>
+	<string name="search_hint">用户名</string>
+	<string name="message_timestamp"><xliff:g id="sent_or_received" example="Sent">%1$s</xliff:g>: <xliff:g id="time_sent_or_received">%2$s</xliff:g> <xliff:g id="delivered" example="Delivered">%3$s</xliff:g></string>
+	<string name="connected_to">连接到 <xliff:g id="device_name" example="Galaxy Nexus">%1$s</xliff:g></string>
+	<string name="online">在线</string>
+	<string name="offline">离线</string>
+	<string name="warning_format">警告: <xliff:g id="warning_message" example="Secrets mismatch">%1$s</xliff:g></string>
+	<string name="unread_messages">未读消息</string>
+	<string name="secure">安全性</string>
+	<string name="unlocked_title">解锁</string>
+	<string name="unlocked_description">轻敲锁定 <xliff:g id="application_name" example="Silent Text">%1$s</xliff:g>.</string>
+	<string name="attachment">附件</string>
+	<string name="unknown">未知</string>
+	<string name="verify_description_verified">为增加安全性，您已与收件人核对此消息。</string>
+	<string name="verify_description_unverified">为增加安全性，与收件人核对此消息。</string>
+	<string name="clear_history_description">您可能会一次清除该对话的所有消息，而不丢失您已经同此人建立的安全性。该行为立刻拉黑所有信息和附加文件，且不可撤销。</string>
+	<string name="reset_passcode_description">通过密码命令解锁和解码您的资料，设置该设备已锁定密码将帮助阻止您的私人对话越权存取。</string>
+	<string name="deactivate_description">这将停用 <xliff:g id="application_name">Silent Text</xliff:g> 应用。您的对话将被保存，您应选择稍后重新激活。</string>
+	<string name="enable_notifications">启用通知</string>
+	<string name="enable_notification_sound">播放声音</string>
+	<string name="enable_notification_vibrate">震动</string>
+	<string name="enable_screenshots">启用截屏</string>
+	<string name="restart_required">重启后将应用您的更改。</string>
+	<string name="someone">某人</string>
+	<string name="silence">无消息需要显示。</string>
+	<string name="application_locked">应用已锁定</string>
+	<string name="copied_to_clipboard">复制到剪贴板</string>
+	<string name="expires_n">有效期 <xliff:g id="time_remaining" example="in 23 seconds">%1$s</xliff:g></string>
+	<string name="unable_to_display_file">无法显示此文件</string>
+	<string name="unable_to_display_image">无法显示此图片</string>
+	<string name="not_downloaded">未下载</string>
+	<string name="create_username">选择用户名</string>
+	<string name="create_password">创建密码</string>
+	<string name="required_email_address">需要备用电邮地址对您的账户进行恢复。</string>
+	<string name="required_username">您的用户名就是其他人怎样  联系到您 <xliff:g id="company_name">Silent Circle</xliff:g> 网络。</string>
+	<string name="required_password">选择强效密码。这将避免越权使用您的账户。</string>
+	<string name="optional_personal_information">本信息完全是一个备选项目，并决定您的账户将怎样在目录列表中显示。</string>
+	<string name="email_address">电邮地址</string>
+	<string name="alternate_email_address">备用电邮地址</string>
+	<string name="personal_information">个人信息</string>
+	<string name="login_information">登录信息</string>
+	<string name="first_name">名</string>
+	<string name="last_name">姓</string>
+	<string name="tap_to_reveal">(轻敲可显示)</string>
+	<string name="password_not_shown">(密码不显示)</string>
+	<string name="accept_terms">我已阅读隐私声明并接受合同条款</string>
+	<string name="accept">我接受</string>
+	<string name="terms">条款</string>
+	<string name="permission_read">阅读安全消息</string>
+	<string name="permission_identify_senders">阅读即将收到的安全消息的发送人姓名</string>
+	<string name="permission_write">书写安全消息</string>
+	<string name="permission_access_accounts">进入您的 <xliff:g id="company_name">Silent Circle</xliff:g> 账户</string>
+	<string name="device_name">设备名称</string>
+	<string name="android_version">安卓版</string>
+	<string name="application_version">应用版</string>
+	<string name="build_version_label">构建版本</string>
+	<string name="environment">环境</string>
+	<string name="xmpp_host_label">XMPP 主机</string>
+	<string name="xmpp_port_label">XMPP 端口</string>
+	<string name="xmpp_status_label">XMPP 状态</string>
+	<string name="not_connected">未连接</string>
+	<string name="performing_srv_lookup">执行SRV查找</string>
+	<string name="connecting">正在连接</string>
+	<string name="connected">已连接</string>
+	<string name="commit">提交</string>
+	<string name="date">日期</string>
+	<string name="error_activity_not_found">没有应用显示此活动。</string>
+	<string name="error_activity_not_found_for_location">没有应用显示地图位置。</string>
+	<string name="error_format">错误: <xliff:g id="error_message" example="Protocol error">%1$s</xliff:g></string>
+	<string name="error_unknown">发生意外错误。请再次尝试。</string>
+	<string name="error_username_required">您必须输入用户名。</string>
+	<string name="error_password_required">您必须输入密码。</string>
+	<string name="error_accept_terms">您必须接受合同条款以创建新账户。</string>
+	<string name="error_invalid_activation_code">您输入的激活码无效。</string>
+	<string name="error_incorrect_passcode">您输入的密码错误。</string>
+	<string name="error_passcode_mismatch">您输入的密码不匹配。</string>
+	<string name="error_invalid_passcode">密码必须包含至少3个字符。</string>
+	<string name="error_invalid_credentials">您输入的验证信息无效。</string>
+	<string name="error_invalid_api_key">您的验证信息已过期。请输入新的激活码。</string>
+	<string name="error_not_connected">未连接</string>
+	<string name="error">错误</string>
+	<string name="error_large_file">您选择的文件太大。</string>
+	<string name="warning">警告</string>
+	<string name="warning_large_file">文件传输可能需要一些时间，而且有可能失败。仍然要进行吗？</string>
+	<string name="partner_welcome">欢迎来到 <xliff:g id="company_name" example="Silent Circle">%1$s</xliff:g> 和 <xliff:g id="partner" example="ACME">%2$s</xliff:g>.</string>
+	<string name="partner_account_creation_prologue">作为 <xliff:g id="partner" example="ACME">%2$s</xliff:g> 客户，您享有, <xliff:g id="free_trial_period" example="12 months">%3$s</xliff:g> 免费进入 <xliff:g id="company_name" example="Silent Circle">%1$s</xliff:g>的加密通信服务的.</string>
+	<string name="partner_free_trial_period">12个月</string>
+</resources>

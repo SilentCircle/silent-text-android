@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android" style="@style/Widget.Silence.ScrollView">
+	<LinearLayout style="@style/Widget.Silence.LinearLayout.Vertical" android:layout_height="wrap_content">
+		<LinearLayout style="@style/Widget.Silence.LinearLayout.Vertical">
+			<LinearLayout style="@style/Widget.Silence.LinearLayout.Vertical.Padded">
+				<TextView style="@style/Widget.Silence.TextView.Title" android:text="@string/device_name"/>
+				<EditText android:id="@+id/device_name_value" style="@style/Widget.Silence.EditText" android:hint="@string/default_hint" android:imeOptions="actionDone|flagNoExtractUi" android:inputType="textCapWords|textNoSuggestions"/>
+			</LinearLayout>
+			<View style="@style/Widget.Silence.Divider"/>
+		</LinearLayout>
+		<LinearLayout style="@style/Widget.Silence.LinearLayout.Vertical">
+			<LinearLayout style="@style/Widget.Silence.LinearLayout.Vertical.Padded">
+				<TextView style="@style/Widget.Silence.TextView.Title" android:text="@string/android_version"/>
+				<TextView android:id="@+id/android_version_value" style="@style/Widget.Silence.TextView" android:text="@string/sample_version"/>
+			</LinearLayout>
+			<View style="@style/Widget.Silence.Divider"/>
+		</LinearLayout>
+		<LinearLayout style="@style/Widget.Silence.LinearLayout.Vertical">
+			<LinearLayout android:id="@+id/application_version" style="@style/Widget.Silence.LinearLayout.Vertical.Padded">
+				<TextView style="@style/Widget.Silence.TextView.Title" android:text="@string/application_version"/>
+				<TextView android:id="@+id/application_version_value" style="@style/Widget.Silence.TextView" android:text="@string/sample_version"/>
+			</LinearLayout>
+			<View style="@style/Widget.Silence.Divider"/>
+		</LinearLayout>
+		<LinearLayout style="@style/Widget.Silence.LinearLayout.Vertical">
+			<LinearLayout style="@style/Widget.Silence.LinearLayout.Vertical.Padded">
+				<TextView style="@style/Widget.Silence.TextView.Title" android:text="@string/environment"/>
+				<TextView style="@style/Widget.Silence.TextView" android:text="@string/build_environment"/>
+			</LinearLayout>
+			<View style="@style/Widget.Silence.Divider"/>
+		</LinearLayout>
+		<LinearLayout style="@style/Widget.Silence.LinearLayout.Vertical">
+			<LinearLayout style="@style/Widget.Silence.LinearLayout.Vertical.Padded">
+				<TextView style="@style/Widget.Silence.TextView.Title" android:text="@string/build_version_label"/>
+				<TextView style="@style/Widget.Silence.TextView" android:text="@string/build_version"/>
+			</LinearLayout>
+			<View style="@style/Widget.Silence.Divider"/>
+		</LinearLayout>
+		<LinearLayout style="@style/Widget.Silence.LinearLayout.Vertical">
+			<LinearLayout style="@style/Widget.Silence.LinearLayout.Vertical.Padded">
+				<TextView style="@style/Widget.Silence.TextView.Title" android:text="@string/commit"/>
+				<TextView style="@style/Widget.Silence.TextView" android:text="@string/build_commit"/>
+			</LinearLayout>
+			<View style="@style/Widget.Silence.Divider"/>
+		</LinearLayout>
+		<LinearLayout style="@style/Widget.Silence.LinearLayout.Vertical">
+			<LinearLayout style="@style/Widget.Silence.LinearLayout.Vertical.Padded">
+				<TextView style="@style/Widget.Silence.TextView.Title" android:text="@string/date"/>
+				<TextView style="@style/Widget.Silence.TextView" android:text="@string/build_date"/>
+			</LinearLayout>
+			<View style="@style/Widget.Silence.Divider"/>
+		</LinearLayout>
+		<LinearLayout android:id="@+id/xmpp_host" style="@style/Widget.Silence.LinearLayout.Vertical">
+			<LinearLayout style="@style/Widget.Silence.LinearLayout.Vertical.Padded">
+				<TextView style="@style/Widget.Silence.TextView.Title" android:text="@string/xmpp_host_label"/>
+				<TextView android:id="@+id/xmpp_host_value" style="@style/Widget.Silence.TextView" android:text="@string/sample_domain"/>
+			</LinearLayout>
+			<View style="@style/Widget.Silence.Divider"/>
+		</LinearLayout>
+		<LinearLayout android:id="@+id/xmpp_port" style="@style/Widget.Silence.LinearLayout.Vertical">
+			<LinearLayout style="@style/Widget.Silence.LinearLayout.Vertical.Padded">
+				<TextView style="@style/Widget.Silence.TextView.Title" android:text="@string/xmpp_port_label"/>
+				<TextView android:id="@+id/xmpp_port_value" style="@style/Widget.Silence.TextView" android:text="@string/sample_port"/>
+			</LinearLayout>
+			<View style="@style/Widget.Silence.Divider"/>
+		</LinearLayout>
+		<LinearLayout style="@style/Widget.Silence.LinearLayout.Vertical">
+			<LinearLayout style="@style/Widget.Silence.LinearLayout.Vertical.Padded">
+				<TextView style="@style/Widget.Silence.TextView.Title" android:text="@string/xmpp_status_label"/>
+				<TextView android:id="@+id/xmpp_status" style="@style/Widget.Silence.TextView" android:text="@string/offline"/>
+			</LinearLayout>
+			<View style="@style/Widget.Silence.Divider"/>
+		</LinearLayout>
+		<Button style="@style/Widget.Silence.Button" android:drawableLeft="@drawable/ic_action_refresh" android:id="@+id/reconnect" android:text="@string/reconnect"/>
+	</LinearLayout>
+</ScrollView>

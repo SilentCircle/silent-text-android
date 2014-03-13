@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+  <item
+    android:id="@+id/remove_passcode"
+    android:title="@string/remove_passcode"
+    android:icon="@drawable/ic_action_delete"
+    android:orderInCategory="1"
+    android:showAsAction="always"/>
+  <item
+    android:id="@+id/set_passcode"
+    android:title="@string/set_passcode"
+    android:icon="@drawable/ic_action_send"
+    android:orderInCategory="2"
+    android:showAsAction="always"/>
+</menu>

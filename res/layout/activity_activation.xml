@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="fill_parent" android:layout_height="fill_parent" android:gravity="center">
+	<LinearLayout android:id="@+id/activation" style="@style/Widget.Silence.LinearLayout.Vertical" android:layout_height="fill_parent" android:layout_width="fill_parent" android:padding="@dimen/spacing_large" android:background="@drawable/bg_notify_default" android:layout_margin="@dimen/spacing_large" android:gravity="center_vertical">
+		<TextView android:id="@+id/partner_welcome" style="@style/Widget.Silence.TextView.PartnerMessaging" android:text="@string/partner_welcome"/>
+		<LinearLayout style="@style/Widget.Silence.LinearLayout.Rotatable" android:gravity="center" android:layout_width="fill_parent">
+			<ImageView android:id="@+id/logo" style="@style/Widget.Silence.ImageView" android:layout_width="@dimen/avatar_large" android:layout_height="@dimen/avatar_large" android:src="@drawable/logo_silentcircle" android:scaleType="fitCenter" android:contentDescription="@string/silent_circle"/>
+			<LinearLayout style="@style/Widget.Silence.LinearLayout.Vertical">
+				<EditText android:id="@+id/username" style="@style/Widget.Silence.EditText" android:hint="@string/username" android:inputType="textNoSuggestions|textEmailAddress"/>
+				<EditText android:id="@+id/password" style="@style/Widget.Silence.EditText.Password" android:hint="@string/password"/>
+			</LinearLayout>
+		</LinearLayout>
+		<TextView style="@style/Widget.Silence.TextView.Error" android:id="@+id/error" android:layout_width="fill_parent" android:layout_height="wrap_content" android:gravity="center_horizontal"/>
+		<LinearLayout style="@style/Widget.Silence.LinearLayout.Horizontal" android:layout_width="fill_parent" android:gravity="center_vertical" android:layout_marginTop="@dimen/spacing_large">
+			<Button android:id="@+id/button_new_account" style="@style/Widget.Silence.SubtleButton" android:drawableLeft="@drawable/ic_action_about" android:text="@string/create_account" android:drawableBottom="@null" android:layout_weight="1"/>
+			<Button android:id="@+id/button_login" style="@style/Widget.Silence.SubtleButton" android:drawableRight="@drawable/ic_action_send" android:text="@string/login" android:gravity="center_vertical|right" android:drawableBottom="@null" android:layout_weight="1"/>
+		</LinearLayout>
+	</LinearLayout>
+	<include layout="@layout/indeterminate_progress" android:visibility="gone" android:id="@+id/progress"/>
+</RelativeLayout>

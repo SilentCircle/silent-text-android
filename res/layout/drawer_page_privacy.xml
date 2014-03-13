@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" style="@style/Widget.Silence.LinearLayout.Vertical">
+  <TextView style="@style/Widget.Silence.TextView" android:text="@string/deactivate_description" android:padding="@dimen/spacing_normal"/>
+  <Button android:drawableLeft="@drawable/ic_action_exit" android:id="@+id/deactivate" style="@style/Widget.Silence.SubtleButton" android:text="@string/deactivate"/>
+</LinearLayout>

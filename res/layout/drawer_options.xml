@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<com.silentcircle.silenttext.view.OptionsDrawer xmlns:android="http://schemas.android.com/apk/res/android" style="@style/Widget.Silence.Drawer">
+  <LinearLayout style="@style/Widget.Silence.LinearLayout.Vertical">
+    <TextView style="@style/Widget.Silence.TextView.Title.ActionBar" android:text="@string/notifications"/>
+    <include layout="@layout/drawer_page_notifications"/>
+    <TextView style="@style/Widget.Silence.TextView.Title.ActionBar" android:text="@string/privacy"/>
+    <include layout="@layout/drawer_page_passcode"/>
+    <TextView style="@style/Widget.Silence.TextView.Title.ActionBar" android:text="@string/deactivate"/>
+    <include layout="@layout/drawer_page_privacy"/>
+    <TextView style="@style/Widget.Silence.TextView.Title.ActionBar" android:text="@string/about"/>
+    <include layout="@layout/drawer_page_about"/>
+  </LinearLayout>
+</com.silentcircle.silenttext.view.OptionsDrawer>

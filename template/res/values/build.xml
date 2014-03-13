@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+  <string name="build_environment">$build.environment$</string>
+  <string name="build_commit">$build.commit$</string>
+  <string name="build_version">$build.version$</string>
+  <string name="build_date">$build.date$</string>
+  <string name="build_scloud_url">$build.scloud_url$</string>
+  <string name="build_gcm_sender">$build.gcm_sender$</string>
+  <string name="build_partners">$build.partners$</string>
+  <item type="bool" name="build_debug" format="boolean">$build.debug$</item>
+</resources>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools" android:layout_width="fill_parent" android:layout_height="fill_parent" tools:context=".activity.UnlockActivity">
+  <LinearLayout style="@style/Widget.Silence.LinearLayout.Rotatable" android:layout_width="fill_parent" android:layout_height="fill_parent">
+    <ImageView style="@style/ActivationLogo" android:contentDescription="@string/silent_circle" android:layout_weight="1"/>
+    <LinearLayout style="@style/Widget.Silence.LinearLayout.Vertical" android:layout_weight="1" android:layout_height="fill_parent" android:gravity="center_vertical">
+      <EditText android:id="@+id/passcode" style="@style/Widget.Silence.EditText.Password" android:hint="@string/new_passcode" android:drawableLeft="@drawable/ic_action_secure" android:imeOptions="actionNext">
+        <requestFocus/>
+      </EditText>
+      <EditText android:id="@+id/passcode_verify" style="@style/Widget.Silence.EditText.Password" android:hint="@string/verify_passcode" android:drawableLeft="@drawable/ic_action_secure"/>
+      <TextView style="@style/Widget.Silence.TextView" android:text="@string/passcode_warning" android:layout_margin="@dimen/spacing_large"/>
+    </LinearLayout>
+  </LinearLayout>
+  <TextView style="@style/Widget.Silence.TextView.Error" android:id="@+id/error"/>
+  <include layout="@layout/indeterminate_progress" android:visibility="gone" android:id="@+id/progress"/>
+</RelativeLayout>

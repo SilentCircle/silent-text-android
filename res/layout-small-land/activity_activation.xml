@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="fill_parent" android:layout_height="fill_parent" android:gravity="center">
+	<RelativeLayout android:id="@+id/activation" style="@style/Widget.Silence.RelativeLayout" android:layout_height="fill_parent" android:layout_width="fill_parent">
+		<TextView android:id="@+id/partner_welcome" style="@style/Widget.Silence.TextView.PartnerMessaging" android:text="@string/partner_welcome"/>
+		<LinearLayout android:layout_width="fill_parent" android:layout_height="fill_parent" android:layout_below="@+id/partner_welcome" android:layout_above="@+id/buttons" style="@style/Widget.Silence.LinearLayout.Horizontal" android:padding="@dimen/spacing_large" android:gravity="center_vertical">
+			<ImageView android:id="@+id/logo" style="@style/Widget.Silence.ImageView" android:layout_width="@dimen/avatar_large" android:layout_height="fill_parent" android:src="@drawable/logo_silentcircle" android:scaleType="fitCenter" android:contentDescription="@string/silent_circle"/>
+			<LinearLayout android:id="@+id/form" style="@style/Widget.Silence.LinearLayout.Vertical">
+				<EditText android:id="@+id/username" style="@style/Widget.Silence.EditText" android:hint="@string/username" android:inputType="textNoSuggestions|textEmailAddress" android:layout_marginBottom="0dp"/>
+				<EditText android:id="@+id/password" style="@style/Widget.Silence.EditText.Password" android:hint="@string/password"/>
+			</LinearLayout>
+		</LinearLayout>
+		<View android:layout_above="@+id/buttons" android:layout_width="fill_parent" android:layout_height="1dp" android:background="@color/silent_dark_orange"/>
+		<LinearLayout android:id="@+id/buttons" android:layout_alignParentBottom="true" style="@style/Widget.Silence.LinearLayout.Horizontal" android:layout_width="fill_parent" android:gravity="center_vertical" android:background="@color/silent_black">
+			<Button android:id="@+id/button_new_account" style="@style/Widget.Silence.SubtleButton" android:drawableLeft="@drawable/ic_action_about" android:text="@string/create_account" android:drawableBottom="@null" android:layout_weight="1"/>
+			<Button android:id="@+id/button_login" style="@style/Widget.Silence.SubtleButton" android:drawableRight="@drawable/ic_action_send" android:text="@string/login" android:gravity="center_vertical|right" android:drawableBottom="@null" android:layout_weight="1"/>
+		</LinearLayout>
+		<TextView style="@style/Widget.Silence.TextView.Error" android:id="@+id/error" android:layout_width="fill_parent" android:layout_height="wrap_content" android:gravity="center_horizontal"/>
+	</RelativeLayout>
+	<include layout="@layout/indeterminate_progress" android:visibility="gone" android:id="@+id/progress"/>
+</RelativeLayout>

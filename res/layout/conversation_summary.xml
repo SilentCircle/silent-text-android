@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<com.silentcircle.silenttext.view.ConversationView
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  style="@style/ConversationSummary">
+
+  <com.silentcircle.silenttext.view.AvatarView
+    style="@style/ConversationAvatar"
+    android:id="@+id/avatar"
+    android:src="@drawable/ic_avatar_placeholder"
+    android:contentDescription="@string/sample_sender"/>
+  
+  <RelativeLayout
+    style="@style/ConversationSummaryContent"
+    android:id="@+id/summary">
+
+    <TextView
+      style="@style/ConversationAlias"
+      android:id="@+id/alias"
+      android:text="@string/sample_recipient"/>
+
+    <TextView
+      style="@style/ConversationDevice"
+      android:id="@+id/device"
+      android:text="@string/sample_device"/>
+
+    <TextView
+      style="@style/ConversationSnippet"
+      android:id="@+id/snippet"
+      android:text="@string/sample_message"/>
+
+    <TextView
+      style="@style/ConversationTimestamp"
+      android:id="@+id/timestamp"
+      android:text="@string/message_timestamp"/>
+    
+    <ImageView
+      style="@style/ConversationSecureIcon"
+      android:id="@+id/secure_icon"
+      android:contentDescription="@string/secure"/>
+    
+    <ImageView
+      style="@style/ConversationCountIcon"
+      android:id="@+id/count_icon"
+      android:contentDescription="@string/unread_messages"/>
+
+    <TextView
+      style="@style/ConversationCount"
+      android:id="@+id/count"
+      android:text="@string/sample_count"/>
+
+  </RelativeLayout>
+
+</com.silentcircle.silenttext.view.ConversationView>

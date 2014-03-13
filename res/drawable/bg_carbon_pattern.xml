@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+  <item>
+
+    <bitmap
+      android:src="@drawable/bg_carbon"
+      android:tileMode="repeat"/>
+
+  </item>
+
+  <item>
+
+    <shape>
+      <gradient
+        android:endColor="#55000000"
+        android:gradientRadius="500"
+        android:startColor="#00888888"
+        android:type="radial"/>
+    </shape>
+
+  </item>
+
+</layer-list>

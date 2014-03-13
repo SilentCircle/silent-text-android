@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+
+  <style name="Message">
+    <item name="android:layout_width">fill_parent</item>
+    <item name="android:layout_height">wrap_content</item>
+    <item name="android:padding">@dimen/spacing_tiny</item>
+    <item name="android:gravity">center_vertical</item>
+    <item name="android:background">@drawable/bg_selectable</item>
+  </style>
+
+  <style name="MessageExtras">
+    <item name="android:layout_width">wrap_content</item>
+    <item name="android:layout_height">wrap_content</item>
+    <item name="android:orientation">horizontal</item>
+    <item name="android:layout_alignParentRight">true</item>
+    <item name="android:layout_centerVertical">true</item>
+  </style>
+
+  <style name="MessageExtra">
+    <item name="android:layout_width">44dp</item>
+    <item name="android:layout_height">44dp</item>
+    <item name="android:scaleType">centerInside</item>
+    <item name="android:background">@drawable/bg_selectable</item>
+  </style>
+
+  <style name="MessageExtra.Burn">
+    <item name="android:src">@drawable/ic_burn_selected</item>
+  </style>
+
+  <style name="MessageExtra.Location">
+    <item name="android:src">@drawable/ic_location_selected</item>
+  </style>
+
+  <style name="MessageExtra.Thumbnail">
+    <item name="android:src">@drawable/ic_avatar_placeholder</item>
+    <item name="android:scaleType">fitCenter</item>
+    <item name="android:padding">@dimen/spacing_small</item>
+    <item name="android:cropToPadding">true</item>
+    <item name="android:layout_width">80dp</item>
+    <item name="android:layout_height">60dp</item>
+  </style>
+
+  <style name="MessageExtra.Resend">
+    <item name="android:src">@drawable/ic_action_send</item>
+  </style>
+
+  <style name="_MessageText">
+    <item name="android:layout_width">fill_parent</item>
+    <item name="android:layout_height">wrap_content</item>
+    <item name="android:textColor">@color/silent_white</item>
+    <item name="android:textColorLink">@color/text_link</item>
+    <item name="android:textSize">@dimen/text_xlarge</item>
+    <item name="android:text">@string/sample_message</item>
+    <item name="android:layout_toLeftOf">@+id/message_extras</item>
+  </style>
+
+  <style name="MessageText" parent="_MessageText"/>
+
+  <style name="MessageTime">
+    <item name="android:layout_width">wrap_content</item>
+    <item name="android:layout_height">wrap_content</item>
+    <item name="android:layout_below">@+id/message_text</item>
+    <item name="android:textColor">@color/silent_glass</item>
+    <item name="android:textSize">@dimen/text_small</item>
+    <item name="android:text">@string/message_timestamp</item>
+  </style>
+
+</resources>

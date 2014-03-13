@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+
+  <style name="_Theme.Silent" parent="Theme.Sherlock">
+    <item name="android:windowBackground">@drawable/bg_carbon_pattern</item>
+    <item name="actionBarStyle">@style/Widget.Silent.ActionBar</item>
+    <item name="actionModeBackground">@drawable/bg_actionbar</item>
+    <item name="selectableItemBackground">@drawable/bg_selectable</item>
+    <item name="actionDropDownStyle">@style/Widget.Silent.Spinner.DropDown.ActionBar</item>
+    <item name="popupMenuStyle">@style/Widget.Silent.PopupMenu</item>
+    <item name="searchViewTextField">@drawable/bg_text_input</item>
+    <item name="searchViewTextFieldRight">@drawable/bg_text_input_right</item>
+    <item name="dropDownListViewStyle">@style/Widget.Silent.ListView.DropDown</item>
+    <item name="android:dropDownListViewStyle">@style/Widget.Silent.ListView.DropDown</item>
+  </style>
+
+  <style name="Theme.Silent" parent="_Theme.Silent"/>
+  
+  <style name="Theme.Silent.Fullscreen">
+    <item name="windowActionBarOverlay">true</item>
+  </style>
+  
+  <style name="Theme.Silent.NoActionBar" parent="Theme.Sherlock.NoActionBar">
+    <item name="android:windowBackground">@drawable/bg_carbon_pattern</item>
+  </style>
+
+  <style name="Widget.Silent.ActionBar" parent="Widget.Sherlock.ActionBar">
+    <item name="background">@drawable/bg_actionbar</item>
+    <item name="android:background">@drawable/bg_actionbar</item>
+  </style>
+
+  <style name="Widget.Silent.Spinner.DropDown.ActionBar" parent="Widget.Sherlock.Spinner.DropDown.ActionBar">
+    <item name="android:dropDownSelector">@drawable/bg_selectable</item>
+  </style>
+
+  <style name="Widget.Silent.PopupMenu" parent="Widget.Sherlock.PopupMenu"/>
+
+  <style name="Widget.Silent.ListView.DropDown" parent="Widget.Sherlock.ListView.DropDown">
+    <item name="android:listSelector">@drawable/bg_selectable</item>
+  </style>
+
+</resources>

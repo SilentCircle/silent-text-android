@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+    <color name="silent_red_selected">#55ef3d44</color>
+    <color name="silent_red">#ffef3d44</color>
+    <color name="silent_dark_red">#ff880000</color>
+    <color name="silent_dark_orange">#ffa42206</color>
+    <color name="silent_orange">#ffe46226</color>
+    <color name="silent_yellow">#fff7c16d</color>
+    <color name="silent_white_disabled">#55ffffff</color>
+    <color name="silent_white">#ddffffff</color>
+    <color name="silent_glass">#88ffffff</color>
+    <color name="silent_black">#ff111111</color>
+    <color name="silent_darken">#22000000</color>
+    <color name="silent_translucent_black">#88000000</color>
+    <color name="silent_translucent_dark_green">#88113311</color>
+    <color name="silent_translucent_light_green">#8800ff00</color>
+    <color name="silent_translucent_red">#88ff0000</color>
+    <color name="silent_translucent_grey">#88888888</color>
+    <color name="silent_muted_dark_orange">#55a42206</color>
+    <color name="silent_grease">#ff222222</color>
+	<color name="silent_blue">#ff00a7cf</color>
+</resources>

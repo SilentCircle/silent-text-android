@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android" style="@style/Widget.Silence.RelativeLayout">
+	<ScrollView style="@style/Widget.Silence.ScrollView" android:layout_above="@+id/navigation">
+		<LinearLayout style="@style/Widget.Silence.LinearLayout.Vertical">
+			<TextView style="@style/Widget.Silence.TextView" android:text="@string/review_account_details" android:layout_marginLeft="@dimen/spacing_xlarge" android:layout_marginRight="@dimen/spacing_xlarge" android:layout_marginTop="@dimen/spacing_large"/>
+			<LinearLayout style="@style/Widget.Silence.LinearLayout.Vertical" android:layout_margin="@dimen/spacing_large" android:padding="@dimen/spacing_normal" android:background="@drawable/bg_notify_default">
+				<LinearLayout style="@style/Widget.Silence.LinearLayout.Horizontal" android:layout_width="fill_parent" android:padding="@dimen/spacing_normal">
+					<TextView style="@style/Widget.Silence.TextView.Title" android:text="@string/username" android:layout_weight="1"/>
+					<TextView android:id="@+id/username" style="@style/Widget.Silence.TextView" android:text="@string/sample_username" android:layout_weight="1" android:gravity="right|center_vertical"/>
+				</LinearLayout>
+				<View style="@style/Widget.Silence.Divider"/>
+				<ViewSwitcher android:id="@+id/password_reveal" android:layout_width="fill_parent" android:layout_height="wrap_content">
+					<LinearLayout style="@style/Widget.Silence.LinearLayout.Horizontal" android:layout_width="fill_parent" android:padding="@dimen/spacing_normal">
+						<TextView style="@style/Widget.Silence.TextView.Title" android:text="@string/password" android:layout_weight="1"/>
+						<TextView style="@style/Widget.Silence.TextView" android:textColor="@color/text_link" android:text="@string/tap_to_reveal"/>
+					</LinearLayout>
+					<LinearLayout style="@style/Widget.Silence.LinearLayout.Horizontal" android:layout_width="fill_parent" android:padding="@dimen/spacing_normal">
+						<TextView style="@style/Widget.Silence.TextView.Title" android:text="@string/password" android:layout_weight="1"/>
+						<TextView android:id="@+id/password" style="@style/Widget.Silence.TextView" android:text="@string/password_not_shown"/>
+					</LinearLayout>
+				</ViewSwitcher>
+				<View style="@style/Widget.Silence.Divider"/>
+				<LinearLayout style="@style/Widget.Silence.LinearLayout.Horizontal" android:layout_width="fill_parent" android:padding="@dimen/spacing_normal">
+					<TextView style="@style/Widget.Silence.TextView.Title" android:text="@string/email_address" android:layout_weight="1"/>
+					<TextView android:id="@+id/email" style="@style/Widget.Silence.TextView" android:text="@string/sample_email_address" android:layout_weight="1" android:gravity="right|center_vertical"/>
+				</LinearLayout>
+				<View style="@style/Widget.Silence.Divider"/>
+				<LinearLayout style="@style/Widget.Silence.LinearLayout.Horizontal" android:layout_width="fill_parent" android:padding="@dimen/spacing_normal">
+					<TextView style="@style/Widget.Silence.TextView.Title" android:text="@string/first_name" android:layout_weight="1"/>
+					<TextView android:id="@+id/first_name" style="@style/Widget.Silence.TextView" android:text="@string/sample_first_name" android:layout_weight="1" android:gravity="right|center_vertical"/>
+				</LinearLayout>
+				<View style="@style/Widget.Silence.Divider"/>
+				<LinearLayout style="@style/Widget.Silence.LinearLayout.Horizontal" android:layout_width="fill_parent" android:padding="@dimen/spacing_normal">
+					<TextView style="@style/Widget.Silence.TextView.Title" android:text="@string/last_name" android:layout_weight="1"/>
+					<TextView android:id="@+id/last_name" style="@style/Widget.Silence.TextView" android:text="@string/sample_last_name" android:layout_weight="1" android:gravity="right|center_vertical"/>
+				</LinearLayout>
+			</LinearLayout>
+			<CheckBox android:id="@+id/accept_terms" style="@style/Widget.Silence.CheckBox" android:text="@string/accept_terms" android:layout_margin="@dimen/spacing_normal"/>
+			<LinearLayout style="@style/Widget.Silence.LinearLayout.Horizontal">
+				<Button android:id="@+id/button_privacy" style="@style/Widget.Silence.SubtleButton" android:text="@string/privacy" android:drawableLeft="@drawable/ic_action_page" android:layout_weight="1"/>
+				<Button android:id="@+id/button_terms" style="@style/Widget.Silence.SubtleButton" android:text="@string/terms" android:drawableLeft="@drawable/ic_action_page" android:layout_weight="1"/>
+			</LinearLayout>
+		</LinearLayout>
+	</ScrollView>
+	<include android:id="@+id/navigation" layout="@layout/account_creation_navigation" android:layout_height="wrap_content" android:layout_width="fill_parent" android:layout_alignParentBottom="true"/>
+</RelativeLayout>			

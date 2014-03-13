@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+
+  <style name="_ConversationMessages">
+    <item name="android:layout_width">fill_parent</item>
+    <item name="android:layout_height">fill_parent</item>
+    <item name="android:stackFromBottom">true</item>
+    <item name="android:listSelector">@android:color/transparent</item>
+    <item name="android:divider">@android:color/transparent</item>
+    <item name="android:cacheColorHint">@android:color/transparent</item>
+    <item name="android:scrollingCache">false</item>
+    <item name="android:transcriptMode">normal</item>
+  </style>
+  
+  <style name="ConversationMessages" parent="_ConversationMessages">
+    <item name="android:choiceMode">multipleChoice</item>
+  </style>
+  
+  <style name="ConversationUpload">
+    <item name="android:layout_width">fill_parent</item>
+    <item name="android:layout_height">wrap_content</item>
+  </style>
+
+  <style name="_ConversationList">
+    <item name="android:layout_width">fill_parent</item>
+    <item name="android:layout_height">fill_parent</item>
+    <item name="android:cacheColorHint">@android:color/transparent</item>
+    <item name="android:scrollingCache">false</item>
+    <item name="android:listSelector">@drawable/bg_selectable</item>
+  </style>
+  
+  <style name="ConversationList" parent="_ConversationList">
+    <item name="android:choiceMode">multipleChoice</item>
+  </style>
+  
+  <style name="_ConversationSummary">
+    <item name="android:layout_width">fill_parent</item>
+    <item name="android:layout_height">wrap_content</item>
+    <item name="android:background">@drawable/bg_notify</item>
+  </style>
+  
+  <style name="ConversationSummary" parent="_ConversationSummary"/>
+  
+  <style name="ConversationSummaryContent">
+    <item name="android:duplicateParentState">true</item>
+    <item name="android:layout_width">fill_parent</item>
+    <item name="android:layout_height">wrap_content</item>
+    <item name="android:layout_toRightOf">@+id/avatar</item>
+    <item name="android:padding">@dimen/spacing_normal</item>
+  </style>
+  
+  <style name="ConversationAvatar">
+    <item name="android:layout_width">64dp</item>
+    <item name="android:layout_height">wrap_content</item>
+    <item name="android:scaleType">centerCrop</item>
+    <item name="android:layout_alignTop">@+id/summary</item>
+    <item name="android:layout_alignBottom">@+id/summary</item>
+  </style>
+
+  <style name="ConversationAlias">
+    <item name="android:layout_width">fill_parent</item>
+    <item name="android:layout_height">wrap_content</item>
+    <item name="android:layout_toLeftOf">@+id/timestamp</item>
+    <item name="android:layout_above">@+id/snippet</item>
+    <item name="android:ellipsize">marquee</item>
+    <item name="android:textSize">@dimen/text_xlarge</item>
+    <item name="android:textColor">@color/silent_white</item>
+  </style>
+
+  <style name="ConversationDevice">
+    <item name="android:layout_width">wrap_content</item>
+    <item name="android:layout_height">wrap_content</item>
+    <item name="android:layout_below">@+id/timestamp</item>
+    <item name="android:layout_alignParentRight">true</item>
+    <item name="android:layout_marginTop">@dimen/spacing_small</item>
+    <item name="android:layout_marginBottom">@dimen/spacing_small</item>
+    <item name="android:maxLines">1</item>
+    <item name="android:ellipsize">marquee</item>
+    <item name="android:textSize">@dimen/text_small</item>
+    <item name="android:textColor">@color/silent_glass</item>
+  </style>
+
+  <style name="ConversationSnippet">
+    <item name="android:duplicateParentState">true</item>
+    <item name="android:layout_width">fill_parent</item>
+    <item name="android:layout_height">wrap_content</item>
+    <item name="android:layout_toLeftOf">@+id/count_icon</item>
+    <item name="android:layout_alignBottom">@+id/count</item>
+    <item name="android:maxLines">1</item>
+    <item name="android:ellipsize">marquee</item>
+    <item name="android:textSize">@dimen/text_normal</item>
+    <item name="android:textColor">@color/conversation_summary_snippet_message</item>
+  </style>
+
+  <style name="ConversationTimestamp">
+    <item name="android:layout_width">wrap_content</item>
+    <item name="android:layout_height">wrap_content</item>
+    <item name="android:layout_alignParentRight">true</item>
+    <item name="android:textSize">@dimen/text_small</item>
+    <item name="android:textColor">@color/silent_glass</item>
+  </style>
+  
+  <style name="ConversationSecureIcon">
+    <item name="android:layout_width">wrap_content</item>
+    <item name="android:layout_height">wrap_content</item>
+    <item name="android:layout_alignTop">@+id/device</item>
+    <item name="android:layout_alignBottom">@+id/device</item>
+    <item name="android:layout_toLeftOf">@+id/device</item>
+    <item name="android:layout_marginRight">@dimen/spacing_tiny</item>
+    <item name="android:layout_marginLeft">@dimen/spacing_tiny</item>
+    <item name="android:scaleType">centerInside</item>
+    <item name="android:src">@drawable/ic_secure</item>
+  </style>
+  
+  <style name="ConversationCountIcon">
+    <item name="android:layout_width">wrap_content</item>
+    <item name="android:layout_height">wrap_content</item>
+    <item name="android:layout_alignTop">@+id/count</item>
+    <item name="android:layout_alignBottom">@+id/count</item>
+    <item name="android:layout_toLeftOf">@+id/count</item>
+    <item name="android:layout_marginRight">@dimen/spacing_tiny</item>
+    <item name="android:layout_marginLeft">@dimen/spacing_tiny</item>
+    <item name="android:scaleType">centerInside</item>
+    <item name="android:src">@drawable/ic_message</item>
+  </style>
+
+  <style name="ConversationCount">
+    <item name="android:layout_width">wrap_content</item>
+    <item name="android:layout_height">wrap_content</item>
+    <item name="android:textSize">@dimen/text_normal</item>
+    <item name="android:textColor">@color/silent_glass</item>
+    <item name="android:layout_alignParentRight">true</item>
+    <item name="android:layout_below">@+id/device</item>
+  </style>
+
+</resources>

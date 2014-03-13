@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<com.silentcircle.silenttext.view.ComposeView
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  style="@style/Compose">
+
+  <com.silentcircle.silenttext.view.ComposeText
+    style="@style/ComposeText"
+    android:id="@+id/compose_text"
+    android:hint="@string/compose_hint"/>
+
+  <ImageView
+    style="@style/ComposeSend"
+    android:id="@+id/compose_send"
+    android:contentDescription="@string/send"/>
+
+</com.silentcircle.silenttext.view.ComposeView>

@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" style="@style/Widget.Silence.LinearLayout.Vertical">
+	<TextView android:id="@+id/title" style="@style/Widget.Silence.TextView" android:textSize="@dimen/abs__action_bar_title_text_size" android:text="@string/sample_username" android:paddingLeft="@dimen/spacing_small" android:drawablePadding="@dimen/spacing_small" android:drawableLeft="@drawable/ic_online"/>
+</LinearLayout>

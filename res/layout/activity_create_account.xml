@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android" style="@style/Widget.Silence.RelativeLayout">
+	<LinearLayout android:id="@+id/create_account" style="@style/Widget.Silence.LinearLayout.Rotatable" android:gravity="center" android:layout_width="fill_parent" android:layout_height="fill_parent">
+		<ScrollView style="@style/Widget.Silence.ScrollView" android:layout_weight="1">
+			<LinearLayout style="@style/Widget.Silence.LinearLayout.Vertical" android:layout_gravity="center">
+				<TextView android:id="@+id/username" style="@style/Widget.Silence.EditText" android:text="@string/sample_username" android:textStyle="bold" android:drawableRight="@drawable/ic_action_edit" android:background="@android:color/transparent" android:layout_marginBottom="@dimen/spacing_tiny" android:layout_marginTop="@dimen/spacing_tiny"/>
+				<TextView android:id="@+id/password" style="@style/Widget.Silence.EditText" android:text="@string/password_not_shown" android:background="@android:color/transparent" android:textColor="@color/silent_glass" android:layout_marginBottom="@dimen/spacing_tiny" android:layout_marginTop="@dimen/spacing_tiny"/>
+				<CheckBox android:id="@+id/accept_terms" style="@style/Widget.Silence.CheckBox" android:text="@string/accept_terms" android:layout_margin="@dimen/spacing_normal"/>
+				<LinearLayout style="@style/Widget.Silence.LinearLayout.Horizontal">
+					<Button android:id="@+id/button_privacy" style="@style/Widget.Silence.SubtleButton" android:text="@string/privacy" android:drawableLeft="@drawable/ic_action_page" android:layout_weight="1"/>
+					<Button android:id="@+id/button_terms" style="@style/Widget.Silence.SubtleButton" android:text="@string/terms" android:drawableLeft="@drawable/ic_action_page" android:layout_weight="1"/>
+				</LinearLayout>
+			</LinearLayout>
+		</ScrollView>
+		<ScrollView style="@style/Widget.Silence.ScrollView" android:layout_weight="1">
+			<LinearLayout style="@style/Widget.Silence.LinearLayout.Vertical" android:layout_gravity="center">
+				<EditText android:id="@+id/email" style="@style/Widget.Silence.EditText" android:hint="@string/sample_email_address">
+					<requestFocus/>
+				</EditText>
+				<EditText android:id="@+id/first_name" style="@style/Widget.Silence.EditText" android:hint="@string/first_name"/>
+				<EditText android:id="@+id/last_name" style="@style/Widget.Silence.EditText" android:hint="@string/last_name"/>
+				<Button android:id="@+id/button_create_account" style="@style/Widget.Silence.Button" android:text="@string/create_account"/>
+			</LinearLayout>
+		</ScrollView>
+	</LinearLayout>
+	<TextView style="@style/Widget.Silence.TextView.Error" android:id="@+id/error"/>
+	<include layout="@layout/indeterminate_progress" android:visibility="gone" android:id="@+id/progress"/>
+</RelativeLayout>

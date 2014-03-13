@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+
+  <style name="ConversationList" parent="_ConversationList">
+    <item name="android:animateLayoutChanges">false</item>
+  </style>
+
+  <style name="ConversationMessages" parent="_ConversationMessages">
+    <item name="android:animateLayoutChanges">false</item>
+  </style>
+
+  <style name="ConversationSummary" parent="_ConversationSummary">
+    <item name="android:animateLayoutChanges">false</item>
+  </style>
+
+</resources>

@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="SilentText" default="help">
+
+  <property file="local.properties"/>
+  <property file="build.properties"/>
+  <property file="secure.properties"/>
+
+  <property environment="env"/>
+
+  <condition property="sdk.dir" value="${env.ANDROID_HOME}">
+    <isset property="env.ANDROID_HOME"/>
+  </condition>
+
+  <condition property="ndk.dir" value="${env.ANDROID_NDK_HOME}">
+    <isset property="env.ANDROID_NDK_HOME"/>
+  </condition>
+
+  <loadproperties srcFile="project.properties"/>
+
+  <fail message="sdk.dir is missing. Make sure to generate local.properties using 'android update project' or to inject it through the ANDROID_HOME environment variable." unless="sdk.dir"/>
+  <fail message="ndk.dir is missing. Make sure to add ndk.dir=/path/to/android-ndk to local.properties or to inject it through the ANDROID_NDK_HOME environment variable." unless="ndk.dir"/>
+
+  <!-- version-tag: custom -->
+
+  <import file="${sdk.dir}/tools/ant/build.xml"/>
+  <import file="test/build.xml" as="test"/>
+
+  <target name="-check-native">
+    <available file="ndk-build" filepath="${ndk.dir}" property="ndk.present"/>
+    <fail message="ndk-build not found in ${ndk.dir}. Is this the right path to the Android NDK?" unless="${ndk.present}"/>
+  </target>
+  
+  <target name="native-clean">
+    <exec executable="${ndk.dir}/ndk-build">
+      <arg value="clean"/>
+    </exec>
+  </target>
+
+  <target name="native-compile">
+    <exec executable="${ndk.dir}/ndk-build" failonerror="true">
+      <arg value="all"/>
+    </exec>
+  </target>
+
+  <target name="generated">
+
+    <exec executable="date" outputproperty="build.date">
+      <arg value="-u"/>
+      <arg value="+%Y-%m-%dT%H:%M:%SZ"/>
+    </exec>
+
+    <exec executable="git" outputproperty="build.commit">
+      <arg value="log"/>
+      <arg value="-n"/>
+      <arg value="1"/>
+      <arg value="--pretty=format:%h"/>
+    </exec>
+
+    <property value="Ad-hoc" name="build.version"/>
+    <property value="true" name="build.debug"/>
+    <property value="https://s3.amazonaws.com/com.silentcircle.silenttext.scloud/" name="build.scloud_url"/>
+
+  </target>
+
+  <target name="-apply-filters">
+    <delete file="res/values/build.xml"/>
+    <copy file="template/res/values/build.xml" tofile="res/values/build.xml"/>
+    <replace file="res/values/build.xml" token="$build.version$" value="${build.version}"/>
+    <replace file="res/values/build.xml" token="$build.environment$" value="${build.environment}"/>
+    <replace file="res/values/build.xml" token="$build.date$" value="${build.date}"/>
+    <replace file="res/values/build.xml" token="$build.commit$" value="${build.commit}"/>
+    <replace file="res/values/build.xml" token="$build.debug$" value="${build.debug}"/>
+    <replace file="res/values/build.xml" token="$build.scloud_url$" value="${build.scloud_url}"/>
+    <replace file="res/values/build.xml" token="$build.gcm_sender$" value="${build.gcm_sender}"/>
+    <replace file="res/values/build.xml" token="$build.partners$" value="${build.partners}"/>
+  </target>
+
+  <target name="-clean-filtered-files">
+    <delete file="res/values/build.xml"/>
+  </target>
+
+  <target name="-pre-build" depends="-check-native,-apply-filters"/>
+  <target name="-pre-compile" depends="native-compile"/>
+  <target name="-pre-clean" depends="test.clean,native-clean,-clean-filtered-files"/>
+  <target name="test" depends="test.all"/>
+
+  <target name="javadoc">
+    <javadoc access="public" destdir="bin/javadoc" doctitle="${ant.project.name}" source="1.6" sourcepath="src:gen">
+      <classpath>
+        <fileset dir="${sdk.dir}">
+          <include name="platforms/${target}/android.jar"/>
+        </fileset>
+        <fileset dir="support">
+          <include name="**/bin/*.jar"/>
+        </fileset>
+        <fileset dir="libs">
+          <include name="**/*.jar"/>
+        </fileset>
+      </classpath>
+    </javadoc>
+  </target>
+
+</project>

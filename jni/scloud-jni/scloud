@@ -1,0 +1,25 @@
+#!/bin/sh
+
+encrypt() {
+  INFILE=$1
+  OUTFILE=$2
+  bin/transform -e < $INFILE > $OUTFILE 2> $OUTFILE.key
+}
+
+decrypt() {
+  INFILE=$1
+  OUTFILE=$2
+  bin/transform -d -k "$(cat $INFILE.key)" < $INFILE > $OUTFILE.out
+}
+
+clean() {
+  FILE=$1
+  rm -f $FILE $FILE.key
+}
+
+if [ -n "$1" -a -n "$2" ]; then
+  encrypt $1 $2
+  decrypt $2 $1
+else
+  echo "Usage: $0 <infile> <outfile>"
+fi
