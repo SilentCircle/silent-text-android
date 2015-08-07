@@ -8,7 +8,7 @@ Share encrypted texts and transfer files up to 100 MB. Includes Burn functionali
 
 ### What's New In This Update
 
-The sources are updated for version 1.12.3 of the project.
+The sources are updated for version 1.12.2 of the project.
 
 ### Prerequisites
 
