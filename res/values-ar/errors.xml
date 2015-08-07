@@ -1,0 +1,31 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<resources>
+
+	<string name="SCIMPError_NONE">لا يوجد خطأ</string>
+	<string name="SCIMPError_NOP">غير متاح</string>
+	<string name="SCIMPError_UNKNOWN">لقد وقع خطأ غير معروف.</string>
+	<string name="SCIMPError_BAD_PARAMS">معاملات سيئة</string>
+	<string name="SCIMPError_OUT_OF_MEMORY">نفدت الذاكرة</string>
+	<string name="SCIMPError_BUFFER_TOO_SMALL">الذاكرة المؤقتة صغيرة جدًا</string>
+	<string name="SCIMPError_USER_ABORT">المستخدم خرج</string>
+	<string name="SCIMPError_UNKNOWN_REQUEST">طلب غير معروف</string>
+	<string name="SCIMPError_LAZY_PROGRAMMER">مبرمج كسول</string>
+	<string name="SCIMPError_ASSERT_FAILED">فشل التأكيد</string>
+	<string name="SCIMPError_FEATURE_UNAVAILABLE">Feature unavailable</string>
+	<string name="SCIMPError_RESOURCE_UNAVAILABLE">المورد غير متاح</string>
+	<string name="SCIMPError_NOT_CONNECTED">حاولت إرسال رسالة قبل وضع سياق آمن</string>
+	<string name="SCIMPError_IMPROPER_INITIALIZATION">بدء تشغيل غير ملائم</string>
+	<string name="SCIMPError_CORRUPT_DATA">كان السياق الآمن فاسدًا ويتم إعادة وضعه الآن.</string>
+	<string name="SCIMPError_SELF_TEST_FAILED">فشل الاختبار الذاتي</string>
+	<string name="SCIMPError_BAD_INTEGRITY">فشل عملية للتحقق من تكامل بروتوكول.</string>
+	<string name="SCIMPError_BAD_HASH_NUMBER">علامة تجزئة سيئة</string>
+	<string name="SCIMPError_BAD_CIPHER_NUMBER">تم استقبال حزمة بروتوكول تحدد مجموعة تشفير غير مدعومة.</string>
+	<string name="SCIMPError_BAD_RANDOM_NUMBER">تم استقبال حزمة بروتوكول تحدد مولد أرقام عشوائي مستعار غير مدعوم.</string>
+	<string name="SCIMPError_SECRETS_MISMATCH">استمرارية المفتاح المفقود مع السياق الآمن القائم مسبقًا.</string>
+	<string name="SCIMPError_KEY_NOT_FOUND">تم استقبال رسالة لا يمكن فك تشفيرها. تتم المطالبة بإعادة الإرسال.</string>
+	<string name="SCIMPError_PROTOCOL_ERROR">تم استقبال حزمة بروتوكول جانحة.</string>
+	<string name="SCIMPError_PROTOCOL_CONTENTION">تم استقبال حزمة بروتوكول غير متوقعة.</string>
+	<string name="SCIMPError_KEY_LOCKED">المفتاح مغلق</string>
+	<string name="SCIMPError_END_OF_ITERATION">نهاية التكرار</string>
+
+</resources>

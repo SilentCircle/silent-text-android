@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<com.silentcircle.silenttext.view.UploadView xmlns:android="http://schemas.android.com/apk/res/android" style="@style/Widget.Silence.RelativeLayout.Overlay">
+<com.silentcircle.silenttext.view.UploadView xmlns:android="http://schemas.android.com/apk/res/android" style="@style/Widget.Silence.ProgressLayout">
   <ImageView android:id="@+id/progress_icon" style="@style/Widget.Silence.ImageView.ActionButton" android:src="@drawable/ic_action_cancel" android:contentDescription="@string/cancel"/>
-  <LinearLayout android:id="@+id/progress" style="@style/Widget.Silence.LinearLayout.Vertical" android:layout_toRightOf="@+id/progress_icon" android:layout_gravity="center_vertical">
+  <LinearLayout android:id="@+id/progress" style="@style/Widget.Silence.ProgressView">
     <TextView android:id="@+id/progress_label" style="@style/Widget.Silence.TextView" android:text="@string/sample_duration" android:padding="@dimen/spacing_small"/>
     <ProgressBar android:id="@+id/progress_bar" style="@style/Widget.Silence.ProgressBar" android:layout_margin="@dimen/spacing_small"/>
   </LinearLayout>

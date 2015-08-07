@@ -1,16 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-  <item
-    android:id="@+id/search"
-    android:title="@string/new_message"
-    android:icon="@drawable/ic_action_compose"
-    android:orderInCategory="1"
-    android:showAsAction="always|collapseActionView"
-    android:actionLayout="@layout/search"/>
-  <item
-    android:id="@+id/options"
-    android:showAsAction="always"
-    android:orderInCategory="2"
-    android:icon="@drawable/ic_drawer"
-    android:title="@string/options"/>
+	<item android:id="@+id/action_search" android:title="@string/new_message" android:icon="@drawable/ic_action_compose" android:orderInCategory="1" android:showAsAction="always|collapseActionView" android:actionLayout="@layout/search"/>
+	<item android:id="@+id/action_lock" android:title="@string/lock_application" android:icon="@drawable/ic_action_secure" android:orderInCategory="2" android:showAsAction="never"/>
+	<item android:id="@+id/action_settings" android:title="@string/settings" android:icon="@drawable/ic_action_settings" android:orderInCategory="3" android:showAsAction="never"/>
 </menu>

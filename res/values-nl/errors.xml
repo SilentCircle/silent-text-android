@@ -1,0 +1,31 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<resources>
+
+	<string name="SCIMPError_NONE">Geen fout</string>
+	<string name="SCIMPError_NOP">N/A</string>
+	<string name="SCIMPError_UNKNOWN">Er is een onbekende fout opgetreden.</string>
+	<string name="SCIMPError_BAD_PARAMS">Slechte parameters</string>
+	<string name="SCIMPError_OUT_OF_MEMORY">Geen geheugen meer</string>
+	<string name="SCIMPError_BUFFER_TOO_SMALL">Buffer te klein</string>
+	<string name="SCIMPError_USER_ABORT">Gebruiker afgewezen</string>
+	<string name="SCIMPError_UNKNOWN_REQUEST">Onbekend verzoek</string>
+	<string name="SCIMPError_LAZY_PROGRAMMER">Luie programmeur</string>
+	<string name="SCIMPError_ASSERT_FAILED">Assert mislukt</string>
+	<string name="SCIMPError_FEATURE_UNAVAILABLE">Functie niet beschikbaar</string>
+	<string name="SCIMPError_RESOURCE_UNAVAILABLE">Bron niet beschikbaar</string>
+	<string name="SCIMPError_NOT_CONNECTED">Probeerde een bericht te versturen voordat een veilige context tot stand was gebracht.</string>
+	<string name="SCIMPError_IMPROPER_INITIALIZATION">Onjuiste initialisatie</string>
+	<string name="SCIMPError_CORRUPT_DATA">De veilige context is beschadigd en wordt nu opnieuw tot stand gebracht.</string>
+	<string name="SCIMPError_SELF_TEST_FAILED">Zelftest mislukt</string>
+	<string name="SCIMPError_BAD_INTEGRITY">Een integriteitscontrole volgens protocol is mislukt.</string>
+	<string name="SCIMPError_BAD_HASH_NUMBER">Slechte hash</string>
+	<string name="SCIMPError_BAD_CIPHER_NUMBER">Er is een protocolpakket is binnengekomen, dat een niet ondersteund coderingssuite specificeert.</string>
+	<string name="SCIMPError_BAD_RANDOM_NUMBER">Er is een protocolpakket is binnengekomen, dat een niet ondersteunde pseudo-willekeurige nummergenerator specificeert.</string>
+	<string name="SCIMPError_SECRETS_MISMATCH">Toetscontinuïteit met voorheen tot stand gebrachte veilige context verloren.</string>
+	<string name="SCIMPError_KEY_NOT_FOUND">Er is een niet te ontcijferen bericht binnengekomen. Verzoek om opnieuw te sturen.</string>
+	<string name="SCIMPError_PROTOCOL_ERROR">Er is een dolend protocolpakket binnengekomen.</string>
+	<string name="SCIMPError_PROTOCOL_CONTENTION">Er is een onverwacht protocolpakket binnengekomen.</string>
+	<string name="SCIMPError_KEY_LOCKED">Toets vergendeld</string>
+	<string name="SCIMPError_END_OF_ITERATION">Einde van iteratie</string>
+
+</resources>

@@ -1,0 +1,56 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+
+  <plurals name="notify_new_messages_title">
+    <item quantity="zero"><xliff:g id="quantity">%1$d</xliff:g> رسائل جديدة</item>
+    <item quantity="one">تم تلقي رسالة جديدة</item>
+    <item quantity="two"><xliff:g id="quantity">%1$d</xliff:g> رسائل جديدة</item>
+    <item quantity="few"><xliff:g id="quantity">%1$d</xliff:g> رسائل جديدة</item>
+    <item quantity="many"><xliff:g id="quantity">%1$d</xliff:g> رسائل جديدة</item>
+    <item quantity="other"><xliff:g id="quantity">%1$d</xliff:g> رسائل جديدة</item>
+  </plurals>
+
+  <plurals name="notify_new_messages_subtitle">
+    <item quantity="zero">قام <xliff:g id="number_of_people">%1$d</xliff:g> أشخاص بإرسال <xliff:g id="number_of_messages" example="2 messages">%2$s</xliff:g> إليك.</item>
+    <item quantity="one">قام <xliff:g id="number_of_people">%1$d</xliff:g> شخصًا بإرسال <xliff:g id="number_of_messages" example="2 messages">%2$s</xliff:g> إليك.</item>
+    <item quantity="two">قام <xliff:g id="number_of_people">%1$d</xliff:g> أشخاص بإرسال <xliff:g id="number_of_messages" example="2 messages">%2$s</xliff:g> إليك.</item>
+    <item quantity="few">قام <xliff:g id="number_of_people">%1$d</xliff:g> أشخاص بإرسال <xliff:g id="number_of_messages" example="2 messages">%2$s</xliff:g> إليك.</item>
+    <item quantity="many">قام <xliff:g id="number_of_people">%1$d</xliff:g> أشخاص بإرسال <xliff:g id="number_of_messages" example="2 messages">%2$s</xliff:g> إليك.</item>
+    <item quantity="other">قام <xliff:g id="number_of_people">%1$d</xliff:g> أشخاص بإرسال <xliff:g id="number_of_messages" example="2 messages">%2$s</xliff:g> إليك.</item>
+  </plurals>
+
+  <plurals name="n_messages">
+      <item quantity="zero"><xliff:g id="count">%1$d</xliff:g> رسائل</item>
+      <item quantity="one">رسالة</item>
+      <item quantity="two"><xliff:g id="count">%1$d</xliff:g> رسائل</item>
+      <item quantity="few"><xliff:g id="count">%1$d</xliff:g> رسائل</item>
+      <item quantity="many"><xliff:g id="count">%1$d</xliff:g> رسائل</item>
+      <item quantity="other"><xliff:g id="count">%1$d</xliff:g> رسائل</item>
+  </plurals>
+
+  <plurals name="notify_unread_messages_from_individual">
+    <item quantity="zero"><xliff:g id="count">%1$d</xliff:g> رسائل غير مقروءة وردت من <xliff:g id="contact_name" example="droidman">%2$s</xliff:g></item>
+    <item quantity="one"><xliff:g id="count">%1$d</xliff:g> رسالة غير مقروءة وردت من <xliff:g id="contact_name" example="droidman">%2$s</xliff:g></item>
+    <item quantity="two"><xliff:g id="count">%1$d</xliff:g> رسائل غير مقروءة وردت من <xliff:g id="contact_name" example="droidman">%2$s</xliff:g></item>
+    <item quantity="few"><xliff:g id="count">%1$d</xliff:g> رسائل غير مقروءة وردت من <xliff:g id="contact_name" example="droidman">%2$s</xliff:g></item>
+    <item quantity="many"><xliff:g id="count">%1$d</xliff:g> رسائل غير مقروءة وردت من <xliff:g id="contact_name" example="droidman">%2$s</xliff:g></item>
+    <item quantity="other"><xliff:g id="count">%1$d</xliff:g> رسائل غير مقروءة وردت من <xliff:g id="contact_name" example="droidman">%2$s</xliff:g></item>
+  </plurals>
+  
+  <plurals name="short_time_seconds">
+      <item quantity="other"><xliff:g id="count">%1$d</xliff:g>s</item>
+  </plurals>
+
+  <plurals name="short_time_minutes">
+      <item quantity="other"><xliff:g id="count">%1$d</xliff:g>m</item>
+  </plurals>
+
+  <plurals name="short_time_hours">
+      <item quantity="other"><xliff:g id="count">%1$d</xliff:g>h</item>
+  </plurals>
+
+  <plurals name="short_time_days">
+      <item quantity="other"><xliff:g id="count">%1$d</xliff:g>d</item>
+  </plurals>
+
+</resources>

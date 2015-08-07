@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 
-  <style name="SearchTextBase">
-    <item name="android:layout_width">fill_parent</item>
-    <item name="android:layout_height">wrap_content</item>
-  </style>
+	<style name="SearchTextBase">
+		<item name="android:layout_width">fill_parent</item>
+		<item name="android:layout_height">wrap_content</item>
+	</style>
 
-  <style name="SearchText" parent="style/SearchTextBase"/>
+	<style name="SearchText" parent="style/SearchTextBase">
+		<item name="android:queryHint">@string/search_hint</item>
+	</style>
 
 </resources>

@@ -1,0 +1,65 @@
+check_variable "${DOWNLOAD_SITE}" "DOWNLOAD_SITE"
+check_variable "${DEPENDENCY_DIR}" "DEPENDENCY_DIR"
+
+#
+# The bootstrapped JDK is provided as-is and assumes your agreement
+# to the terms and conditions required by Oracle in the license
+# agreement located at the following URL:
+#
+# http://www.oracle.com/technetwork/java/javase/terms/license/index.html
+#
+# Alternately, you may install OpenJDK on your system by following
+# the instructions located at the following URL:
+#
+# http://openjdk.java.net/install/
+#
+JAVA_DOWNLOAD_URL_Linux_x86_64="${DOWNLOAD_SITE}/com/oracle/jdk-linux-x86_64/1.7.0_51/jdk-linux-x86_64-1.7.0_51.tgz"
+JAVA_DOWNLOAD_URL_Linux_x86="${DOWNLOAD_SITE}/com/oracle/jdk-linux-x86/1.7.0_51/jdk-linux-x86-1.7.0_51.tgz"
+JAVA_DOWNLOAD_URL_Darwin_x86_64="${DOWNLOAD_SITE}/com/oracle/jdk-darwin-x86_64/1.7.0_51/jdk-darwin-x86_64-1.7.0_51.tgz"
+JAVA_DOWNLOAD_URL_Darwin_x86="${DOWNLOAD_SITE}/com/oracle/jdk-darwin-x86/1.7.0_51/jdk-darwin-x86-1.7.0_51.tgz"
+  
+detect_java() {
+  [ -z "${JAVA_HOME}" -a "${OS_TYPE}" = 'Darwin' ] && JAVA_HOME="/System/Library/Frameworks/JavaVM.framework/Home"
+  detected="${JAVA_HOME}"
+  program="javac"
+  target="$(which ${program})"
+  if [ ! -z "${target}" ]; then
+    [ -d "${detected}" ] || detected=$( [ -h "${target}" ] && cd $(dirname "${target}") && cd $(dirname $(ls -l "${program}" | sed -E 's/^.+-> (.+)$/\1/g')) && cd .. && pwd )
+    [ -d "${detected}" ] || detected=$(dirname $(dirname "${target}"))
+  fi
+  [ -d "${detected}" ] && JAVA_HOME="${detected}"
+}   
+    
+install_java() {
+
+  detect_java
+
+  [ -z "${JAVA_HOME}" ] && export JAVA_HOME="$1"
+
+  PACKAGE_ARCHIVE_URL=""
+
+  case "${OS_TYPE}_${OS_ARCH}" in
+    Darwin_x86_64)
+      PACKAGE_ARCHIVE_URL="${JAVA_DOWNLOAD_URL_Darwin_x86_64}"
+      ;;
+    Darwin_i[3|4|5|6]86)
+      PACKAGE_ARCHIVE_URL="${JAVA_DOWNLOAD_URL_Darwin_x86}"
+      ;;
+    Linux_x86_64)
+      PACKAGE_ARCHIVE_URL="${JAVA_DOWNLOAD_URL_Linux_x86_64}"
+      ;;
+    Linux_i[3|4|5|6]86)
+      PACKAGE_ARCHIVE_URL="${JAVA_DOWNLOAD_URL_Linux_x86}"
+      ;;
+    *)
+      printf "[ERROR] Unsupported operating system: ${OS_TYPE} ${OS_ARCH}\n"
+      exit 1
+      ;;
+  esac
+
+  [ ! -z "${PACKAGE_ARCHIVE_URL}" ] && install_file "Java Development Kit (JDK)" "${PACKAGE_ARCHIVE_URL}" "z" "jdk1.7.0_51" "${JAVA_HOME}"
+
+}
+    
+install_java "${DEPENDENCY_DIR}/java"
+

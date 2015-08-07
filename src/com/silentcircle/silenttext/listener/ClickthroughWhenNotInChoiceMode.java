@@ -1,19 +1,18 @@
 /*
-Copyright © 2013, Silent Circle, LLC.
-All rights reserved.
+Copyright (C) 2013-2015, Silent Circle, LLC. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
-    * Any redistribution, use, or modification is done solely for personal 
+    * Any redistribution, use, or modification is done solely for personal
       benefit and not for any commercial purpose or for monetary gain
     * Redistributions of source code must retain the above copyright
       notice, this list of conditions and the following disclaimer.
     * Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-    * Neither the name Silent Circle nor the names of its contributors may 
-      be used to endorse or promote products derived from this software 
-      without specific prior written permission.
+    * Neither the name Silent Circle nor the
+      names of its contributors may be used to endorse or promote products
+      derived from this software without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -32,15 +31,25 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.GridView;
 
+import com.silentcircle.silenttext.view.HasChoiceMode;
 import com.silentcircle.silenttext.view.ListView;
-import com.silentcircle.silenttext.view.adapter.ListAdapter;
 
 public class ClickthroughWhenNotInChoiceMode implements OnItemClickListener {
 
+	private static ClickthroughWhenNotInChoiceMode instance;
+
+	public static ClickthroughWhenNotInChoiceMode getInstance() {
+		if( instance == null ) {
+			instance = new ClickthroughWhenNotInChoiceMode();
+		}
+		return instance;
+	}
+
 	@Override
 	public void onItemClick( AdapterView<?> parentView, View view, int position, long itemID ) {
-		ListAdapter<?> adapter = (ListAdapter<?>) parentView.getAdapter();
+		HasChoiceMode adapter = (HasChoiceMode) parentView.getAdapter();
 		if( adapter.isInChoiceMode() ) {
 			return;
 		}
@@ -48,6 +57,9 @@ public class ClickthroughWhenNotInChoiceMode implements OnItemClickListener {
 			( (OnClickListener) view ).onClick( view );
 			if( parentView instanceof ListView ) {
 				( (ListView) parentView ).setItemChecked( position, false );
+			}
+			if( parentView instanceof GridView ) {
+				// ( (GridView) parentView ).setItemChecked( position, false );
 			}
 		}
 	}

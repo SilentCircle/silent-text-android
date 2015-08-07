@@ -1,19 +1,18 @@
 /*
-Copyright © 2013, Silent Circle, LLC.
-All rights reserved.
+Copyright (C) 2013-2015, Silent Circle, LLC. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
-    * Any redistribution, use, or modification is done solely for personal 
+    * Any redistribution, use, or modification is done solely for personal
       benefit and not for any commercial purpose or for monetary gain
     * Redistributions of source code must retain the above copyright
       notice, this list of conditions and the following disclaimer.
     * Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-    * Neither the name Silent Circle nor the names of its contributors may 
-      be used to endorse or promote products derived from this software 
-      without specific prior written permission.
+    * Neither the name Silent Circle nor the
+      names of its contributors may be used to endorse or promote products
+      derived from this software without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -28,14 +27,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package com.silentcircle.silenttext.listener;
 
+import com.silentcircle.silenttext.transport.Envelope;
+
 public interface TransportListener {
 
-	public void onInsecureMessageReceived( String id, String sender, String message );
+	public void onInsecureMessageReceived( Envelope envelope );
 
-	public void onMessageReturned( String id, String recipient, String reason );
+	public void onMessageAcknowledged( Envelope envelope );
 
-	public void onMessageSent( String id, String recipient, String message );
+	public void onMessageReturned( Envelope envelope, String reason );
 
-	public void onSecureMessageReceived( String id, String sender, String message, boolean notifiable, boolean badgeworthy );
+	public void onMessageSent( Envelope envelope );
+
+	public void onSecureMessageReceived( Envelope envelope );
 
 }

@@ -1,27 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<com.silentcircle.silenttext.view.ProgressView
-  xmlns:android="http://schemas.android.com/apk/res/android"
-  android:layout_width="fill_parent"
-  android:layout_height="fill_parent"
-  android:layout_alignParentLeft="true"
-  android:layout_alignParentRight="true"
-  android:layout_alignParentTop="true"
-  android:layout_alignParentBottom="true"
-  android:background="@drawable/bg_carbon_pattern"
-  android:gravity="center">
-
-  <ImageView
-    android:id="@+id/progress_wheel"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:src="@drawable/logo_circle"
-    android:contentDescription="@string/silent_circle"/>
-
-  <ImageView
-    android:id="@+id/progress_text"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:src="@drawable/logo_text"
-    android:contentDescription="@string/silent_circle"/>
-
+<com.silentcircle.silenttext.view.ProgressView 
+    xmlns:android="http://schemas.android.com/apk/res/android" 
+    android:layout_width="fill_parent" 
+    android:layout_height="fill_parent" 
+    android:layout_alignParentLeft="true" 
+    android:layout_alignParentRight="true" 
+    android:layout_alignParentTop="true" 
+    android:layout_alignParentBottom="true" 
+    android:background="@drawable/bg_window_dark" 
+    android:gravity="center">
+    
+    <ProgressBar
+        android:id="@+id/progress_id"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         style="?android:attr/progressBarStyleLarge"
+         />
+    <!--  
+	<ImageView android:id="@+id/progress_wheel" 
+	    android:layout_width="wrap_content" 
+	    android:layout_height="wrap_content" 
+	    android:src="@drawable/logo_circle" 
+	    android:contentDescription="@string/silent_circle"/>
+	<ImageView android:id="@+id/progress_text" 
+	    android:layout_width="wrap_content" 
+	    android:layout_height="wrap_content" 
+	    android:src="@drawable/logo_text" 
+	    android:contentDescription="@string/silent_circle"/>
+	-->    
 </com.silentcircle.silenttext.view.ProgressView>

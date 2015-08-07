@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <com.silentcircle.silenttext.view.ContactView xmlns:android="http://schemas.android.com/apk/res/android" style="@style/Widget.Silence.ContactView.Small">
 
-  <com.silentcircle.silenttext.view.AvatarView android:id="@+id/avatar" style="@style/Widget.Silence.ImageView.Avatar.Small" android:contentDescription="@string/sample_sender"/>
+	<com.silentcircle.silenttext.view.AvatarView android:id="@+id/avatar" style="@style/Widget.Silence.ImageView.Avatar.Small" android:contentDescription="@string/sample_sender"/>
 
-  <LinearLayout style="@style/Widget.Silence.LinearLayout.Vertical" android:layout_toRightOf="@+id/avatar" android:padding="@dimen/spacing_small" android:layout_height="fill_parent" android:gravity="center_vertical">
-    <TextView style="@style/Widget.Silence.TextView.Title" android:id="@+id/alias" android:text="@string/sample_recipient"/>
-    <TextView style="@style/Widget.Silence.TextView" android:id="@+id/username" android:text="@string/sample_domain" android:textSize="@dimen/text_small"/>
-  </LinearLayout>
+	<LinearLayout style="@style/Widget.Silence.LinearLayout.Vertical" android:layout_toRightOf="@+id/avatar" android:padding="@dimen/spacing_small" android:layout_height="fill_parent" android:gravity="center_vertical">
+		<TextView style="@style/Widget.Silence.TextView.Title" android:id="@+id/alias" android:text="@string/sample_recipient"/>
+		<TextView style="@style/Widget.Silence.TextView" android:id="@+id/username" android:text="@string/sample_stylized_username" android:textColor="@color/silent_glass" android:textSize="@dimen/text_small"/>
+	</LinearLayout>
 
 </com.silentcircle.silenttext.view.ContactView>

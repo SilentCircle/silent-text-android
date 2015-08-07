@@ -1,22 +1,55 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
-    <color name="silent_red_selected">#55ef3d44</color>
-    <color name="silent_red">#ffef3d44</color>
-    <color name="silent_dark_red">#ff880000</color>
-    <color name="silent_dark_orange">#ffa42206</color>
-    <color name="silent_orange">#ffe46226</color>
-    <color name="silent_yellow">#fff7c16d</color>
-    <color name="silent_white_disabled">#55ffffff</color>
-    <color name="silent_white">#ddffffff</color>
-    <color name="silent_glass">#88ffffff</color>
-    <color name="silent_black">#ff111111</color>
-    <color name="silent_darken">#22000000</color>
-    <color name="silent_translucent_black">#88000000</color>
-    <color name="silent_translucent_dark_green">#88113311</color>
-    <color name="silent_translucent_light_green">#8800ff00</color>
-    <color name="silent_translucent_red">#88ff0000</color>
-    <color name="silent_translucent_grey">#88888888</color>
-    <color name="silent_muted_dark_orange">#55a42206</color>
-    <color name="silent_grease">#ff222222</color>
+
+	<color name="theme_accent_primary">@color/theme_dark_accent_primary</color>
+
+	<color name="theme_dark_bg_secondary">@color/solid_black</color>
+	<color name="theme_dark_accent_primary">@color/solid_dark_grey</color>
+	<color name="theme_dark_text_primary">@color/solid_white</color>
+	<color name="theme_dark_text_secondary">@color/translucent_white</color>
+	
+	<color name="subtle_black">#30000000</color>
+	<color name="subtle_medium_grey">#30808080</color>
+
+	<color name="translucent_white">#80ffffff</color>
+
+	<color name="solid_black">#ff000000</color>
+	<color name="solid_dark_grey">#ff505050</color>
+	<color name="solid_white">#ffffffff</color>
+
+	<color name="silent_circle_red">#ffa42206</color>
+	<color name="silent_circle_orange">#ffe46226</color>
+
+	<color name="text_error">@color/silent_circle_red</color>
+	<color name="text_warning">@color/solid_dark_grey</color>
+
+	<color name="text_secondary_default_dark">@color/silent_glass</color>
+	<color name="text_secondary_selected_dark">@color/silent_glass</color>
+
+	<color name="silent_dark_grey">#ff505050</color>
+	<color name="silent_translucent_dark_grey">#80505050</color>
+	<color name="silent_red">#ffef3d44</color>
+	<color name="silent_dark_orange">#ffa42206</color>
+	<color name="silent_green">#ff55cc55</color>
+	<color name="silent_orange">#ffe46226</color>
+	<color name="silent_yellow">#fff7c16d</color>
+	<color name="silent_white_disabled">#55ffffff</color>
+	<color name="silent_white">#ddffffff</color>
+	<color name="silent_glass">#88ffffff</color>
+	<color name="silent_black">#ff111111</color>
+	<color name="blackphone_yellow">#ffecbd19</color>
+	<color name="silent_darken">#22000000</color>
+	<color name="silent_translucent_black">#88000000</color>
+	<color name="silent_translucent_light_green">#8800ff00</color>
+	<color name="silent_grease">#ff222222</color>
 	<color name="silent_blue">#ff00a7cf</color>
+	
+	<!-- Color for directory search -->
+    <color name="directory_search_orgnization_name">#FFFFFFFF</color>
+    <color name="directory_search_yellow">#FFFFBE00</color>
+    <color name="directory_search_gray">#FF595959</color>
+	<color name="indicator_gray">#ff666666</color>
+	<color name="transparent">#00000000</color>
+	<color name="progress_color">#D23D44</color>
+
 </resources>

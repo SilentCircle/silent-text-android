@@ -1,19 +1,18 @@
 /*
-Copyright © 2013, Silent Circle, LLC.
-All rights reserved.
+Copyright (C) 2013-2015, Silent Circle, LLC. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
-    * Any redistribution, use, or modification is done solely for personal 
+    * Any redistribution, use, or modification is done solely for personal
       benefit and not for any commercial purpose or for monetary gain
     * Redistributions of source code must retain the above copyright
       notice, this list of conditions and the following disclaimer.
     * Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-    * Neither the name Silent Circle nor the names of its contributors may 
-      be used to endorse or promote products derived from this software 
-      without specific prior written permission.
+    * Neither the name Silent Circle nor the
+      names of its contributors may be used to endorse or promote products
+      derived from this software without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -28,11 +27,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package com.silentcircle.scloud.model;
 
-public class SCloudObject {
+import java.nio.charset.Charset;
 
-	private String key;
-	private String url;
-	private String locator;
+import com.silentcircle.api.aspect.Sensitive;
+import com.silentcircle.api.aspect.util.Sensitivity;
+
+public class SCloudObject implements Sensitive {
+
+	// TODO: make key a byte array and remove all occurrences of String()
+	private CharSequence key;
+	private CharSequence url;
+	private CharSequence locator;
 	private int size;
 	private byte [] data;
 	private int offset;
@@ -42,23 +47,55 @@ public class SCloudObject {
 	public SCloudObject() {
 	}
 
-	public SCloudObject( String key, String locator ) {
+	public SCloudObject( byte [] key, CharSequence locator, byte [] data ) {
+		this( new String( key, Charset.forName( "UTF-8" ) ), locator, data );
+	}
+
+	public SCloudObject( byte [] key, CharSequence locator, int size ) {
+		this( new String( key, Charset.forName( "UTF-8" ) ), locator, size );
+	}
+
+	public SCloudObject( CharSequence key, CharSequence locator ) {
 		setKey( key );
 		setLocator( locator );
 	}
 
-	public SCloudObject( String key, String locator, byte [] data ) {
+	public SCloudObject( CharSequence key, CharSequence locator, byte [] data ) {
 		this( key, locator, data, 0, data == null ? 0 : data.length );
 	}
 
-	public SCloudObject( String key, String locator, byte [] data, int offset, int length ) {
+	public SCloudObject( CharSequence key, CharSequence locator, byte [] data, int offset, int length ) {
 		this( key, locator );
 		setData( data, offset, length );
 	}
 
-	public SCloudObject( String key, String locator, int size ) {
+	public SCloudObject( CharSequence key, CharSequence locator, int size ) {
 		this( key, locator );
 		this.size = size;
+	}
+
+	@Override
+	public void burn() {
+		if( key != null ) {
+			Sensitivity.burn( key );
+			key = null;
+		}
+		if( locator != null ) {
+			Sensitivity.burn( locator );
+			locator = null;
+		}
+		if( url != null ) {
+			Sensitivity.burn( url );
+			url = null;
+		}
+		if( data != null ) {
+			Sensitivity.burn( data );
+			data = null;
+		}
+		uploaded = false;
+		downloaded = false;
+		offset = 0;
+		size = 0;
 	}
 
 	@Override
@@ -70,11 +107,11 @@ public class SCloudObject {
 		return data;
 	}
 
-	public String getKey() {
+	public CharSequence getKey() {
 		return key;
 	}
 
-	public String getLocator() {
+	public CharSequence getLocator() {
 		return locator;
 	}
 
@@ -86,7 +123,7 @@ public class SCloudObject {
 		return size;
 	}
 
-	public String getURL() {
+	public CharSequence getURL() {
 		return url;
 	}
 
@@ -117,11 +154,11 @@ public class SCloudObject {
 		this.downloaded = downloaded;
 	}
 
-	public void setKey( String key ) {
+	public void setKey( CharSequence key ) {
 		this.key = key;
 	}
 
-	public void setLocator( String locator ) {
+	public void setLocator( CharSequence locator ) {
 		this.locator = locator;
 	}
 
@@ -133,7 +170,7 @@ public class SCloudObject {
 		this.uploaded = uploaded;
 	}
 
-	public void setURL( String url ) {
+	public void setURL( CharSequence url ) {
 		this.url = url;
 	}
 

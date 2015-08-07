@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="fill_parent" android:layout_height="fill_parent">
+	<com.silentcircle.silenttext.view.ListView 
+	    android:id="@+id/chat_events" 
+	    android:layout_width="fill_parent" 
+	    android:layout_height="fill_parent" 
+	    android:listSelector="@drawable/none" 
+	    android:stackFromBottom="true" 
+	    android:dividerHeight="@dimen/none" 
+	    android:divider="@drawable/none" 
+	    android:transcriptMode="normal"/>
+</RelativeLayout>

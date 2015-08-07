@@ -7,4 +7,12 @@
     <item type="id" name="share"/>
     <item type="id" name="lock"/>
     <item type="id" name="pending"/>
+    <item type="id" name="create_account"/>
+    <item type="id" name="conversation_status"/>
+    <item type="id" name="ringtone"/>
+    <item type="id" name="messages"/>
+    
+    <item type="id" name="directory_search" />
+    <item type="id" name="sc_contacts_search" />
+    <item type="id" name="directory_search_request_code" />
 </resources>

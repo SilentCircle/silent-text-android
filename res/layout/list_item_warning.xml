@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<com.silentcircle.silenttext.widget.WarningEventView xmlns:android="http://schemas.android.com/apk/res/android" style="@style/Widget.Text.Floating.Warning" android:text="@string/sample_warning"/>

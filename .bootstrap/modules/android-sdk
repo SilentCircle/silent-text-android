@@ -1,0 +1,106 @@
+check_variable "${DEPENDENCY_DIR}" "DEPENDENCY_DIR"
+check_variable "${DOWNLOAD_SITE}" "DOWNLOAD_SITE"
+
+ANDROID_SDK_DOWNLOAD_URL_Linux="${DOWNLOAD_SITE}/com/google/android/android-sdk-linux/23.0.2/android-sdk-linux-23.0.2.tgz"
+ANDROID_SDK_DOWNLOAD_URL_Darwin="${DOWNLOAD_SITE}/com/google/android/android-sdk-darwin/23.0.2/android-sdk-darwin-23.0.2.tgz"
+
+ANDROID_BUILD_TOOLS_VERSION="19.1.0"
+
+detect_android_sdk() {
+  detected="${ANDROID_HOME}"
+  program="android"
+  target="$(which ${program})"
+  if [ ! -z "${target}" ]; then
+    [ -d "${detected}" ] || detected=$( [ -h "${target}" ] && cd $(dirname "${target}") && cd $(dirname $(ls -l "${program}" | sed -E 's/^.+-> (.+)$/\1/g')) && cd .. && pwd )
+    [ -d "${detected}" ] || detected=$(dirname $(dirname "${target}"))
+  fi
+  [ -d "${detected}" ] && ANDROID_HOME="${detected}"
+}
+
+install_android_sdk() {
+
+  detect_android_sdk
+
+  [ -z "${ANDROID_HOME}" ] && export ANDROID_HOME="$1"
+
+  PACKAGE_ARCHIVE_TARGET_CHILD=""
+  PACKAGE_ARCHIVE_URL=""
+
+  case "${OS_TYPE}" in
+    Darwin)
+      PACKAGE_ARCHIVE_URL="${ANDROID_SDK_DOWNLOAD_URL_Darwin}"
+      PACKAGE_ARCHIVE_TARGET_CHILD="android-sdk-macosx"
+      ;;
+    Linux)
+      PACKAGE_ARCHIVE_URL="${ANDROID_SDK_DOWNLOAD_URL_Linux}"
+      PACKAGE_ARCHIVE_TARGET_CHILD="android-sdk-linux"
+      ;;
+    *)
+      printf "[ERROR] Unsupported operating system: ${OS_TYPE} ${OS_ARCH}\n"
+      exit 1
+      ;;
+  esac
+
+  [ ! -z "${PACKAGE_ARCHIVE_URL}" ] && install_file "Android SDK" "${PACKAGE_ARCHIVE_URL}" "z" "${PACKAGE_ARCHIVE_TARGET_CHILD}" "${ANDROID_HOME}"
+
+}
+
+install_android_sdk_platforms() {
+
+  ANDROID="${ANDROID_HOME}/tools/android"
+
+  if [ -x "${ANDROID}" ]; then
+
+    platforms=""
+
+    if [ -f "project.properties" ]; then
+
+      platforms="$(grep -E '^target=' project.properties | sed -E 's/^(.+)=(.+)$/\2/g')"
+
+      for library in . $(grep android.library.reference project.properties | sed -E 's/^(.+)=(.+)$/\2/' | xargs ); do
+
+        if [ -f "${library}/project.properties" ]; then
+
+          platform="$(grep -E '^target=' ${library}/project.properties | sed -E 's/^(.+)=(.+)$/\2/g')"
+
+          found="$(printf ${platforms} | grep ${platform})"
+
+          if [ -z "${found}" ]; then
+            if [ -z "${platforms}" ]; then
+              platforms="${platform}"
+            else
+              platforms="${platforms},${platform}"
+            fi
+          fi
+
+        fi
+
+      done
+
+    fi
+
+    ANDROID_SDK_LIST="$(${ANDROID} list sdk --no-ui --extended)"
+
+    for platform in build-tools-${ANDROID_BUILD_TOOLS_VERSION} platform-tools ${platforms}; do
+
+      if [ ! -z "${platform}" ]; then
+
+        printf "  Module: ${platform} "
+
+        if printf "${ANDROID_SDK_LIST}" | grep "${platform}" > /dev/null; then
+          printf "(not installed)\n"
+          printf "y\n" | ${ANDROID} --silent update sdk --no-ui --filter "${platform}" || exit 1
+        else
+          printf "(yes)\n"
+        fi
+
+      fi
+
+    done
+
+  fi
+
+}
+
+install_android_sdk "${DEPENDENCY_DIR}/android-sdk"
+install_android_sdk_platforms

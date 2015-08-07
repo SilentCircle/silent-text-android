@@ -1,19 +1,18 @@
 /*
-Copyright © 2013, Silent Circle, LLC.
-All rights reserved.
+Copyright (C) 2013-2015, Silent Circle, LLC. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
-    * Any redistribution, use, or modification is done solely for personal 
+    * Any redistribution, use, or modification is done solely for personal
       benefit and not for any commercial purpose or for monetary gain
     * Redistributions of source code must retain the above copyright
       notice, this list of conditions and the following disclaimer.
     * Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-    * Neither the name Silent Circle nor the names of its contributors may 
-      be used to endorse or promote products derived from this software 
-      without specific prior written permission.
+    * Neither the name Silent Circle nor the
+      names of its contributors may be used to endorse or promote products
+      derived from this software without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -54,6 +53,7 @@ import android.provider.MediaStore;
 import android.provider.MediaStore.Audio.AudioColumns;
 
 import com.silentcircle.silenttext.log.Log;
+import com.silentcircle.silenttext.provider.VideoProvider;
 import com.silentcircle.silenttext.util.IOUtils;
 
 public class CreateThumbnail implements Runnable {
@@ -92,6 +92,16 @@ public class CreateThumbnail implements Runnable {
 	private static Bitmap createEmptyThumbnail( int targetWidth, int targetHeight ) {
 		Bitmap bitmap = Bitmap.createBitmap( targetWidth, targetHeight, Bitmap.Config.ARGB_8888 );
 		new Canvas( bitmap ).drawColor( 0xFF000000 );
+		return bitmap;
+	}
+
+	private static Bitmap createVideoThumbnail( Uri uri ) {
+		Bitmap bitmap = null;
+		// MediaMetadataRetriever media = new MediaMetadataRetriever();
+		// media.setDataSource( AttachmentUtils.getVideoPath() );
+		// bitmap = media.getFrameAtTime( 0, MediaMetadataRetriever.OPTION_CLOSEST );
+
+		bitmap = ThumbnailUtils.createVideoThumbnail( uri.getPath(), MediaStore.Video.Thumbnails.MINI_KIND );
 		return bitmap;
 	}
 
@@ -136,7 +146,9 @@ public class CreateThumbnail implements Runnable {
 	protected final ContentResolver resolver;
 	protected final Uri uri;
 	protected final String contentType;
+
 	private final int maximumWidth;
+
 	private final int maximumHeight;
 
 	private static final Log LOG = new Log( CreateThumbnail.class.getSimpleName() );
@@ -268,19 +280,22 @@ public class CreateThumbnail implements Runnable {
 
 	private Bitmap getVideoThumbnail() {
 		Bitmap bitmap = null;
-		Cursor cursor = MediaStore.Video.query( resolver, uri, new String [] {
-			BaseColumns._ID
-		} );
-		if( cursor == null ) {
-			return decorateVideoThumbnail( resize( bitmap ) );
-		}
-		if( cursor.moveToNext() ) {
-			BitmapFactory.Options options = new BitmapFactory.Options();
-			bitmap = MediaStore.Video.Thumbnails.getThumbnail( resolver, cursor.getInt( 0 ), MediaStore.Video.Thumbnails.MINI_KIND, options );
+		if( uri.toString().contains( VideoProvider.CONTENT_URL_PREFIX ) ) {
+			bitmap = createVideoThumbnail( uri );
 		} else {
-			bitmap = getVideoThumbnailFroyo();
+			Cursor cursor = MediaStore.Video.query( resolver, uri, new String [] {
+				BaseColumns._ID
+			} );
+			if( cursor != null ) {
+				if( cursor.moveToNext() ) {
+					BitmapFactory.Options options = new BitmapFactory.Options();
+					bitmap = MediaStore.Video.Thumbnails.getThumbnail( resolver, cursor.getInt( 0 ), MediaStore.Video.Thumbnails.MINI_KIND, options );
+				} else {
+					bitmap = getVideoThumbnailFroyo();
+				}
+				cursor.close();
+			}
 		}
-		cursor.close();
 		return decorateVideoThumbnail( resize( bitmap ) );
 	}
 

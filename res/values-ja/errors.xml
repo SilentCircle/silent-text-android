@@ -1,0 +1,31 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<resources>
+
+	<string name="SCIMPError_NONE">エラーなし</string>
+	<string name="SCIMPError_NOP">該当なし</string>
+	<string name="SCIMPError_UNKNOWN">不明なエラーが発生しました。</string>
+	<string name="SCIMPError_BAD_PARAMS">間違ったパラメータ</string>
+	<string name="SCIMPError_OUT_OF_MEMORY">メモリなし</string>
+	<string name="SCIMPError_BUFFER_TOO_SMALL">バファリングが小さすぎます</string>
+	<string name="SCIMPError_USER_ABORT">ユーザーが途中停止しました</string>
+	<string name="SCIMPError_UNKNOWN_REQUEST">不明なリクエスト</string>
+	<string name="SCIMPError_LAZY_PROGRAMMER">やる気のないプログラマー</string>
+	<string name="SCIMPError_ASSERT_FAILED">アサート失敗</string>
+	<string name="SCIMPError_FEATURE_UNAVAILABLE">機能利用不可</string>
+	<string name="SCIMPError_RESOURCE_UNAVAILABLE">リソース利用不可</string>
+	<string name="SCIMPError_NOT_CONNECTED">安全なコンテクストを確立する前にメッセージの送信が試行されました。</string>
+	<string name="SCIMPError_IMPROPER_INITIALIZATION">不適切な初期化</string>
+	<string name="SCIMPError_CORRUPT_DATA">ソースコンテクストが破損しています。再度確立されます。</string>
+	<string name="SCIMPError_SELF_TEST_FAILED">セルフテスト失敗</string>
+	<string name="SCIMPError_BAD_INTEGRITY">プロトコル統合確認に失敗しました。</string>
+	<string name="SCIMPError_BAD_HASH_NUMBER">ハッシュが不適切です</string>
+	<string name="SCIMPError_BAD_CIPHER_NUMBER">サポートされていない暗号スイートを指定したプロトコルパックを受信しました。</string>
+	<string name="SCIMPError_BAD_RANDOM_NUMBER">サポートされていない擬似乱数生成器を指定するプロトコルパケットを受信しました。</string>
+	<string name="SCIMPError_SECRETS_MISMATCH">以前確立した安全なコンテクストでキーの連続性を失いました。</string>
+	<string name="SCIMPError_KEY_NOT_FOUND">解読不明なメッセージを受け取りました。再伝送リクエスト中。</string>
+	<string name="SCIMPError_PROTOCOL_ERROR">誤ったプロトコルパックを受け取りました。</string>
+	<string name="SCIMPError_PROTOCOL_CONTENTION">予期せぬプロトコルパックを受け取りました。</string>
+	<string name="SCIMPError_KEY_LOCKED">ロックされたキー</string>
+	<string name="SCIMPError_END_OF_ITERATION">反復終了</string>
+
+</resources>

@@ -1,19 +1,18 @@
 /*
-Copyright © 2013, Silent Circle, LLC.
-All rights reserved.
+Copyright (C) 2013-2015, Silent Circle, LLC. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
-    * Any redistribution, use, or modification is done solely for personal 
+    * Any redistribution, use, or modification is done solely for personal
       benefit and not for any commercial purpose or for monetary gain
     * Redistributions of source code must retain the above copyright
       notice, this list of conditions and the following disclaimer.
     * Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-    * Neither the name Silent Circle nor the names of its contributors may 
-      be used to endorse or promote products derived from this software 
-      without specific prior written permission.
+    * Neither the name Silent Circle nor the
+      names of its contributors may be used to endorse or promote products
+      derived from this software without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -70,14 +69,35 @@ public class InactivityTimeout {
 		if( delay <= 0 ) {
 			return context.getResources().getString( R.string.never_lock );
 		}
-		long a = System.currentTimeMillis();
-		long b = a + 1000 * delay;
-		return context.getResources().getString( R.string.lock_after, DateUtils.getRelativeTimeSpanString( b, a, DateUtils.SECOND_IN_MILLIS ) );
+		return context.getResources().getString( R.string.lock_after, DateUtils.getRelativeTimeSpanString( 1000 * delay, 0, DateUtils.SECOND_IN_MILLIS ) );
 	}
 
 	public int getLevel( int delay ) {
 		int index = levels.indexOfValue( delay );
 		return index >= 0 ? levels.keyAt( index ) : levels.keyAt( 1 );
+	}
+
+	public CharSequence [] listLabels( Context context ) {
+		int size = levels.size();
+		CharSequence [] labels = new CharSequence [size];
+		for( int i = 0; i < size; i++ ) {
+			int delay = levels.valueAt( i );
+			if( delay <= 0 ) {
+				labels[i] = context.getString( R.string.never_lock );
+			} else {
+				labels[i] = DateUtils.getRelativeTimeSpanString( 1000 * delay, 0, DateUtils.SECOND_IN_MILLIS );
+			}
+		}
+		return labels;
+	}
+
+	public CharSequence [] listValues() {
+		int size = levels.size();
+		CharSequence [] values = new CharSequence [size];
+		for( int i = 0; i < size; i++ ) {
+			values[i] = Integer.toString( levels.valueAt( i ) );
+		}
+		return values;
 	}
 
 	public void put( int level, int delay ) {

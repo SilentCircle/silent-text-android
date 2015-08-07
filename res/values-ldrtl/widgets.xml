@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+
+	<style name="Widget.Layout.Card.__Incoming">
+		<item name="android:background">@drawable/bg_my_card_dark</item>
+	</style>
+
+	<style name="Widget.Layout.Card.__Outgoing">
+		<item name="android:background">@drawable/bg_card_dark</item>
+	</style>
+
+</resources>
+

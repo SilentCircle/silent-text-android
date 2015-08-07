@@ -1,19 +1,18 @@
 /*
-Copyright © 2013, Silent Circle, LLC.
-All rights reserved.
+Copyright (C) 2013-2015, Silent Circle, LLC. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
-    * Any redistribution, use, or modification is done solely for personal 
+    * Any redistribution, use, or modification is done solely for personal
       benefit and not for any commercial purpose or for monetary gain
     * Redistributions of source code must retain the above copyright
       notice, this list of conditions and the following disclaimer.
     * Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-    * Neither the name Silent Circle nor the names of its contributors may 
-      be used to endorse or promote products derived from this software 
-      without specific prior written permission.
+    * Neither the name Silent Circle nor the
+      names of its contributors may be used to endorse or promote products
+      derived from this software without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -28,15 +27,23 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package com.silentcircle.silenttext.util;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.TimeZone;
 
-import org.jivesoftware.smack.util.Base64;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.twuni.twoson.JSONGenerator;
+
+import android.text.Html;
+import android.text.Spanned;
+
+import com.silentcircle.silentstorage.util.Base64;
 
 public class JSONUtils {
 
@@ -58,7 +65,7 @@ public class JSONUtils {
 	}
 
 	public static byte [] getBytes( JSONObject json, String key ) {
-		return json == null ? null : Base64.decode( getString( json, key ) );
+		return json == null ? null : Base64.decodeBase64( getString( json, key ) );
 	}
 
 	public static long getDate( char [] value ) {
@@ -122,12 +129,63 @@ public class JSONUtils {
 		}
 	}
 
+	public static JSONObject getJSONObject( JSONObject json, String key ) {
+		if( json == null ) {
+			return null;
+		}
+		try {
+			return json.has( key ) ? json.getJSONObject( key ) : null;
+		} catch( JSONException exception ) {
+			return null;
+		}
+	}
+
+	public static String getString( JSONArray json, int index ) {
+		if( json == null ) {
+			return null;
+		}
+		try {
+			return index < json.length() ? json.getString( index ) : null;
+		} catch( JSONException exception ) {
+			return null;
+		}
+	}
+
 	public static String getString( JSONObject json, String key ) {
 		if( json == null ) {
 			return null;
 		}
 		try {
 			return json.has( key ) ? json.getString( key ) : null;
+		} catch( JSONException exception ) {
+			return null;
+		}
+	}
+
+	public static void next( JSONGenerator json, String key, CharSequence value ) throws IOException {
+		if( !StringUtils.isEmpty( value ) ) {
+			json.next();
+			write( json, key, value );
+		}
+	}
+
+	public static JSONArray parseJSONArray( String json ) {
+		if( json == null ) {
+			return null;
+		}
+		try {
+			return new JSONArray( json );
+		} catch( JSONException exception ) {
+			return null;
+		}
+	}
+
+	public static JSONObject parseJSONObject( String json ) {
+		if( json == null ) {
+			return null;
+		}
+		try {
+			return new JSONObject( json );
 		} catch( JSONException exception ) {
 			return null;
 		}
@@ -141,6 +199,67 @@ public class JSONUtils {
 			json.put( key, ISO8601.format( new Date( value ) ) );
 		} catch( JSONException exception ) {
 			// Ignore this.
+		}
+	}
+
+	public static JSONArray readJSONArray( InputStream in ) {
+		return parseJSONArray( IOUtils.readAsString( in ) );
+	}
+
+	public static JSONObject readJSONObject( InputStream in ) {
+		return parseJSONObject( IOUtils.readAsString( in ) );
+	}
+
+	public static String toFormattedText( JSONObject json ) {
+		return toFormattedText( json, new StringBuilder(), 0 );
+	}
+
+	private static String toFormattedText( JSONObject json, StringBuilder text, int indent ) {
+		Iterator<?> it = json.keys();
+		while( it.hasNext() ) {
+			String key = String.valueOf( it.next() );
+			Object value = json.opt( key );
+			for( int i = 0; i < indent; i++ ) {
+				text.append( " " );
+			}
+			text.append( key ).append( ':' );
+			if( value instanceof JSONObject ) {
+				text.append( "\n" );
+				toFormattedText( (JSONObject) value, text, indent + 2 );
+			} else {
+				text.append( ' ' ).append( value ).append( "\n" );
+			}
+		}
+		return text.toString();
+	}
+
+	public static Spanned toHTML( JSONObject json ) {
+		return toHTML( json, new StringBuilder(), 0 );
+	}
+
+	private static Spanned toHTML( JSONObject json, StringBuilder html, int indent ) {
+		Iterator<?> it = json.keys();
+		while( it.hasNext() ) {
+			String key = String.valueOf( it.next() );
+			Object value = json.opt( key );
+			for( int i = 0; i < indent; i++ ) {
+				html.append( "-" );
+			}
+			html.append( "<b>" ).append( key ).append( "</b>:" );
+			if( value instanceof JSONObject ) {
+				html.append( "<br/>\n" );
+				toHTML( (JSONObject) value, html, indent + 2 );
+			} else {
+				html.append( ' ' ).append( value ).append( "<br/>\n" );
+			}
+		}
+		return Html.fromHtml( html.toString() );
+	}
+
+	public static void write( JSONGenerator json, String key, CharSequence value ) throws IOException {
+		if( !StringUtils.isEmpty( value ) ) {
+			json.writeKey( key );
+			json.writeString( com.silentcircle.silentstorage.util.IOUtils.toByteArray( value ) );
 		}
 	}
 

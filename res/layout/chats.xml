@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="fill_parent" android:layout_height="fill_parent">
+	<com.silentcircle.silenttext.view.ListView android:id="@+id/chats_list" android:layout_width="fill_parent" android:layout_height="fill_parent" android:listSelector="@drawable/none" android:dividerHeight="@dimen/none" android:divider="@drawable/none"/>
+	<LinearLayout android:id="@+id/chats_empty" android:layout_width="fill_parent" android:layout_height="fill_parent" android:orientation="vertical" android:gravity="center">
+		<TextView style="@style/Widget.Silence.TextView" android:text="@string/empty_conversation_list" android:drawableTop="@drawable/bg_watermark" android:drawablePadding="@dimen/space_normal"/>
+	</LinearLayout>
+</RelativeLayout>

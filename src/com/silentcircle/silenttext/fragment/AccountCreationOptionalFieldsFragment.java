@@ -1,19 +1,18 @@
 /*
-Copyright © 2013, Silent Circle, LLC.
-All rights reserved.
+Copyright (C) 2013-2015, Silent Circle, LLC. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
-    * Any redistribution, use, or modification is done solely for personal 
+    * Any redistribution, use, or modification is done solely for personal
       benefit and not for any commercial purpose or for monetary gain
     * Redistributions of source code must retain the above copyright
       notice, this list of conditions and the following disclaimer.
     * Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-    * Neither the name Silent Circle nor the names of its contributors may 
-      be used to endorse or promote products derived from this software 
-      without specific prior written permission.
+    * Neither the name Silent Circle nor the
+      names of its contributors may be used to endorse or promote products
+      derived from this software without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -28,8 +27,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package com.silentcircle.silenttext.fragment;
 
+import android.app.Fragment;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -50,9 +49,10 @@ public class AccountCreationOptionalFieldsFragment extends AccountCreationFragme
 
 	@Override
 	protected Bundle exportTo( Bundle outState ) {
-		outState.putCharSequence( "email", valueOf( R.id.email ) );
-		outState.putCharSequence( "first_name", valueOf( R.id.first_name ) );
-		outState.putCharSequence( "last_name", valueOf( R.id.last_name ) );
+		outState.putCharSequence( EXTRA_EMAIL, valueOf( R.id.email ) );
+		outState.putCharSequence( EXTRA_FIRST_NAME, valueOf( R.id.first_name ) );
+		outState.putCharSequence( EXTRA_LAST_NAME, valueOf( R.id.last_name ) );
+		outState.putCharSequence( EXTRA_LICENSE_CODE, valueOf( R.id.license_code ) );
 		return outState;
 	}
 
@@ -67,9 +67,20 @@ public class AccountCreationOptionalFieldsFragment extends AccountCreationFragme
 	}
 
 	@Override
+	protected boolean hasNextFragment() {
+		return true;
+	}
+
+	@Override
+	protected boolean hasPreviousFragment() {
+		return true;
+	}
+
+	@Override
 	public View onCreateView( LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState ) {
 		View view = super.onCreateView( inflater, container, savedInstanceState );
-		setTrigger( view, R.id.last_name );
+
+		setTrigger( view, R.id.license_code );
 		return view;
 	}
 

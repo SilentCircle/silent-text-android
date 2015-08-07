@@ -1,19 +1,18 @@
 /*
-Copyright © 2013, Silent Circle, LLC.
-All rights reserved.
+Copyright (C) 2013-2015, Silent Circle, LLC. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
-    * Any redistribution, use, or modification is done solely for personal 
+    * Any redistribution, use, or modification is done solely for personal
       benefit and not for any commercial purpose or for monetary gain
     * Redistributions of source code must retain the above copyright
       notice, this list of conditions and the following disclaimer.
     * Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-    * Neither the name Silent Circle nor the names of its contributors may 
-      be used to endorse or promote products derived from this software 
-      without specific prior written permission.
+    * Neither the name Silent Circle nor the
+      names of its contributors may be used to endorse or promote products
+      derived from this software without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -31,49 +30,47 @@ package com.silentcircle.silenttext.activity;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import android.annotation.TargetApi;
+import android.app.ActionBar;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.DrawerLayout.DrawerListener;
 import android.view.Gravity;
 import android.view.View;
-import android.view.WindowManager.LayoutParams;
+import android.view.View.OnClickListener;
 import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.silentcircle.api.model.Entitlement;
 import com.silentcircle.api.model.User;
 import com.silentcircle.silenttext.Action;
 import com.silentcircle.silenttext.Extra;
 import com.silentcircle.silenttext.Manifest;
-import com.silentcircle.silenttext.NativeBridge;
 import com.silentcircle.silenttext.R;
+import com.silentcircle.silenttext.SCimpBridge;
 import com.silentcircle.silenttext.ServiceConfiguration;
 import com.silentcircle.silenttext.application.SilentTextApplication;
-import com.silentcircle.silenttext.client.JabberClient;
-import com.silentcircle.silenttext.client.SCloudBroker;
-import com.silentcircle.silenttext.crypto.CryptoUtils;
+import com.silentcircle.silenttext.client.XMPPTransport;
 import com.silentcircle.silenttext.listener.DismissOnClick;
 import com.silentcircle.silenttext.listener.OnObjectReceiveListener;
 import com.silentcircle.silenttext.listener.SOSListener;
 import com.silentcircle.silenttext.log.Log;
-import com.silentcircle.silenttext.model.Contact;
 import com.silentcircle.silenttext.model.Conversation;
 import com.silentcircle.silenttext.model.Credential;
 import com.silentcircle.silenttext.model.Server;
@@ -82,54 +79,115 @@ import com.silentcircle.silenttext.repository.ContactRepository;
 import com.silentcircle.silenttext.repository.ConversationRepository;
 import com.silentcircle.silenttext.repository.ServerRepository;
 import com.silentcircle.silenttext.thread.ViewAnimator;
-import com.silentcircle.silenttext.view.ListView;
+import com.silentcircle.silenttext.util.AsyncUtils;
+import com.silentcircle.silenttext.util.StringUtils;
+import com.silentcircle.silenttext.view.AvatarView;
 import com.silentcircle.silenttext.view.OptionsDrawer;
 import com.silentcircle.silenttext.view.adapter.ListAdapter;
 
-public abstract class SilentActivity extends SherlockFragmentActivity {
+public abstract class SilentActivity extends Activity {
 
-	protected static final String ACTION_SILENT_CALL = "com.silentcircle.silentphone.action.NEW_OUTGOING_CALL";
+	class CheckUserEntitledToSilentTextTask extends AsyncTask<Void, Void, Void> {
 
-	private static final int R_id_activate = 0xFFFF & R.id.activate;
-	private static final int R_id_unlock = 0xFFFF & R.id.unlock;
+		private final String username;
+		private final OnObjectReceiveListener<Boolean> listener;
 
-	protected static Intent createIntentToCallUser( String remoteUserID ) {
-		Intent intent = new Intent( ACTION_SILENT_CALL, Uri.fromParts( PROTOCOL_SILENT_PHONE, remoteUserID, null ) );
-		intent.addFlags( Intent.FLAG_ACTIVITY_NEW_TASK );
-		return intent;
+		CheckUserEntitledToSilentTextTask( String username, OnObjectReceiveListener<Boolean> listener ) {
+			this.username = username;
+			this.listener = listener;
+		}
+
+		@Override
+		public Void doInBackground( Void... ignore ) {
+			User user = getUser( username, true );
+			listener.onObjectReceived( Boolean.valueOf( user != null && user.getEntitlements().contains( Entitlement.SILENT_TEXT ) ) );
+			return null;
+		}
+
+	}
+
+	public static final int REQUEST_UNLOCK = 0xFFFF & R.id.unlock;
+	public static final int REQUEST_ACTIVATE = 0xFFFF & R.id.activate;
+
+	private static final String CACHE_STAGING_DIR_NAME = ".temp";
+
+	public static void assertPermissionToView( Activity activity, boolean requireUnlock, boolean requireLinkedAccount, boolean requireActive ) {
+
+		SilentTextApplication global = SilentTextApplication.from( activity );
+		View blackout = activity.findViewById( R.id.blackout );
+
+		if( requireUnlock && !global.isUnlocked() ) {
+			if( blackout != null ) {
+				blackout.setVisibility( View.VISIBLE );
+			}
+			activity.startActivityForResult( new Intent( activity, UnlockActivity.class ), REQUEST_UNLOCK );
+			throw new IllegalStateException();
+		}
+
+		if( requireLinkedAccount && !global.isUserKeyUnlocked() ) {
+			if( blackout != null ) {
+				blackout.setVisibility( View.VISIBLE );
+			}
+			activity.startActivityForResult( new Intent( activity, LoginActivity.class ), REQUEST_ACTIVATE );
+			throw new IllegalStateException();
+		}
+
+		if( requireActive && global.isInactive( OptionsDrawer.getInactivityTimeout( activity ) ) ) {
+			if( blackout != null ) {
+				blackout.setVisibility( View.VISIBLE );
+			}
+			global.lock();
+			activity.startActivityForResult( new Intent( activity, UnlockActivity.class ), REQUEST_UNLOCK );
+			throw new IllegalStateException();
+		}
+
+		if( blackout != null ) {
+			blackout.setVisibility( View.GONE );
+		}
+
 	}
 
 	protected static boolean isDebuggable() {
 		return ServiceConfiguration.getInstance().debug;
 	}
 
-	protected BroadcastReceiver lockReceiver;
+	/**
+	 * @param activity
+	 * @param requestCode
+	 * @param resultCode
+	 * @param data
+	 */
+	public static void onActivityResult( Activity activity, int requestCode, int resultCode, Intent data ) {
+		if( requestCode == SilentActivity.REQUEST_UNLOCK || requestCode == SilentActivity.REQUEST_ACTIVATE ) {
+			if( resultCode == RESULT_CANCELED ) {
+				activity.finish();
+				return;
+			}
+		}
+	}
 
+	protected BroadcastReceiver lockReceiver;
 	protected Runnable hideError = new ViewAnimator( this, R.id.error, R.anim.slide_up );
 	protected Handler handler;
 	protected Log log;
 	protected final List<AsyncTask<?, ?, ?>> tasks = new ArrayList<AsyncTask<?, ?, ?>>();
-	protected static final String PROTOCOL_SILENT_PHONE = "silenttel";
-	protected AsyncTask<Void, Void, Void> isAccessibleTask;
-
-	private static final String CACHE_STAGING_DIR_NAME = ".temp";
-
-	protected void _invalidateOptionsMenu() {
-		invalidateOptionsMenu( true );
-	}
 
 	protected void adviseReconnect() {
 		getSilentTextApplication().adviseReconnect();
 	}
 
-	protected void autoUnlock() {
-		getSilentTextApplication().unlock( new char [0] );
-	}
+	protected void beginLoading( final int contentViewId ) {
 
-	protected void beginLoading( int contentViewId ) {
-		// getSupportActionBar().hide();
-		findViewById( contentViewId ).setVisibility( View.GONE );
-		findViewById( R.id.progress ).setVisibility( View.VISIBLE );
+		runOnUiThread( new Runnable() {
+
+			@Override
+			public void run() {
+				setVisibleIf( false, contentViewId );
+				setVisibleIf( true, R.id.progress );
+			}
+
+		} );
+
 	}
 
 	protected void clearTasks() {
@@ -140,30 +198,47 @@ public abstract class SilentActivity extends SherlockFragmentActivity {
 	}
 
 	protected void closeDrawer() {
+		closeDrawer( GravityCompat.START );
+		closeDrawer( GravityCompat.END );
+	}
+
+	protected void closeDrawer( int gravity ) {
 		DrawerLayout drawer = (DrawerLayout) findViewById( R.id.drawer );
-		drawer.closeDrawer( Gravity.END );
+		try {
+			drawer.closeDrawer( gravity );
+		} catch( IllegalArgumentException ignore ) {
+			// This just means there no drawer there, which means it cannot have been open anyway.
+		}
+	}
+
+	protected <T extends AdapterView<android.widget.ListAdapter>> T findAdapterViewById( int viewResourceId ) {
+		return (T) findViewById( viewResourceId );
 	}
 
 	protected EditText findEditTextById( int viewResourceId ) {
 		return (EditText) findViewById( viewResourceId );
 	}
 
-	protected ListView findListViewById( int viewResourceId ) {
-		return (ListView) findViewById( viewResourceId );
-	}
-
 	protected TextView findTextViewById( int viewResourceId ) {
 		return (TextView) findViewById( viewResourceId );
 	}
 
-	protected void finishLoading( int contentViewId ) {
-		// getSupportActionBar().show();
-		findViewById( contentViewId ).setVisibility( View.VISIBLE );
-		findViewById( R.id.progress ).setVisibility( View.GONE );
+	protected void finishLoading( final int contentViewId ) {
+
+		runOnUiThread( new Runnable() {
+
+			@Override
+			public void run() {
+				setVisibleIf( true, contentViewId );
+				setVisibleIf( false, R.id.progress );
+			}
+
+		} );
+
 	}
 
 	protected CharSequence generateDeviceID() {
-		return UUID.randomUUID().toString();
+		return ( (SilentTextApplication) getApplication() ).getOrCreateUUID();
 	}
 
 	protected SilentActivity getActivity() {
@@ -171,14 +246,10 @@ public abstract class SilentActivity extends SherlockFragmentActivity {
 	}
 
 	protected <T extends ListAdapter<?>> T getAdapter( int viewResourceId ) {
-		return (T) findListViewById( viewResourceId ).getAdapter();
+		return (T) findAdapterViewById( viewResourceId ).getAdapter();
 	}
 
-	protected SCloudBroker getBroker() {
-		return getSilentTextApplication().getBroker();
-	}
-
-	protected File getCacheStagingDir() {
+	public File getCacheStagingDir() {
 		return new File( getCacheDir(), CACHE_STAGING_DIR_NAME );
 	}
 
@@ -187,26 +258,15 @@ public abstract class SilentActivity extends SherlockFragmentActivity {
 	}
 
 	protected Conversation getConversation( String partner ) {
-		if( partner == null ) {
-			return null;
-		}
-		ConversationRepository conversations = getConversations();
-		if( conversations == null ) {
-			return null;
-		}
-		return conversations.findByPartner( partner );
+		return getSilentTextApplication().getConversation( partner );
 	}
 
 	protected ConversationRepository getConversations() {
 		return getSilentTextApplication().getConversations();
 	}
 
-	protected Intent getDebugSettingsIntent() {
-		return isDebuggable() ? new Intent( this, Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB ? LegacySettingsActivity.class : HoneycombSettingsActivity.class ) : null;
-	}
-
-	protected JabberClient getJabber() {
-		return getSilentTextApplication().getJabber();
+	protected XMPPTransport getJabber() {
+		return getSilentTextApplication().getXMPPTransport();
 	}
 
 	protected String getLocalResourceName() {
@@ -215,42 +275,25 @@ public abstract class SilentActivity extends SherlockFragmentActivity {
 
 	protected Log getLog() {
 		if( log == null ) {
-			log = new Log( getClass().getSimpleName() );
+			log = new Log( getLogTag() );
 		}
 		return log;
 	}
 
-	protected NativeBridge getNative() {
-		return getSilentTextApplication().getNative();
+	protected String getLogTag() {
+		return "SilentActivity";
+	}
+
+	protected SCimpBridge getNative() {
+		return getSilentTextApplication().getSCimpBridge();
 	}
 
 	protected String getOnlineStatus() {
-		return getSilentTextApplication().getOnlineStatus();
+		return getSilentTextApplication().getXMPPTransportConnectionStatus();
 	}
 
 	protected Conversation getOrCreateConversation( String partner ) {
-
-		Conversation conversation = getConversation( partner );
-
-		if( conversation == null ) {
-
-			conversation = new Conversation();
-			conversation.setStorageKey( CryptoUtils.randomBytes( 64 ) );
-			conversation.setPartner( new Contact( partner ) );
-			conversation.getPartner().setAlias( getContacts().getDisplayName( partner ) );
-
-			if( isSelf( partner ) ) {
-				conversation.getPartner().setDevice( getLocalResourceName() );
-				getConversations().save( conversation );
-			} else {
-				getConversations().save( conversation );
-				getNative().connect( partner );
-			}
-
-		}
-
-		return conversation;
-
+		return getSilentTextApplication().getOrCreateConversation( partner );
 	}
 
 	protected String getRegisteredDeviceID() {
@@ -313,11 +356,11 @@ public abstract class SilentActivity extends SherlockFragmentActivity {
 	}
 
 	protected long getTimeUntilInactive() {
-		return getSilentTextApplication().getTimeUntilInactive( OptionsDrawer.getInactivityTimeout( this ) );
+		return getSilentTextApplication().getTimeRemainingUntilInactive( OptionsDrawer.getInactivityTimeout( this ) );
 	}
 
-	protected User getUser( CharSequence username ) {
-		return getSilentTextApplication().getUser( username );
+	protected User getUser( CharSequence username, boolean forceUpdate ) {
+		return getSilentTextApplication().getUser( username, forceUpdate );
 	}
 
 	protected String getUsername() {
@@ -357,12 +400,12 @@ public abstract class SilentActivity extends SherlockFragmentActivity {
 
 				@Override
 				public void onDrawerClosed( View view ) {
-					hideSoftKeyboard( R.id.compose_text, R.id.search, R.id.username, R.id.password, R.id.passcode, R.id.passcode_verify );
+					hideSoftKeyboard( R.id.compose_text, R.id.action_search, R.id.username, R.id.password, R.id.passcode, R.id.passcode_previous );
 				}
 
 				@Override
 				public void onDrawerOpened( View view ) {
-					hideSoftKeyboard( R.id.compose_text, R.id.search, R.id.username, R.id.password, R.id.passcode, R.id.passcode_verify );
+					hideSoftKeyboard( R.id.compose_text, R.id.action_search, R.id.username, R.id.password, R.id.passcode, R.id.passcode_previous );
 				}
 
 				@Override
@@ -405,40 +448,25 @@ public abstract class SilentActivity extends SherlockFragmentActivity {
 		}
 	}
 
+	protected void invalidateSupportOptionsMenu() {
+		invalidateOptionsMenu( true );
+	}
+
 	protected void isAccessible( final String username, final OnObjectReceiveListener<Boolean> listener ) {
-		if( isSelf( username ) ) {
+		if( isAlwaysAccessible( username ) ) {
 			listener.onObjectReceived( Boolean.valueOf( true ) );
 			return;
 		}
-		String deviceID = getRegisteredDeviceID();
-		if( deviceID == null ) {
-			JabberClient jabber = getJabber();
-			if( jabber != null ) {
-				jabber.isAccessible( username, listener );
-				return;
-			}
-			listener.onObjectReceived( Boolean.valueOf( false ) );
-			return;
-		}
-		if( isAccessibleTask != null ) {
-			return;
-		}
-		isAccessibleTask = new AsyncTask<Void, Void, Void>() {
-
-			@Override
-			public Void doInBackground( Void... ignore ) {
-				User user = getUser( username );
-				listener.onObjectReceived( Boolean.valueOf( user != null && user.getEntitlements().contains( Entitlement.SILENT_CIRCLE_MOBILE ) ) );
-				isAccessibleTask = null;
-				return null;
-			}
-
-		}.execute();
+		tasks.add( AsyncUtils.execute( new CheckUserEntitledToSilentTextTask( username, listener ) ) );
 
 	}
 
 	protected boolean isActivated() {
-		return getSilentTextApplication().isActivated();
+		return getSilentTextApplication().isUserKeyUnlocked();
+	}
+
+	protected boolean isAlwaysAccessible( String username ) {
+		return !ServiceConfiguration.getInstance().features.checkUserAvailability || isSelf( username );
 	}
 
 	protected boolean isInactive() {
@@ -446,8 +474,19 @@ public abstract class SilentActivity extends SherlockFragmentActivity {
 		return getSilentTextApplication().isInactive( timeout );
 	}
 
+	@TargetApi( Build.VERSION_CODES.JELLY_BEAN_MR1 )
+	protected boolean isLayoutDirectionRTL() {
+		if( Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR1 ) {
+			return false;
+		}
+		Resources resources = getResources();
+		Configuration configuration = resources.getConfiguration();
+		int layoutDirection = configuration.getLayoutDirection();
+		return layoutDirection == View.LAYOUT_DIRECTION_RTL;
+	}
+
 	protected boolean isOnline() {
-		return getSilentTextApplication().isOnline();
+		return getSilentTextApplication().isXMPPTransportConnected();
 	}
 
 	protected boolean isSelf( String username ) {
@@ -458,13 +497,17 @@ public abstract class SilentActivity extends SherlockFragmentActivity {
 		return self != null && self.equalsIgnoreCase( username );
 	}
 
-	protected boolean isSilentPhoneInstalled() {
-		Intent intent = createIntentToCallUser( "alice@silentcircle.com" );
-		return getPackageManager().resolveActivity( intent, 0 ) != null;
-	}
-
 	protected boolean isUnlocked() {
 		return getSilentTextApplication().isUnlocked();
+	}
+
+	protected void loadAvatar( String username, int... viewResourceIDs ) {
+		for( int i = 0; i < viewResourceIDs.length; i++ ) {
+			View view = findViewById( viewResourceIDs[i] );
+			if( view instanceof AvatarView ) {
+				( (AvatarView) view ).loadAvatar( username );
+			}
+		}
 	}
 
 	protected void lock() {
@@ -481,7 +524,7 @@ public abstract class SilentActivity extends SherlockFragmentActivity {
 
 	@Override
 	protected void onActivityResult( int requestCode, int resultCode, Intent data ) {
-		if( requestCode == R_id_activate || requestCode == R_id_unlock ) {
+		if( requestCode == REQUEST_ACTIVATE || requestCode == REQUEST_UNLOCK ) {
 			if( resultCode == RESULT_CANCELED ) {
 				finish();
 				return;
@@ -494,8 +537,13 @@ public abstract class SilentActivity extends SherlockFragmentActivity {
 	protected void onCreate( Bundle savedInstanceState ) {
 		super.onCreate( savedInstanceState );
 		handler = new Handler();
-		log = new Log( getClass().getSimpleName() );
-		log.onCreate();
+		getLog().onCreate();
+	}
+
+	protected void onDeactivated() {
+		Intent intent = new Intent( this, LoginActivity.class );
+		Extra.DEACTIVATED.flag( intent );
+		startActivity( intent );
 	}
 
 	@Override
@@ -508,24 +556,18 @@ public abstract class SilentActivity extends SherlockFragmentActivity {
 	@Override
 	protected void onPause() {
 		super.onPause();
-		ping();
+		sendToBackground();
 		unregisterLockReceiver();
-		if( isAccessibleTask != null ) {
-			isAccessibleTask.cancel( true );
-			isAccessibleTask = null;
-		}
 	}
 
 	@Override
 	protected void onResume() {
 		super.onResume();
-		secureThisWindow();
 		if( !isOnline() ) {
 			adviseReconnect();
 		}
 		registerLockReceiver();
-		getSilentTextApplication().cancelAutoLock();
-		getSilentTextApplication().cancelAutoDisconnect();
+		sendToForeground();
 		ServiceConfiguration.refresh( this );
 		getSilentTextApplication().registerKeyManagerIfNecessary();
 		// getSilentTextApplication().validateSharedSession();
@@ -542,10 +584,6 @@ public abstract class SilentActivity extends SherlockFragmentActivity {
 		drawer.openDrawer( Gravity.END );
 	}
 
-	protected void ping() {
-		getSilentTextApplication().ping();
-	}
-
 	private void registerLockReceiver() {
 		lockReceiver = new FinishActivityOnReceive( this );
 		registerReceiver( lockReceiver, Action.LOCK, Manifest.permission.READ );
@@ -556,11 +594,11 @@ public abstract class SilentActivity extends SherlockFragmentActivity {
 	}
 
 	protected void requestActivation() {
-		startActivityForResult( ActivationActivity.class, R_id_activate );
+		startActivityForResult( LoginActivity.class, REQUEST_ACTIVATE );
 	}
 
 	protected void requestUnlock() {
-		startActivityForResult( UnlockActivity.class, R_id_unlock );
+		startActivityForResult( UnlockActivity.class, REQUEST_UNLOCK );
 	}
 
 	protected void save( Conversation conversation ) {
@@ -571,24 +609,31 @@ public abstract class SilentActivity extends SherlockFragmentActivity {
 		getServers().save( server );
 	}
 
-	protected void secureThisWindow() {
-		if( android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.HONEYCOMB ) {
-			if( OptionsDrawer.isSecureOutputRequired( this ) ) {
-				getWindow().setFlags( LayoutParams.FLAG_SECURE, LayoutParams.FLAG_SECURE );
-			} else {
-				getWindow().clearFlags( LayoutParams.FLAG_SECURE );
-			}
-		}
+	protected void sendToBackground() {
+		getSilentTextApplication().sendToBackground();
+	}
+
+	protected void sendToForeground() {
+		getSilentTextApplication().sendToForeground();
 	}
 
 	protected void setAdapter( int viewResourceId, ListAdapter<?> adapter ) {
-		findListViewById( viewResourceId ).setAdapter( adapter );
+		findAdapterViewById( viewResourceId ).setAdapter( adapter );
 	}
 
 	protected void setHint( int viewResourceID, CharSequence hint ) {
 		View view = findViewById( viewResourceID );
 		if( view instanceof TextView ) {
 			( (TextView) view ).setHint( hint );
+		}
+	}
+
+	protected void setOnClickListener( OnClickListener onClickListener, int... viewResourceIDs ) {
+		for( int i = 0; i < viewResourceIDs.length; i++ ) {
+			View view = findViewById( viewResourceIDs[i] );
+			if( view != null ) {
+				view.setOnClickListener( onClickListener );
+			}
 		}
 	}
 
@@ -599,38 +644,23 @@ public abstract class SilentActivity extends SherlockFragmentActivity {
 		}
 	}
 
-	protected void setVisibleIf( boolean condition, int... viewResourceIDs ) {
-		int visibility = condition ? View.VISIBLE : View.GONE;
-		for( int i = 0; i < viewResourceIDs.length; i++ ) {
-			int viewResourceID = viewResourceIDs[i];
-			View view = findViewById( viewResourceID );
-			if( view != null ) {
-				view.setVisibility( visibility );
+	protected void setVisibleIf( final boolean condition, final int... viewResourceIDs ) {
+
+		runOnUiThread( new Runnable() {
+
+			@Override
+			public void run() {
+				int visibility = condition ? View.VISIBLE : View.GONE;
+				for( int i = 0; i < viewResourceIDs.length; i++ ) {
+					int viewResourceID = viewResourceIDs[i];
+					View view = findViewById( viewResourceID );
+					if( view != null ) {
+						view.setVisibility( visibility );
+					}
+				}
 			}
-		}
-	}
 
-	protected boolean shouldAbort() {
-
-		if( !isUnlocked() ) {
-			lockContentView();
-			requestUnlock();
-			return true;
-		}
-
-		if( !isActivated() ) {
-			lockContentView();
-			requestActivation();
-			return true;
-		}
-
-		if( isInactive() ) {
-			lockContentView();
-			lock();
-			return true;
-		}
-
-		return false;
+		} );
 
 	}
 
@@ -645,6 +675,14 @@ public abstract class SilentActivity extends SherlockFragmentActivity {
 		error.startAnimation( AnimationUtils.loadAnimation( error.getContext(), R.anim.slide_down ) );
 		handler.removeCallbacks( hideError );
 		handler.postDelayed( hideError, 5000 );
+	}
+
+	protected void showError( Throwable exception ) {
+		String message = exception.getLocalizedMessage();
+		if( StringUtils.isEmpty( message ) ) {
+			message = String.format( "%s [%s]", getString( R.string.error_unknown ), exception.getClass().getSimpleName() );
+		}
+		showError( message );
 	}
 
 	protected void sos( int viewResourceID, Intent launchIntent ) {
@@ -691,7 +729,7 @@ public abstract class SilentActivity extends SherlockFragmentActivity {
 	}
 
 	protected void toggleActionBar() {
-		ActionBar bar = getSupportActionBar();
+		ActionBar bar = getActionBar();
 		if( bar.isShowing() ) {
 			bar.hide();
 		} else {
@@ -708,22 +746,31 @@ public abstract class SilentActivity extends SherlockFragmentActivity {
 		}
 	}
 
-	protected void transition( String remoteUserID, String packetID ) {
-		Intent intent = Action.TRANSITION.intent();
-		Extra.PARTNER.to( intent, remoteUserID );
-		Extra.ID.to( intent, packetID );
-		sendBroadcast( intent, Manifest.permission.READ );
+	protected void toggleDrawer( View drawerView ) {
+		DrawerLayout drawer = (DrawerLayout) findViewById( R.id.drawer );
+		if( drawer.isDrawerOpen( drawerView ) ) {
+			drawer.closeDrawer( drawerView );
+		} else {
+			drawer.openDrawer( drawerView );
+		}
 	}
 
-	protected boolean tryAutoUnlock() {
-		if( !isUnlocked() ) {
-			try {
-				autoUnlock();
-			} catch( Exception exception ) {
-				return false;
+	protected void transition( String remoteUserID, String packetID ) {
+
+		final Intent intent = Action.TRANSITION.intent();
+
+		Extra.PARTNER.to( intent, remoteUserID );
+		Extra.ID.to( intent, packetID );
+
+		runOnUiThread( new Runnable() {
+
+			@Override
+			public void run() {
+				sendBroadcast( intent, Manifest.permission.READ );
 			}
-		}
-		return true;
+
+		} );
+
 	}
 
 	protected void unlockContentView() {

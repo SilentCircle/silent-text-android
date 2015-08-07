@@ -1,19 +1,18 @@
 /*
-Copyright © 2013, Silent Circle, LLC.
-All rights reserved.
+Copyright (C) 2013-2015, Silent Circle, LLC. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
-    * Any redistribution, use, or modification is done solely for personal 
+    * Any redistribution, use, or modification is done solely for personal
       benefit and not for any commercial purpose or for monetary gain
     * Redistributions of source code must retain the above copyright
       notice, this list of conditions and the following disclaimer.
     * Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-    * Neither the name Silent Circle nor the names of its contributors may 
-      be used to endorse or promote products derived from this software 
-      without specific prior written permission.
+    * Neither the name Silent Circle nor the
+      names of its contributors may be used to endorse or promote products
+      derived from this software without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -29,49 +28,25 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 package com.silentcircle.silenttext.view;
 
 import android.content.Context;
-import android.os.Build;
 import android.util.AttributeSet;
 import android.util.SparseBooleanArray;
+import android.view.ActionMode;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListAdapter;
 
-import com.actionbarsherlock.view.ActionMode;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuItem;
 import com.silentcircle.silenttext.activity.SilentActivity;
-import com.silentcircle.silenttext.listener.SwipeToDelete;
 
 public class ListView extends android.widget.ListView {
 
-	public static class DeleteOnSwipe implements SwipeToDelete.DismissCallbacks {
-
-		@Override
-		public boolean canDismiss( int position ) {
-			return true;
-		}
-
-		@Override
-		public void onDismiss( android.widget.ListView listView, int [] reverseSortedPositions ) {
-			ListAdapter adapter = listView.getAdapter();
-			if( adapter instanceof com.silentcircle.silenttext.view.adapter.ListAdapter ) {
-				com.silentcircle.silenttext.view.adapter.ListAdapter<?> a = (com.silentcircle.silenttext.view.adapter.ListAdapter<?>) adapter;
-				for( int i = 0; i < reverseSortedPositions.length; i++ ) {
-					int position = reverseSortedPositions[i];
-					a.remove( position );
-				}
-				a.notifyDataSetChanged();
-			}
-		}
-
-	}
-
-	protected class MultiChoiceModeCallback implements MultiChoiceModeListener {
+	protected class MultiChoiceModeCallback implements com.silentcircle.silenttext.view.MultiChoiceModeListener {
 
 		protected ActionMode currentMode;
-		protected final MultiChoiceModeListener delegate;
+		protected final com.silentcircle.silenttext.view.MultiChoiceModeListener delegate;
 
-		public MultiChoiceModeCallback( MultiChoiceModeListener delegate ) {
+		public MultiChoiceModeCallback( com.silentcircle.silenttext.view.MultiChoiceModeListener delegate ) {
 			this.delegate = delegate;
 		}
 
@@ -137,14 +112,6 @@ public class ListView extends android.widget.ListView {
 
 	}
 
-	public static interface MultiChoiceModeListener extends ActionMode.Callback {
-
-		public void onItemCheckedStateChanged( ActionMode mode, int position, long itemId, boolean checked );
-
-		public void performAction( int menuActionId, int position );
-
-	}
-
 	protected class SetCheckedStateOnItemClick implements OnItemClickListener {
 
 		private OnItemClickListener delegate;
@@ -170,44 +137,6 @@ public class ListView extends android.widget.ListView {
 
 		public void setDelegate( OnItemClickListener delegate ) {
 			this.delegate = delegate;
-		}
-
-	}
-
-	public static abstract class SimpleMultiChoiceModeListener implements MultiChoiceModeListener {
-
-		private final int menuResourceId;
-
-		public SimpleMultiChoiceModeListener( int menuResourceId ) {
-			this.menuResourceId = menuResourceId;
-		}
-
-		@Override
-		public boolean onActionItemClicked( ActionMode mode, MenuItem item ) {
-			mode.finish();
-			return true;
-		}
-
-		@Override
-		public boolean onCreateActionMode( ActionMode mode, Menu menu ) {
-			mode.getMenuInflater().inflate( menuResourceId, menu );
-			return true;
-		}
-
-		@Override
-		public void onDestroyActionMode( ActionMode mode ) {
-			// Do nothing.
-		}
-
-		@Override
-		public void onItemCheckedStateChanged( ActionMode mode, int position, long itemId, boolean checked ) {
-			// Do nothing.
-		}
-
-		@Override
-		public boolean onPrepareActionMode( ActionMode mode, Menu menu ) {
-			// Don't change a thing.
-			return false;
 		}
 
 	}
@@ -247,8 +176,6 @@ public class ListView extends android.widget.ListView {
 
 	protected MultiChoiceModeCallback multiChoiceModeCallback;
 
-	private SwipeToDelete swiper;
-
 	public ListView( Context context ) {
 		super( context );
 		prepareItemListeners();
@@ -285,16 +212,8 @@ public class ListView extends android.widget.ListView {
 	}
 
 	protected void prepareItemListeners() {
-		prepareSwipeToDelete();
 		super.setOnItemClickListener( new SetCheckedStateOnItemClick() );
 		super.setOnItemLongClickListener( new StartActionModeOnItemLongClick() );
-	}
-
-	protected void prepareSwipeToDelete() {
-		if( Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB_MR1 ) {
-			return;
-		}
-		swiper = new SwipeToDelete( this, new DeleteOnSwipe() );
 	}
 
 	public void setItemsChecked( boolean checked ) {
@@ -305,7 +224,7 @@ public class ListView extends android.widget.ListView {
 		}
 	}
 
-	public void setMultiChoiceModeListener( MultiChoiceModeListener listener ) {
+	public void setMultiChoiceModeListener( com.silentcircle.silenttext.view.MultiChoiceModeListener listener ) {
 		multiChoiceModeCallback = new MultiChoiceModeCallback( listener );
 		setChoiceMode( CHOICE_MODE_MULTIPLE );
 	}
@@ -318,18 +237,6 @@ public class ListView extends android.widget.ListView {
 	@Override
 	public void setOnItemLongClickListener( OnItemLongClickListener listener ) {
 		( (StartActionModeOnItemLongClick) getOnItemLongClickListener() ).setDelegate( listener );
-	}
-
-	public void setSwipeEnabled( boolean enabled ) {
-		if( enabled ) {
-			if( swiper != null ) {
-				setOnTouchListener( swiper );
-				setOnScrollListener( swiper.makeScrollListener() );
-			}
-		} else {
-			setOnTouchListener( null );
-			setOnScrollListener( null );
-		}
 	}
 
 }

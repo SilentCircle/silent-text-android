@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools" android:layout_width="fill_parent" android:layout_height="fill_parent" tools:context=".activity.UnlockActivity">
-  <LinearLayout style="@style/Widget.Silence.LinearLayout.Rotatable" android:layout_width="fill_parent" android:layout_height="fill_parent">
-    <ImageView style="@style/ActivationLogo" android:contentDescription="@string/silent_circle"/>
-    <RelativeLayout style="@style/Widget.Silence.RelativeLayout" android:layout_weight="1">
-      <EditText android:id="@+id/passcode" style="@style/Widget.Silence.EditText.Password" android:hint="@string/passcode" android:drawableLeft="@drawable/ic_action_secure" android:layout_centerInParent="true">
-        <requestFocus/>
-      </EditText>
-      <TextView style="@style/Widget.Silence.TextView" android:text="@string/current_passcode" android:layout_below="@+id/passcode" android:layout_alignLeft="@+id/passcode"/>
-    </RelativeLayout>
-  </LinearLayout>
-  <TextView style="@style/Widget.Silence.TextView.Error" android:id="@+id/error"/>
-  <include layout="@layout/indeterminate_progress" android:visibility="gone" android:id="@+id/progress"/>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android" style="@style/Widget.Silence.RelativeLayout">
+	<LinearLayout style="@style/Widget.Silence.LinearLayout.Vertical" android:background="@drawable/bg_notify_default" android:layout_margin="@dimen/spacing_large" android:layout_centerInParent="true">
+		<TextView style="@style/Widget.Silence.TextView" android:text="@string/current_passcode" android:padding="@dimen/spacing_large" android:layout_width="fill_parent" android:gravity="center"/>
+		<LinearLayout style="@style/Widget.Silence.LinearLayout.Horizontal" android:layout_width="fill_parent">
+			<ImageView style="@style/Widget.Silence.ImageView.Avatar" android:src="@drawable/logo_silentcircle" android:contentDescription="@string/silent_circle" android:layout_margin="@dimen/spacing_normal"/>
+			<EditText android:id="@+id/passcode" style="@style/Widget.Silence.EditText.Password" android:hint="@string/passcode">
+				<requestFocus/>
+			</EditText>
+		</LinearLayout>
+		<TextView style="@style/Widget.Silence.TextView.Error" android:id="@+id/error"/>
+	</LinearLayout>
+	<include layout="@layout/indeterminate_progress" android:visibility="gone" android:id="@+id/progress"/>
 </RelativeLayout>

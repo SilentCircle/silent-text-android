@@ -1,19 +1,18 @@
 /*
-Copyright © 2013, Silent Circle, LLC.
-All rights reserved.
+Copyright (C) 2013-2015, Silent Circle, LLC. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
-    * Any redistribution, use, or modification is done solely for personal 
+    * Any redistribution, use, or modification is done solely for personal
       benefit and not for any commercial purpose or for monetary gain
     * Redistributions of source code must retain the above copyright
       notice, this list of conditions and the following disclaimer.
     * Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-    * Neither the name Silent Circle nor the names of its contributors may 
-      be used to endorse or promote products derived from this software 
-      without specific prior written permission.
+    * Neither the name Silent Circle nor the
+      names of its contributors may be used to endorse or promote products
+      derived from this software without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -38,9 +37,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.media.AudioManager;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.SystemClock;
 import android.os.Vibrator;
 import android.support.v4.app.NotificationCompat;
 
@@ -50,6 +51,7 @@ import com.silentcircle.silenttext.activity.ConversationActivity;
 import com.silentcircle.silenttext.activity.ConversationListActivity;
 import com.silentcircle.silenttext.application.SilentTextApplication;
 import com.silentcircle.silenttext.model.Conversation;
+import com.silentcircle.silenttext.model.UserPreferences;
 import com.silentcircle.silenttext.repository.ConversationRepository;
 
 public class NotificationBroadcaster extends BroadcastReceiver {
@@ -65,6 +67,9 @@ public class NotificationBroadcaster extends BroadcastReceiver {
 		250,
 		250
 	};
+
+	private static long minimumTimeOfNextNotification = Long.MIN_VALUE;
+	private static final long NOTIFICATION_WINDOW = 2 * 1000L;
 
 	public static void cancel( Context context ) {
 		NotificationManager manager = (NotificationManager) context.getSystemService( Context.NOTIFICATION_SERVICE );
@@ -97,47 +102,95 @@ public class NotificationBroadcaster extends BroadcastReceiver {
 		return getApplication( context ).getConversations();
 	}
 
-	public static SharedPreferences getPreferences( Context context ) {
+	public static UserPreferences getPreferences( Context context ) {
+		SilentTextApplication application = SilentTextApplication.from( context );
+		UserPreferences preferences = application.getGlobalPreferences();
+		return preferences == null ? application.createDefaultUserPreferences() : preferences;
+	}
+
+	public static SharedPreferences getPreferencesLegacy( Context context ) {
 		return context.getSharedPreferences( PREFERENCES, Context.MODE_PRIVATE );
 	}
 
+	public static Uri getRingtone( Context context ) {
+		return isEnabled( context ) ? getPreferences( context ).getRingtoneURI() : null;
+	}
+
 	private static boolean isActivated( Context context ) {
-		return SilentTextApplication.from( context ).isActivated();
+		return SilentTextApplication.from( context ).isUserKeyUnlocked();
+	}
+
+	public static boolean isApplicationInForeground( Context context ) {
+		return SilentTextApplication.from( context ).isApplicationInForeground();
+	}
+
+	public static boolean isEnabled( Context context ) {
+		return getPreferences( context ).notifications;
 	}
 
 	public static boolean isEnabled( SharedPreferences preferences ) {
 		return preferences.getBoolean( KEY_ENABLE_NOTIFICATIONS, true );
 	}
 
+	public static boolean isEnabledLegacy( Context context ) {
+		return isEnabled( getPreferencesLegacy( context ) );
+	}
+
 	public static boolean isOnline( Context context ) {
-		return SilentTextApplication.from( context ).isOnline();
+		return SilentTextApplication.from( context ).isXMPPTransportConnected();
+	}
+
+	public static boolean isReadyForNextNotification() {
+		long now = SystemClock.elapsedRealtime();
+		return now >= minimumTimeOfNextNotification;
+	}
+
+	public static boolean isSoundEnabled( Context context ) {
+		AudioManager audioManager = (AudioManager) context.getSystemService( Context.AUDIO_SERVICE );
+		return isEnabled( context ) && getPreferences( context ).notificationSound && audioManager.getRingerMode() == AudioManager.RINGER_MODE_NORMAL;
 	}
 
 	public static boolean isSoundEnabled( SharedPreferences preferences ) {
 		return isEnabled( preferences ) && preferences.getBoolean( KEY_ENABLE_SOUND, true );
 	}
 
+	public static boolean isSoundEnabledLegacy( Context context ) {
+		return isSoundEnabled( getPreferencesLegacy( context ) );
+	}
+
 	private static boolean isUnlocked( Context context ) {
 		return SilentTextApplication.from( context ).isUnlocked();
+	}
+
+	public static boolean isVibrateEnabled( Context context ) {
+		AudioManager audioManager = (AudioManager) context.getSystemService( Context.AUDIO_SERVICE );
+		return isEnabled( context ) && getPreferences( context ).notificationVibrate && audioManager.getRingerMode() != AudioManager.RINGER_MODE_SILENT;
 	}
 
 	public static boolean isVibrateEnabled( SharedPreferences preferences ) {
 		return isEnabled( preferences ) && preferences.getBoolean( KEY_ENABLE_VIBRATE, true );
 	}
 
-	private static void playNotificationSound( Context context, SharedPreferences preferences ) {
-		if( !isSoundEnabled( preferences ) ) {
+	public static boolean isVibrateEnabledLegacy( Context context ) {
+		return isVibrateEnabled( getPreferencesLegacy( context ) );
+	}
+
+	private static void playNotificationSound( Context context ) {
+		if( !isSoundEnabled( context ) ) {
 			return;
 		}
-		Uri uri = RingtoneManager.getDefaultUri( RingtoneManager.TYPE_NOTIFICATION );
+		Uri uri = getRingtone( context );
+		if( uri == null ) {
+			uri = RingtoneManager.getDefaultUri( RingtoneManager.TYPE_NOTIFICATION );
+		}
 		Ringtone ringtone = RingtoneManager.getRingtone( context.getApplicationContext(), uri );
-		if( ringtone != null ) {
+		if( ringtone != null && !ringtone.isPlaying() ) {
 			ringtone.play();
 		}
 	}
 
-	private static void playNotificationVibration( Context context, SharedPreferences preferences ) {
-		if( !isVibrateEnabled( preferences ) ) {
+	private static void playNotificationVibration( Context context ) {
+		if( !isVibrateEnabled( context ) ) {
 			return;
 		}
 		Vibrator vibrator = (Vibrator) context.getSystemService( Context.VIBRATOR_SERVICE );
@@ -146,11 +199,21 @@ public class NotificationBroadcaster extends BroadcastReceiver {
 
 	private static void sendNotification( Context context, boolean silent ) {
 
-		SharedPreferences preferences = getPreferences( context );
-		boolean enabled = isEnabled( preferences );
+		boolean foreground = isApplicationInForeground( context );
+		boolean enabled = isEnabled( context );
 		boolean unlocked = isUnlocked( context );
 		boolean activated = isActivated( context );
 		boolean online = isOnline( context );
+
+		NotificationManager manager = (NotificationManager) context.getSystemService( Context.NOTIFICATION_SERVICE );
+
+		if( foreground ) {
+			manager.cancel( R.id.messages );
+			if( !silent ) {
+				playNotificationVibration( context );
+			}
+			return;
+		}
 
 		if( !enabled ) {
 			return;
@@ -180,8 +243,6 @@ public class NotificationBroadcaster extends BroadcastReceiver {
 			partners.add( null );
 		}
 
-		NotificationManager manager = (NotificationManager) context.getSystemService( Context.NOTIFICATION_SERVICE );
-
 		if( unreadMessageCount < 1 ) {
 			manager.cancel( R.id.messages );
 			return;
@@ -203,7 +264,7 @@ public class NotificationBroadcaster extends BroadcastReceiver {
 		notification.setOnlyAlertOnce( true );
 		notification.setAutoCancel( !online );
 		notification.setStyle( style );
-		notification.setSmallIcon( R.drawable.ic_notify_message );
+		notification.setSmallIcon( R.drawable.ic_notify_solid );
 		notification.setContentIntent( intent );
 		notification.setNumber( unreadMessageCount );
 		notification.setContentTitle( title );
@@ -211,12 +272,16 @@ public class NotificationBroadcaster extends BroadcastReceiver {
 
 		if( !silent ) {
 			notification.setTicker( subtitle );
-			playNotificationSound( context, preferences );
-			playNotificationVibration( context, preferences );
+			playNotificationSound( context );
+			playNotificationVibration( context );
 		}
 
 		manager.notify( R.id.messages, notification.build() );
 
+	}
+
+	private static void setDelayForNextNotification() {
+		minimumTimeOfNextNotification = SystemClock.elapsedRealtime() + NOTIFICATION_WINDOW;
 	}
 
 	private static String withoutDomain( Context context, String emailAddress ) {
@@ -225,7 +290,10 @@ public class NotificationBroadcaster extends BroadcastReceiver {
 
 	@Override
 	public void onReceive( Context context, Intent intent ) {
-		sendNotification( context, Extra.SILENT.test( intent ) );
+		if( isReadyForNextNotification() ) {
+			setDelayForNextNotification();
+			sendNotification( context, Extra.SILENT.test( intent ) );
+		}
 	}
 
 }

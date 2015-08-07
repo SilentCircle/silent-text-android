@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<com.silentcircle.silenttext.view.RelativeLayout 
+    xmlns:android="http://schemas.android.com/apk/res/android" 
+    xmlns:tools="http://schemas.android.com/tools" 
+    android:layout_width="fill_parent" 
+    android:layout_height="fill_parent" 
+    tools:context=".activity.ConversationListActivity" 
+    android:animateLayoutChanges="true">
+    <ProgressBar
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:indeterminate="true"
+        android:id="@+id/progressBar_id"
+        android:visibility="invisible"
+        android:layout_centerHorizontal="true"
+        tools:visibility="visible"
+        />
+    <LinearLayout android:id="@+id/directory_cb_layout_id"
+        android:layout_below="@id/progressBar_id" 
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone">    
+        <CheckBox android:id="@+id/sc_directory_cb_id"
+        		android:layout_width="wrap_content"
+        		android:layout_height="wrap_content"
+        		android:checked="true"
+        		android:text="@string/silent_circle" />
+        <CheckBox android:id="@+id/orgnization_directory_cb_id"
+        		android:layout_width="wrap_content"
+        		android:layout_height="wrap_content"
+        		android:checked="true"
+        		android:text="@string/directory_search_own_organization" />
+    </LinearLayout>
+
+	<FrameLayout android:id="@+id/chats" 
+	    android:layout_width="fill_parent" 
+	    android:layout_height="fill_parent" />
+	<LinearLayout android:id="@+id/actions" 
+	    style="@style/Widget.Layout.FloatingActions">
+		<ImageView android:id="@+id/action_new_message" 
+		    style="@style/Widget.FloatingAction" 
+		    android:src="@drawable/ic_action_add" 
+		    android:contentDescription="@string/new_message"/>
+	</LinearLayout>
+	<include android:id="@+id/progress" 
+	    layout="@layout/indeterminate_progress" 
+	    android:visibility="gone"/>
+	<View android:id="@+id/blackout" 
+	    style="@style/Widget.Silence.Blackout"/>
+</com.silentcircle.silenttext.view.RelativeLayout>

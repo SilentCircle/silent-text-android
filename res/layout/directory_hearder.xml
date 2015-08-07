@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+Created by Rong Li on 01.08.15.
+-->
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/directory_header"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:background="@color/directory_search_gray">
+
+        <ImageView
+        android:id="@+id/orgnization_img_id"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginLeft="8dip"
+        android:layout_marginStart="8dip"
+        android:src="@drawable/ic_stroked_company"/>
+
+        <TextView
+            android:id="@+id/org_name_tv_id"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="8dip"
+            android:layout_marginRight="8dip"
+            android:layout_toRightOf="@+id/orgnization_img_id"
+            android:layout_toEndOf="@+id/orgnization_img_id"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:singleLine="true"
+            android:textStyle="bold"
+            android:textAllCaps="true"
+            tools:text="Dirname"/>
+
+    </RelativeLayout>
+</FrameLayout>

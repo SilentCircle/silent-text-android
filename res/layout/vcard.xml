@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" style="@style/Widget.Silence.LinearLayout.Vertical" android:layout_height="fill_parent" android:layout_width="fill_parent">
+	<include android:id="@+id/contact" layout="@layout/contact"/>
+	<ScrollView android:layout_height="fill_parent" android:layout_width="fill_parent">
+		<TextView android:id="@+id/raw_vcard" style="@style/Widget.Silence.TextView.Long" android:layout_margin="@dimen/spacing_large"/>
+	</ScrollView>
+</LinearLayout>

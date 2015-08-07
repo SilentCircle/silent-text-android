@@ -1,35 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<RelativeLayout
-  xmlns:android="http://schemas.android.com/apk/res/android"
-  xmlns:tools="http://schemas.android.com/tools"
-  android:id="@+id/activity"
-  android:layout_width="fill_parent"
-  android:layout_height="fill_parent"
-  tools:context=".activity.ConversationActivity">
-  
-  <com.silentcircle.silenttext.view.ListView
-    style="@style/ConversationMessages"
-    android:id="@+id/messages"
-    android:layout_above="@+id/upload"
-    tools:listitem="@layout/message"/>
-
-  <include
-    layout="@layout/upload"
-    android:id="@+id/upload"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:layout_margin="@dimen/spacing_normal"
-    android:layout_above="@+id/compose"/>
-
-  <include
-    layout="@layout/compose"
-    android:id="@+id/compose"/>
-
-  <include
-    layout="@layout/indeterminate_progress"
-    android:visibility="gone"
-    android:id="@+id/progress"/>
-
-  <View android:id="@+id/blackout" style="@style/Widget.Silence.Blackout"/>
-
-</RelativeLayout>
+<com.silentcircle.silenttext.view.RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools" android:id="@+id/activity" android:layout_width="fill_parent" android:layout_height="fill_parent" tools:context=".activity.ConversationActivity">
+	<FrameLayout android:id="@+id/chat" android:layout_width="fill_parent" android:layout_height="fill_parent" android:layout_above="@+id/upload"/>
+	<include layout="@layout/upload" android:id="@+id/upload" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_margin="@dimen/spacing_normal" android:layout_above="@+id/compose"/>
+	<include layout="@layout/compose" android:id="@+id/compose"/>
+	<include layout="@layout/indeterminate_progress" android:visibility="gone" android:id="@+id/progress"/>
+	<View android:id="@+id/blackout" style="@style/Widget.Silence.Blackout"/>
+</com.silentcircle.silenttext.view.RelativeLayout>

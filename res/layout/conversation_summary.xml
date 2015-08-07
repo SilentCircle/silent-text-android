@@ -1,53 +1,59 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<com.silentcircle.silenttext.view.ConversationView
-  xmlns:android="http://schemas.android.com/apk/res/android"
-  style="@style/ConversationSummary">
-
-  <com.silentcircle.silenttext.view.AvatarView
-    style="@style/ConversationAvatar"
-    android:id="@+id/avatar"
-    android:src="@drawable/ic_avatar_placeholder"
-    android:contentDescription="@string/sample_sender"/>
-  
-  <RelativeLayout
-    style="@style/ConversationSummaryContent"
-    android:id="@+id/summary">
-
-    <TextView
-      style="@style/ConversationAlias"
-      android:id="@+id/alias"
-      android:text="@string/sample_recipient"/>
-
-    <TextView
-      style="@style/ConversationDevice"
-      android:id="@+id/device"
-      android:text="@string/sample_device"/>
-
-    <TextView
-      style="@style/ConversationSnippet"
-      android:id="@+id/snippet"
-      android:text="@string/sample_message"/>
-
-    <TextView
-      style="@style/ConversationTimestamp"
-      android:id="@+id/timestamp"
-      android:text="@string/message_timestamp"/>
-    
-    <ImageView
-      style="@style/ConversationSecureIcon"
-      android:id="@+id/secure_icon"
-      android:contentDescription="@string/secure"/>
-    
-    <ImageView
-      style="@style/ConversationCountIcon"
-      android:id="@+id/count_icon"
-      android:contentDescription="@string/unread_messages"/>
-
-    <TextView
-      style="@style/ConversationCount"
-      android:id="@+id/count"
-      android:text="@string/sample_count"/>
-
-  </RelativeLayout>
-
+<com.silentcircle.silenttext.view.ConversationView 
+    xmlns:android="http://schemas.android.com/apk/res/android" 
+    style="@style/Widget.Silence.LinearLayout.Horizontal" 
+    android:layout_width="fill_parent" 
+    android:background="@drawable/bg_selectable">
+	<com.silentcircle.silenttext.view.AvatarView 
+	    android:id="@+id/avatar" 
+	    style="@style/Widget.Silence.ImageView.Avatar" 
+	    android:src="@drawable/ic_avatar_placeholder" 
+	    android:contentDescription="@null"/>
+	<RelativeLayout 
+	    android:layout_width="fill_parent" 
+	    android:layout_height="wrap_content">
+		<LinearLayout 
+		    android:id="@+id/card" 
+		    style="@style/Widget.Silence.LinearLayout.Vertical" 
+		    android:layout_height="wrap_content" 
+		    android:padding="@dimen/spacing_normal">
+			<RelativeLayout 
+			    android:layout_width="fill_parent" 
+			    android:layout_height="wrap_content">
+				<TextView 
+				    android:id="@+id/alias" 
+				    style="@style/Widget.Silence.TextView" 
+				    android:textSize="@dimen/text_xlarge" 
+				    android:text="@string/sample_recipient" 
+				    android:layout_width="fill_parent" 
+				    android:layout_toLeftOf="@+id/timestamp"/>
+				<TextView 
+				    android:id="@+id/timestamp" 
+				    style="@style/Widget.Silence.TextView" 
+				    android:textSize="@dimen/text_small" 
+				    android:textColor="@color/text_secondary_dark" 
+				    android:text="@string/message_timestamp" 
+				    android:layout_alignParentRight="true"/>
+			</RelativeLayout>
+			<TextView 
+			    android:id="@+id/snippet" 
+			    style="@style/Widget.Silence.TextView" 
+			    android:textColor="@color/text_secondary_dark" 
+			    android:text="@string/sample_message" 
+			    android:maxLines="7" 
+			    android:ellipsize="end" />
+		</LinearLayout>
+		<TextView android:id="@+id/count" 
+		    style="@style/Widget.Silence.TextView.Message" 
+		    android:textSize="@dimen/text_small" 
+		    android:text="@string/sample_count" 
+		    android:background="@drawable/bg_notify" 
+		    android:layout_alignParentRight="true" 
+		    android:layout_alignBottom="@+id/card"/>
+		<View 
+		    android:layout_width="fill_parent" 
+		    android:layout_height="@dimen/stroke_thin" 
+		    android:background="@drawable/divider" 
+		    android:layout_alignBottom="@+id/card"/>
+	</RelativeLayout>
 </com.silentcircle.silenttext.view.ConversationView>

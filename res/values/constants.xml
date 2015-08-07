@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+	<string name="silent_circle">Silent Circle</string>
+	<string name="silent_text">Silent Text</string>
+	<string name="security_rating_hint_2_to_3">&#9733;&#9733;&#9734;&#8594;&#9733;&#9733;&#9733;</string>
+	<string name="support_email_address">support@silentcircle.com</string>
+	<string name="support_email_subject">[User Feedback] Silent Text for Android</string>
+	<string name="checkmark">&#x2713;</string>
+	
+	<string name="sccps_user_management_base_alt" translatable="false">/v1/me/</string>
+	<string name="sccps_directory_request" translatable="false">/v1/people/?terms=</string>
+</resources>

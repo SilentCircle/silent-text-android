@@ -1,19 +1,18 @@
 /*
-Copyright © 2013, Silent Circle, LLC.
-All rights reserved.
+Copyright (C) 2013-2015, Silent Circle, LLC. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
-    * Any redistribution, use, or modification is done solely for personal 
+    * Any redistribution, use, or modification is done solely for personal
       benefit and not for any commercial purpose or for monetary gain
     * Redistributions of source code must retain the above copyright
       notice, this list of conditions and the following disclaimer.
     * Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-    * Neither the name Silent Circle nor the names of its contributors may 
-      be used to endorse or promote products derived from this software 
-      without specific prior written permission.
+    * Neither the name Silent Circle nor the
+      names of its contributors may be used to endorse or promote products
+      derived from this software without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -33,14 +32,17 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.TextView;
 
-import com.silentcircle.silenttext.NativeBridge;
+import com.silentcircle.silenttext.SCimpBridge;
 import com.silentcircle.silenttext.application.SilentTextApplication;
+import com.silentcircle.silenttext.location.LocationObserver;
+import com.silentcircle.silenttext.location.OnLocationReceivedListener;
 import com.silentcircle.silenttext.model.Conversation;
 import com.silentcircle.silenttext.model.event.Message;
 import com.silentcircle.silenttext.repository.ConversationRepository;
 import com.silentcircle.silenttext.task.ComposeMessageTask;
+import com.silentcircle.silenttext.util.AsyncUtils;
 
-public class SendMessageOnClick implements OnClickListener {
+public class SendMessageOnClick implements OnClickListener, OnLocationReceivedListener {
 
 	private static SilentTextApplication getApplication( View view ) {
 		return SilentTextApplication.from( view.getContext() );
@@ -50,11 +52,11 @@ public class SendMessageOnClick implements OnClickListener {
 	protected final String username;
 	protected final Conversation conversation;
 	protected final ConversationRepository repository;
-	protected final NativeBridge encryptor;
-
+	protected final SCimpBridge encryptor;
+	private String text;
 	private final boolean shouldRequestDeliveryNotification;
 
-	public SendMessageOnClick( TextView source, String username, Conversation conversation, ConversationRepository repository, NativeBridge encryptor, boolean shouldRequestDeliveryNotification ) {
+	public SendMessageOnClick( TextView source, String username, Conversation conversation, ConversationRepository repository, SCimpBridge encryptor, boolean shouldRequestDeliveryNotification ) {
 		this.source = source;
 		this.username = username;
 		this.conversation = conversation;
@@ -63,23 +65,14 @@ public class SendMessageOnClick implements OnClickListener {
 		this.shouldRequestDeliveryNotification = shouldRequestDeliveryNotification;
 	}
 
-	/**
-	 * If location sharing is enabled, override this method to return a location.
-	 * 
-	 * @return Always returns {code}null{code}
-	 */
-	protected Location getLocation() {
-		return null;
-	}
-
 	@Override
 	public void onClick( View button ) {
 
-		if( !getApplication( button ).isActivated() ) {
+		if( !getApplication( button ).isUserKeyUnlocked() ) {
 			return;
 		}
 
-		String text = source.getText().toString();
+		text = source.getText().toString();
 
 		if( text == null || "".equals( text.trim() ) ) {
 			return;
@@ -87,17 +80,32 @@ public class SendMessageOnClick implements OnClickListener {
 
 		source.setText( null );
 
-		Location location = conversation.isLocationEnabled() ? getLocation() : null;
+		if( conversation.isLocationEnabled() ) {
+			LocationObserver.observe( source.getContext(), this );
+			return;
+		}
 
-		new ComposeMessageTask( username, conversation, repository, location, shouldRequestDeliveryNotification ) {
+		onLocationReceived( null );
+
+	}
+
+	@Override
+	public void onLocationReceived( Location location ) {
+
+		AsyncUtils.execute( new ComposeMessageTask( username, conversation, repository, location, shouldRequestDeliveryNotification ) {
 
 			@Override
 			protected void onPostExecute( Message message ) {
 				withMessage( message );
 			}
 
-		}.execute( text );
+		}, text );
 
+	}
+
+	@Override
+	public void onLocationUnavailable() {
+		onLocationReceived( null );
 	}
 
 	/**

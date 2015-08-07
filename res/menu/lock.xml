@@ -6,10 +6,4 @@
     android:icon="@drawable/ic_action_delete"
     android:orderInCategory="1"
     android:showAsAction="always"/>
-  <item
-    android:id="@+id/set_passcode"
-    android:title="@string/set_passcode"
-    android:icon="@drawable/ic_action_send"
-    android:orderInCategory="2"
-    android:showAsAction="always"/>
 </menu>

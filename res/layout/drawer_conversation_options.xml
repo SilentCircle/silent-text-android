@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <com.silentcircle.silenttext.view.ConversationOptionsDrawer xmlns:android="http://schemas.android.com/apk/res/android" style="@style/Widget.Silence.Drawer">
 	<LinearLayout style="@style/Widget.Silence.LinearLayout.Vertical">
-		<CheckBox android:id="@+id/location_sharing" style="@style/Widget.Silence.CheckBox" android:text="@string/share_location" android:layout_margin="@dimen/spacing_normal" android:drawableRight="@drawable/ic_location"/>
+		<CheckBox android:id="@+id/location_sharing" style="@style/Widget.Silence.CheckBox.Location" android:text="@string/share_location"/>
 		<View style="@style/Widget.Silence.Divider"/>
-		<CheckBox android:id="@+id/burn_notice" style="@style/Widget.Silence.CheckBox" android:text="@string/burn_notice" android:layout_margin="@dimen/spacing_normal" android:drawableRight="@drawable/ic_burn"/>
+		<CheckBox android:id="@+id/burn_notice" style="@style/Widget.Silence.CheckBox.BurnNotice" android:text="@string/burn_notice"/>
 		<LinearLayout android:id="@+id/burn_delay" style="@style/Widget.Silence.LinearLayout.Vertical" android:layout_marginBottom="@dimen/spacing_normal">
 			<TextView android:id="@+id/burn_delay_label" style="@style/Widget.Silence.TextView" android:textSize="@dimen/text_large" android:text="@string/sample_duration" android:layout_width="fill_parent" android:gravity="center_horizontal"/>
 			<LinearLayout style="@style/Widget.Silence.LinearLayout.Horizontal" android:layout_width="fill_parent" android:padding="@dimen/spacing_normal">
@@ -13,15 +13,16 @@
 		</LinearLayout>
 		<View style="@style/Widget.Silence.Divider"/>
 		<LinearLayout style="@style/Widget.Silence.LinearLayout.Vertical" android:visibility="gone">
-			<CheckBox android:id="@+id/send_receipts" style="@style/Widget.Silence.CheckBox" android:text="@string/send_receipts" android:layout_margin="@dimen/spacing_normal"/>
+			<CheckBox android:id="@+id/send_receipts" style="@style/Widget.Silence.CheckBox" android:text="@string/send_receipts"/>
 			<View style="@style/Widget.Silence.Divider"/>
 		</LinearLayout>
-		<Button android:id="@+id/clear" style="@style/Widget.Silence.SubtleButton" android:drawableLeft="@drawable/ic_action_delete" android:text="@string/clear_history"/>
-		<Button android:id="@+id/save" style="@style/Widget.Silence.SubtleButton" android:drawableLeft="@drawable/ic_action_save" android:text="@string/save_conversation"/>
-		<Button android:id="@+id/reset_keys" style="@style/Widget.Silence.SubtleButton" android:drawableLeft="@drawable/ic_action_refresh" android:text="@string/reset_keys"/>
+		<Button android:id="@+id/clear" style="@style/Widget.Silence.SubtleButton.Delete" android:text="@string/clear_conversation"/>
+		<Button android:id="@+id/save" style="@style/Widget.Silence.SubtleButton.Save" android:text="@string/save_conversation"/>
 		<LinearLayout android:id="@+id/verify" style="@style/Widget.Silence.LinearLayout.Vertical" android:padding="@dimen/spacing_normal" android:layout_margin="@dimen/spacing_normal">
+			<TextView android:id="@+id/verify_rating" style="@style/Widget.Silence.TextView.About" android:layout_marginBottom="@dimen/spacing_normal" android:text="@string/security_rating_hint_2_to_3"/>
 			<TextView android:id="@+id/verify_label" style="@style/Widget.Silence.TextView" android:layout_marginBottom="@dimen/spacing_normal" android:text="@string/verify_description_unverified"/>
 			<CheckBox android:id="@+id/verified" style="@style/Widget.Silence.CheckBox" android:text="@string/sample_sas_phrase"/>
 		</LinearLayout>
+		<Button android:id="@+id/reset_keys" style="@style/Widget.Silence.SubtleButton.Refresh" android:text="@string/reset_keys"/>
 	</LinearLayout>
 </com.silentcircle.silenttext.view.ConversationOptionsDrawer>

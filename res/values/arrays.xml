@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+    <string-array name="share_app_array">
+        <item>@string/silent_text</item>
+        <item>@string/email</item>
+    </string-array>
+
+</resources>

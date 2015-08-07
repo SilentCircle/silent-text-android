@@ -1,19 +1,18 @@
 /*
-Copyright © 2013, Silent Circle, LLC.
-All rights reserved.
+Copyright (C) 2013-2015, Silent Circle, LLC. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
-    * Any redistribution, use, or modification is done solely for personal 
+    * Any redistribution, use, or modification is done solely for personal
       benefit and not for any commercial purpose or for monetary gain
     * Redistributions of source code must retain the above copyright
       notice, this list of conditions and the following disclaimer.
     * Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-    * Neither the name Silent Circle nor the names of its contributors may 
-      be used to endorse or promote products derived from this software 
-      without specific prior written permission.
+    * Neither the name Silent Circle nor the
+      names of its contributors may be used to endorse or promote products
+      derived from this software without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -40,17 +39,24 @@ import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
+import android.text.TextUtils;
 
 import com.silentcircle.silenttext.R;
+import com.silentcircle.silenttext.activity.ConversationActivity;
 import com.silentcircle.silenttext.application.SilentTextApplication;
+import com.silentcircle.silenttext.dialog.ShareDialogFragment;
 import com.silentcircle.silenttext.log.Log;
 import com.silentcircle.silenttext.model.Conversation;
 import com.silentcircle.silenttext.model.event.Event;
 import com.silentcircle.silenttext.model.event.Message;
 import com.silentcircle.silenttext.repository.ConversationRepository;
 import com.silentcircle.silenttext.repository.EventRepository;
+import com.silentcircle.silenttext.util.AttachmentUtils;
+import com.silentcircle.silenttext.util.MessageUtils;
 
 public class SaveConversationHistoryOnConfirm implements OnConfirmListener {
+
+	private static final String SHARE_DIALOG_TAG = "share_dialog_tag";
 
 	private static final Log LOG = new Log( SaveConversationHistoryOnConfirm.class.getSimpleName() );
 	private static final DateFormat DATE_FORMAT = DateFormat.getDateTimeInstance();
@@ -59,7 +65,7 @@ public class SaveConversationHistoryOnConfirm implements OnConfirmListener {
 		StringBuilder history = new StringBuilder();
 		for( int i = 0; i < events.size(); i++ ) {
 			Event event = events.get( i );
-			if( event instanceof Message && ( (Message) event ).expires() ) {
+			if( event instanceof Message && ( ( (Message) event ).expires() || ( (Message) event ).getSiren() == null ) ) {
 				continue;
 			}
 			history.append( "[" ).append( DATE_FORMAT.format( new Date( event.getTime() ) ) ).append( "] " );
@@ -104,9 +110,22 @@ public class SaveConversationHistoryOnConfirm implements OnConfirmListener {
 			Conversation conversation = conversations.findByPartner( remoteUserID );
 			EventRepository history = conversations.historyOf( conversation );
 			List<Event> messages = history.list();
+			String msg = getPrintableHistory( messages );
+			if( !TextUtils.isEmpty( msg ) && msg.length() > ConversationActivity.MESSAGE_TEXT_SIZE_LIMIT * ConversationActivity.MESSAGE_TEXT_SIZE_LIMIT ) {
+				if( msg.length() > AttachmentUtils.FILE_SIZE_LIMIT ) {
+					AttachmentUtils.showFileSizeErrorDialog( activity );
+				} else {
+					MessageUtils.saveMessagesToFile( activity, msg );
+					ShareDialogFragment dialog = ShareDialogFragment.newInstance( remoteUserID );
+					dialog.setCancelable( false );
+					dialog.show( activity.getFragmentManager(), SaveConversationHistoryOnConfirm.SHARE_DIALOG_TAG );
+				}
+				return;
+			}
+
 			Intent intent = new Intent( Intent.ACTION_SEND );
 			intent.setType( "text/plain" );
-			intent.putExtra( Intent.EXTRA_TEXT, getPrintableHistory( messages ) );
+			intent.putExtra( Intent.EXTRA_TEXT, msg );
 			intent.putExtra( Intent.EXTRA_SUBJECT, context.getString( R.string.conversation_with, withoutDomain( remoteUserID ) ) );
 			try {
 				activity.startActivity( intent );
@@ -115,5 +134,4 @@ public class SaveConversationHistoryOnConfirm implements OnConfirmListener {
 			}
 		}
 	}
-
 }

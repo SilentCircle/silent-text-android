@@ -1,19 +1,18 @@
 /*
-Copyright © 2013, Silent Circle, LLC.
-All rights reserved.
+Copyright (C) 2013-2015, Silent Circle, LLC. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
-    * Any redistribution, use, or modification is done solely for personal 
+    * Any redistribution, use, or modification is done solely for personal
       benefit and not for any commercial purpose or for monetary gain
     * Redistributions of source code must retain the above copyright
       notice, this list of conditions and the following disclaimer.
     * Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-    * Neither the name Silent Circle nor the names of its contributors may 
-      be used to endorse or promote products derived from this software 
-      without specific prior written permission.
+    * Neither the name Silent Circle nor the
+      names of its contributors may be used to endorse or promote products
+      derived from this software without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -28,46 +27,78 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package com.silentcircle.silenttext.activity;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuItem;
 import com.silentcircle.silenttext.Extra;
 import com.silentcircle.silenttext.R;
 import com.silentcircle.silenttext.receiver.LockApplicationOnReceive;
+import com.silentcircle.silenttext.service.PassphraseIntentService;
+import com.silentcircle.silenttext.util.AsyncUtils;
 
 public class UnlockActivity extends SilentActivity {
 
+	class UnlockTask extends AsyncTask<CharSequence, Void, Boolean> {
+
+		@Override
+		protected Boolean doInBackground( CharSequence... codes ) {
+			try {
+				return Boolean.valueOf( unlock( codes[0] ) );
+			} catch( Throwable throwable ) {
+				return Boolean.valueOf( false );
+			}
+		}
+
+		@Override
+		protected void onPostExecute( Boolean success ) {
+			if( success.booleanValue() ) {
+				setAsUnlocked();
+			} else {
+				setAsLocked();
+			}
+		}
+
+		@Override
+		protected void onPreExecute() {
+			beginLoading( R.id.passcode );
+		}
+	}
+
 	protected boolean auto;
 
-	private AsyncTask<CharSequence, Void, Boolean> task;
-
 	private Intent nextIntent;
+
+	private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
+
+		@Override
+		public void onReceive( Context context, Intent intent ) {
+			startActivity( new Intent( UnlockActivity.this, ConversationListActivity.class ) );
+			UnlockActivity.this.finish();
+		}
+	};
 
 	@Override
 	protected void beginLoading( int contentViewId ) {
 		super.beginLoading( contentViewId );
-		getSupportActionBar().hide();
-	}
-
-	private void cancelTask() {
-		if( task != null ) {
-			task.cancel( true );
-			task = null;
-		}
+		getActionBar().hide();
 	}
 
 	@Override
 	protected void finishLoading( int contentViewId ) {
 		super.finishLoading( contentViewId );
-		getSupportActionBar().show();
+		getActionBar().show();
 	}
 
 	private void handleIntent( Intent intent ) {
@@ -111,12 +142,19 @@ public class UnlockActivity extends SilentActivity {
 
 		}
 
+		LocalBroadcastManager.getInstance( this ).registerReceiver( mReceiver, new IntentFilter( PassphraseIntentService.USER_NAME_READY ) );
 	}
 
 	@Override
 	public boolean onCreateOptionsMenu( Menu menu ) {
-		getSupportMenuInflater().inflate( R.menu.unlock, menu );
+		getMenuInflater().inflate( R.menu.unlock, menu );
 		return super.onCreateOptionsMenu( menu );
+	}
+
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		LocalBroadcastManager.getInstance( this ).unregisterReceiver( mReceiver );
 	}
 
 	@Override
@@ -134,12 +172,6 @@ public class UnlockActivity extends SilentActivity {
 				return true;
 		}
 		return super.onOptionsItemSelected( item );
-	}
-
-	@Override
-	protected void onPause() {
-		super.onPause();
-		cancelTask();
 	}
 
 	@Override
@@ -177,39 +209,14 @@ public class UnlockActivity extends SilentActivity {
 	}
 
 	protected void unlock() {
-
-		cancelTask();
-
-		task = new AsyncTask<CharSequence, Void, Boolean>() {
-
-			@Override
-			protected Boolean doInBackground( CharSequence... codes ) {
-				return Boolean.valueOf( unlock( codes[0] ) );
-			}
-
-			@Override
-			protected void onPostExecute( Boolean success ) {
-				if( success.booleanValue() ) {
-					setAsUnlocked();
-				} else {
-					setAsLocked();
-				}
-			}
-
-			@Override
-			protected void onPreExecute() {
-				beginLoading( R.id.passcode );
-			}
-
-		}.execute( findEditTextById( R.id.passcode ).getText() );
-
+		tasks.add( AsyncUtils.execute( new UnlockTask(), findEditTextById( R.id.passcode ).getText() ) );
 	}
 
 	protected boolean unlock( CharSequence code ) {
 		try {
 			getSilentTextApplication().unlock( code );
 			return isUnlocked();
-		} catch( Exception exception ) {
+		} catch( Throwable exception ) {
 			log.warn( "Failed to unlock: %s", exception.getMessage() );
 			return false;
 		}

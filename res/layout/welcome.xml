@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<com.silentcircle.silenttext.view.WelcomeView xmlns:android="http://schemas.android.com/apk/res/android" style="@style/Widget.Silence.LinearLayout.Vertical" android:layout_height="fill_parent" android:padding="@dimen/spacing_large" android:gravity="center_vertical">
+	<TextView style="@style/Widget.Silence.TextView" android:textStyle="bold" android:textSize="@dimen/text_xlarge" android:text="@string/welcome_greeting" android:layout_marginBottom="@dimen/spacing_large"/>
+	<TextView android:id="@+id/welcome_tips_header" style="@style/Widget.Silence.TextView" android:textSize="@dimen/text_large" android:text="@string/welcome_tips_header"/>
+	<LinearLayout android:id="@+id/tip_encrypt_device" style="@style/Widget.Silence.LinearLayout.Vertical">
+		<TextView style="@style/Widget.Silence.TextView" android:textSize="@dimen/text_large" android:padding="@dimen/spacing_large" android:text="@string/welcome_tip_encrypt_device"/>
+		<TextView android:id="@+id/action_encrypt_device" style="@style/Widget.Silence.SubtleButton.Device" android:text="@string/encrypt_device"/>
+	</LinearLayout>
+	<LinearLayout android:id="@+id/tip_set_passcode" style="@style/Widget.Silence.LinearLayout.Vertical">
+		<TextView style="@style/Widget.Silence.TextView" android:textSize="@dimen/text_large" android:padding="@dimen/spacing_large" android:text="@string/welcome_tip_passcode"/>
+		<TextView android:id="@+id/action_set_passcode" style="@style/Widget.Silence.SubtleButton.Secure" android:text="@string/set_passcode"/>
+	</LinearLayout>
+</com.silentcircle.silenttext.view.WelcomeView>

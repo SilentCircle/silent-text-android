@@ -1,19 +1,18 @@
 /*
-Copyright © 2013, Silent Circle, LLC.
-All rights reserved.
+Copyright (C) 2013-2015, Silent Circle, LLC. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
-    * Any redistribution, use, or modification is done solely for personal 
+    * Any redistribution, use, or modification is done solely for personal
       benefit and not for any commercial purpose or for monetary gain
     * Redistributions of source code must retain the above copyright
       notice, this list of conditions and the following disclaimer.
     * Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-    * Neither the name Silent Circle nor the names of its contributors may 
-      be used to endorse or promote products derived from this software 
-      without specific prior written permission.
+    * Neither the name Silent Circle nor the
+      names of its contributors may be used to endorse or promote products
+      derived from this software without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -57,13 +56,19 @@ public abstract class BaseFileRepository<T> implements Filterable<String>, Repos
 	}
 
 	private static final String UTF8 = "UTF-8";
+
+	public static void flush( Object object ) {
+		if( object instanceof BaseFileRepository ) {
+			( (BaseFileRepository<?>) object ).flush();
+		}
+	}
+
 	protected final File root;
 	protected IOFilter<String> filter;
 	protected ModelAdapter<T> adapter;
-	protected final Log log = new Log( getClass().getSimpleName() );
+	protected final Log log = new Log( getLogTag() );
 	protected boolean pendingRemoval;
-
-	private final Map<String, T> files = new HashMap<String, T>();
+	private final Map<String, T> cache = new HashMap<String, T>();
 
 	public BaseFileRepository( File root ) {
 		this( root, null );
@@ -75,19 +80,23 @@ public abstract class BaseFileRepository<T> implements Filterable<String>, Repos
 		this.filter = filter;
 	}
 
-	protected T cache( String hash, T object ) {
-		if( hash == null || object == null ) {
+	private T cache( File file, T object ) {
+		return cache( file == null ? null : file.getName(), object );
+	}
+
+	private T cache( String hash, T object ) {
+		if( hash == null || object == null || !isCacheable( object ) ) {
 			return object;
 		}
-		files.put( hash, object );
+		cache.put( hash, object );
 		return object;
 	}
 
-	protected T cached( String hash ) {
+	private T cached( String hash ) {
 		if( hash == null ) {
 			return null;
 		}
-		T result = files.get( hash );
+		T result = cache.get( hash );
 		if( result == null ) {
 			throw new ObjectNotFoundException();
 		}
@@ -96,7 +105,7 @@ public abstract class BaseFileRepository<T> implements Filterable<String>, Repos
 
 	@Override
 	public void clear() {
-		files.clear();
+		flush();
 		pendingRemoval = true;
 		if( delete( root ) ) {
 			pendingRemoval = false;
@@ -111,7 +120,7 @@ public abstract class BaseFileRepository<T> implements Filterable<String>, Repos
 		if( file == null ) {
 			return true;
 		}
-		files.remove( file.getName() );
+		cache.remove( file.getName() );
 		if( file.isDirectory() ) {
 			for( File child : file.listFiles() ) {
 				if( !delete( child ) ) {
@@ -148,10 +157,11 @@ public abstract class BaseFileRepository<T> implements Filterable<String>, Repos
 
 	@Override
 	public T findById( String id ) {
+		String fileName = Hash.sha1( id );
 		try {
-			return cached( Hash.sha1( id ) );
+			return cached( fileName );
 		} catch( ObjectNotFoundException exception ) {
-			// Oh well.
+			// This object is not cached.
 		}
 		if( !exists( id ) ) {
 			return null;
@@ -160,6 +170,10 @@ public abstract class BaseFileRepository<T> implements Filterable<String>, Repos
 		String contents = file == null ? null : readFile( file );
 		T object = contents == null ? null : deserialize( contents );
 		return cache( file == null ? null : file.getName(), object );
+	}
+
+	public void flush() {
+		cache.clear();
 	}
 
 	private File getFile( String id ) {
@@ -171,11 +185,26 @@ public abstract class BaseFileRepository<T> implements Filterable<String>, Repos
 		return object == null ? null : getFile( identify( object ) );
 	}
 
+	protected String getLogTag() {
+		return "BaseFileRepository";
+	}
+
 	protected String identify( T object ) {
 		if( adapter == null ) {
 			return null;
 		}
-		return adapter.identify( object );
+		String id = adapter.identify( object );
+		if( object != null && id == null ) {
+			log.warn( "#identify type:%s failed", object.getClass().getName() );
+		}
+		return id;
+	}
+
+	/**
+	 * @param object
+	 */
+	protected boolean isCacheable( T object ) {
+		return true;
 	}
 
 	@Override
@@ -189,7 +218,8 @@ public abstract class BaseFileRepository<T> implements Filterable<String>, Repos
 				continue;
 			}
 			try {
-				objects.add( cached( file.getName() ) );
+				T object = cached( file.getName() );
+				objects.add( object );
 			} catch( ObjectNotFoundException exception ) {
 				String contents = readFile( file );
 				T object = contents == null ? null : deserialize( contents );
@@ -199,7 +229,9 @@ public abstract class BaseFileRepository<T> implements Filterable<String>, Repos
 				}
 			}
 		}
-		return new ArrayList<T>( objects );
+		List<T> list = new ArrayList<T>();
+		list.addAll( objects );
+		return list;
 	}
 
 	private String readFile( File file ) {
@@ -219,7 +251,7 @@ public abstract class BaseFileRepository<T> implements Filterable<String>, Repos
 				}
 			}
 		} catch( Throwable exception ) {
-			log.error( exception, "READ from:%s", file );
+			log.error( exception, "#readFile file:%s", file );
 		} finally {
 			IOUtils.close( in );
 		}
@@ -242,7 +274,7 @@ public abstract class BaseFileRepository<T> implements Filterable<String>, Repos
 			return;
 		}
 		File file = getFile( object );
-		cache( file.getName(), object );
+		cache( file, object );
 		writeFile( file, serialize( object ) );
 	}
 
@@ -275,7 +307,7 @@ public abstract class BaseFileRepository<T> implements Filterable<String>, Repos
 			out.write( buffer );
 			out.flush();
 		} catch( IOException exception ) {
-			log.error( exception, "WRITE to:%s\n%s", file, contents );
+			log.error( exception, "#writeFile file:%s", file );
 		} finally {
 			IOUtils.close( out );
 		}

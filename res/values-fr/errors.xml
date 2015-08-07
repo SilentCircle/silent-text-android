@@ -1,0 +1,31 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<resources>
+
+	<string name="SCIMPError_NONE">Aucune erreur</string>
+	<string name="SCIMPError_NOP">N/A</string>
+	<string name="SCIMPError_UNKNOWN">Une erreur inconnue est survenue.</string>
+	<string name="SCIMPError_BAD_PARAMS">Mauvais paramètres</string>
+	<string name="SCIMPError_OUT_OF_MEMORY">Plus de mémoire</string>
+	<string name="SCIMPError_BUFFER_TOO_SMALL">Mémoire tampon trop petite</string>
+	<string name="SCIMPError_USER_ABORT">Abandon de l\'utilisateur</string>
+	<string name="SCIMPError_UNKNOWN_REQUEST">Demande inconnue</string>
+	<string name="SCIMPError_LAZY_PROGRAMMER">Programmeur paresseux</string>
+	<string name="SCIMPError_ASSERT_FAILED">Échec de l\'assertion</string>
+	<string name="SCIMPError_FEATURE_UNAVAILABLE">Fonction non disponible</string>
+	<string name="SCIMPError_RESOURCE_UNAVAILABLE">Ressource non disponible</string>
+	<string name="SCIMPError_NOT_CONNECTED">Tentative d\'envoi d\'un message avant l\'établissement d\'un environnement sécurisé.</string>
+	<string name="SCIMPError_IMPROPER_INITIALIZATION">Initialisation incorrecte</string>
+	<string name="SCIMPError_CORRUPT_DATA">L\'environnement sécurisé a été corrompu et est maintenant en cours de rétablissement.</string>
+	<string name="SCIMPError_SELF_TEST_FAILED">Échec de l\'autotest</string>
+	<string name="SCIMPError_BAD_INTEGRITY">Échec de la vérification de l\'intégrité du protocole.</string>
+	<string name="SCIMPError_BAD_HASH_NUMBER">Mauvais hachage</string>
+	<string name="SCIMPError_BAD_CIPHER_NUMBER">Un paquet de protocoles a été reçu indiquant une suite de chiffrement non prise en charge.</string>
+	<string name="SCIMPError_BAD_RANDOM_NUMBER">Un paquet de protocoles a été reçu indiquant un générateur de nombres pseudo-aléatoire non pris en charge.</string>
+	<string name="SCIMPError_SECRETS_MISMATCH">Perte de la continuité de la clé avec l\'environnement sécurisé précédemment établi.</string>
+	<string name="SCIMPError_KEY_NOT_FOUND">Un message indéchiffrable a été reçu. Demande de retransmission en cours.</string>
+	<string name="SCIMPError_PROTOCOL_ERROR">Un paquet de protocoles errant a été reçu.</string>
+	<string name="SCIMPError_PROTOCOL_CONTENTION">Un paquet de protocoles inattendu a été reçu.</string>
+	<string name="SCIMPError_KEY_LOCKED">Clé verrouillée</string>
+	<string name="SCIMPError_END_OF_ITERATION">Fin d\'itération</string>
+
+</resources>

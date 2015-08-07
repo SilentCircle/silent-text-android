@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" style="@style/Widget.Silence.LinearLayout.Vertical">
+	<TextView android:id="@+id/message" style="@style/Widget.Silence.TextView" android:textSize="@dimen/text_xlarge" android:padding="@dimen/spacing_large" android:text="@string/confirm_account_removal"/>
+	<CheckBox android:id="@+id/checkbox" style="@style/Widget.Silence.CheckBox" android:text="@string/preserve_user_data"/>
+</LinearLayout>

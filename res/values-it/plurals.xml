@@ -1,24 +1,56 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version='1.0' encoding='UTF-8'?>
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
 
   <plurals name="notify_new_messages_title">
+    <item quantity="zero"><xliff:g id="quantity">%1$d</xliff:g> nuovi messaggi</item>
     <item quantity="one">Nuovo messaggio ricevuto</item>
+    <item quantity="two"><xliff:g id="quantity">%1$d</xliff:g> nuovi messaggi</item>
+    <item quantity="few"><xliff:g id="quantity">%1$d</xliff:g> nuovi messaggi</item>
+    <item quantity="many"><xliff:g id="quantity">%1$d</xliff:g> nuovi messaggi</item>
     <item quantity="other"><xliff:g id="quantity">%1$d</xliff:g> nuovi messaggi</item>
   </plurals>
 
   <plurals name="notify_new_messages_subtitle">
-    <item quantity="one"><xliff:g id="number_of_people">%1$d</xliff:g> una persona ti ha inviato <xliff:g id="number_of_messages" example="2 messages">%2$s</xliff:g>.</item>
+    <item quantity="zero"><xliff:g id="number_of_people">%1$d</xliff:g> persone ti hanno inviato <xliff:g id="number_of_messages" example="2 messages">%2$s</xliff:g>.</item>
+    <item quantity="one"><xliff:g id="number_of_people">%1$d</xliff:g> persona ti ha inviato <xliff:g id="number_of_messages" example="2 messages">%2$s</xliff:g>.</item>
+    <item quantity="two"><xliff:g id="number_of_people">%1$d</xliff:g> persone ti hanno inviato <xliff:g id="number_of_messages" example="2 messages">%2$s</xliff:g>.</item>
+    <item quantity="few"><xliff:g id="number_of_people">%1$d</xliff:g> persone ti hanno inviato <xliff:g id="number_of_messages" example="2 messages">%2$s</xliff:g>.</item>
+    <item quantity="many"><xliff:g id="number_of_people">%1$d</xliff:g> persone ti hanno inviato <xliff:g id="number_of_messages" example="2 messages">%2$s</xliff:g>.</item>
     <item quantity="other"><xliff:g id="number_of_people">%1$d</xliff:g> persone ti hanno inviato <xliff:g id="number_of_messages" example="2 messages">%2$s</xliff:g>.</item>
   </plurals>
 
   <plurals name="n_messages">
+      <item quantity="zero"><xliff:g id="count">%1$d</xliff:g> messaggi</item>
       <item quantity="one">un messaggio</item>
+      <item quantity="two"><xliff:g id="count">%1$d</xliff:g> messaggi</item>
+      <item quantity="few"><xliff:g id="count">%1$d</xliff:g> messaggi</item>
+      <item quantity="many"><xliff:g id="count">%1$d</xliff:g> messaggi</item>
       <item quantity="other"><xliff:g id="count">%1$d</xliff:g> messaggi</item>
   </plurals>
 
   <plurals name="notify_unread_messages_from_individual">
+    <item quantity="zero"><xliff:g id="count">%1$d</xliff:g> messaggi non letti da <xliff:g id="contact_name" example="droidman">%2$s</xliff:g></item>
     <item quantity="one"><xliff:g id="count">%1$d</xliff:g> messaggi non letti da <xliff:g id="contact_name" example="droidman">%2$s</xliff:g></item>
+    <item quantity="two"><xliff:g id="count">%1$d</xliff:g> messaggi non letti da <xliff:g id="contact_name" example="droidman">%2$s</xliff:g></item>
+    <item quantity="few"><xliff:g id="count">%1$d</xliff:g> messaggi non letti da <xliff:g id="contact_name" example="droidman">%2$s</xliff:g></item>
+    <item quantity="many"><xliff:g id="count">%1$d</xliff:g> messaggi non letti da <xliff:g id="contact_name" example="droidman">%2$s</xliff:g></item>
     <item quantity="other"><xliff:g id="count">%1$d</xliff:g> messaggi non letti da <xliff:g id="contact_name" example="droidman">%2$s</xliff:g></item>
+  </plurals>
+  
+  <plurals name="short_time_seconds">
+      <item quantity="other"><xliff:g id="count">%1$d</xliff:g>s</item>
+  </plurals>
+
+  <plurals name="short_time_minutes">
+      <item quantity="other"><xliff:g id="count">%1$d</xliff:g>m</item>
+  </plurals>
+
+  <plurals name="short_time_hours">
+      <item quantity="other"><xliff:g id="count">%1$d</xliff:g>h</item>
+  </plurals>
+
+  <plurals name="short_time_days">
+      <item quantity="other"><xliff:g id="count">%1$d</xliff:g>g</item>
   </plurals>
 
 </resources>

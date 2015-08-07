@@ -1,0 +1,195 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+	<string name="label_push_notifications"><xliff:g id="application_name">Silent Text</xliff:g> GCM Pushmeldingen</string>
+	<string name="new_message">Nieuw bericht</string>
+	<string name="copy">Kopiëren</string>
+	<string name="notifications">Meldingen</string>
+	<string name="privacy">Privacy</string>
+	<string name="about">Over</string>
+	<string name="encryption">Versleuteling</string>
+	<string name="privacy_statement">Privacyverklaring</string>
+	<string name="license_information">Licentiegegevens</string>
+	<string name="terms_and_conditions">Gebruiksvoorwaarden</string>
+	<string name="compose_hint">Typ je bericht hier</string>
+	<string name="security_rating">Waardering beveiliging</string>
+	<string name="empty_conversation_list">Je hebt geen gesprekken.</string>
+	<string name="burn_notice">Wismelding</string>
+	<string name="burn">Wissen</string>
+	<string name="current_passcode">Voer je huidige wachtwoordzin in en ga door.</string>
+	<string name="passcode_warning">Let op! Je wachtwoordzin kan niet worden hersteld als je hem kwijt bent. Zorg ervoor dat je je hem herinnert.</string>
+	<string name="are_you_sure">Weet je het zeker?</string>
+	<string name="cannot_be_undone">Deze actie kan niet ongedaan worden gemaakt.</string>
+	<string name="save_will_expose_data">Als je dit gesprek opslaat, worden alle bijbehorende berichten weergegeven in een andere applicatie naar jouw keuze. Berichten met een bijlage of een wismelding worden NIET geëxporteerd.</string>
+	<string name="reset_keys_warning">Berichten kunnen niet worden verstuurd of ontvangen totdat nieuwe sleutels zijn ingesteld. Dat kan even duren.</string>
+	<string name="yes">Ja</string>
+	<string name="no">Nee</string>
+	<string name="cannot_open_file"><xliff:g id="application_name">Silent Text</xliff:g> kan dit bestand niet openen. Als je het wilt bekijken, delen, of opslaan, hebben andere applicaties ook toegang tot dit bestand.</string>
+	<string name="album_artwork">Albumkunst</string>
+	<string name="activate">Activeren</string>
+	<string name="reset_keys">Sleutels opnieuw instellen</string>
+	<string name="unverified">Niet geverifieerd</string>
+	<string name="verified">Geverifieerd</string>
+	<string name="cancel">Annuleren</string>
+	<string name="save">Opslaan</string>
+	<string name="settings">Instellingen</string>
+	<string name="securing">Beveiligen<xliff:g id="ellipsis" example="…">…</xliff:g></string>
+	<string name="downloading">Downloaden<xliff:g id="ellipsis" example="…">…</xliff:g></string>
+	<string name="decrypting">Ontsleutelen<xliff:g id="ellipsis" example="…">…</xliff:g></string>
+	<string name="waiting_for_connection">Wachten op verbinding<xliff:g id="ellipsis" example="…">…</xliff:g></string>
+	<string name="view">Bekijken</string>
+	<string name="share">Delen</string>
+	<string name="share_location">Locatie delen</string>
+	<string name="send_to">Sturen naar<xliff:g id="ellipsis" example="…">…</xliff:g></string>
+	<string name="cancelled">Geannuleerd</string>
+	<string name="username_unavailable"><xliff:g id="username">%1$s</xliff:g> is niet beschikbaar.</string>
+	<string name="conversation_with">Gesprek met <xliff:g id="username">%1$s</xliff:g></string>
+	<string name="resend">Opnieuw versturen</string>
+	<string name="progress_encrypting">Versleutelen<xliff:g id="ellipsis" example="…">…</xliff:g><xliff:g id="progress_percent" example="32%">%1$d%%</xliff:g></string>
+	<string name="progress_preparing">Voorbereiden<xliff:g id="ellipsis" example="…">…</xliff:g><xliff:g id="progress_percent" example="32%">%1$d%%</xliff:g></string>
+	<string name="progress_uploading">Uploaden<xliff:g id="ellipsis" example="…">…</xliff:g><xliff:g id="progress_percent" example="32%">%1$d%%</xliff:g></string>
+	<string name="progress_exporting">Exporteren<xliff:g id="ellipsis" example="…">…</xliff:g><xliff:g id="progress_percent" example="32%">%1$d%%</xliff:g></string>
+	<string name="location">Locatie</string>
+	<string name="unlock">Ontgrendelen</string>
+	<string name="autolock">Automatische vergrendeling</string>
+	<string name="lock_application">Applicatie vergrendelen</string>
+	<string name="options">Opties</string>
+	<string name="view_with">Open <xliff:g id="file_name">%1$s</xliff:g></string>
+	<string name="share_with">Deel <xliff:g id="file_name">%1$s</xliff:g></string>
+	<string name="none">(geen)</string>
+	<string name="saved_to">Opgeslagen in <xliff:g id="file_path">%1$s</xliff:g></string>
+	<string name="lock_after">Automatisch vergrendelen <xliff:g id="lock_timeout" example="in 30 seconds">%1$s</xliff:g></string>
+	<string name="never_lock">Niet automatisch vergrendelen</string>
+	<string name="no_expiration">Berichten verlopen niet</string>
+	<string name="messages_expire">Berichten verlopen <xliff:g id="expire_timeout" example="in 1 minute">%1$s</xliff:g></string>
+	<string name="passcode">Wachtwoordzin</string>
+	<string name="notify_new_passcode_set">Er is een nieuwe wachtwoordzin ingesteld</string>
+	<string name="notify_passcode_removed">De wachtwoordzin is verwijderd.</string>
+	<string name="notify_account_removed">Het account is verwijderd.</string>
+	<string name="activation_code">Activeringscode</string>
+	<string name="activation_code_description">Log in of creëer een account op <xliff:g id="login_url">https://accounts.silentcircle.com</xliff:g>.</string>
+	<string name="review_account_details">Controleer aub of de volgende informatie correct is, voordat je een account aanmaakt.</string>
+	<string name="previous">Vorige</string>
+	<string name="next">Volgende</string>
+	<string name="finish">Voltooien</string>
+	<string name="username">Gebruikersnaam</string>
+	<string name="password">Wachtwoord</string>
+	<string name="login">Inloggen</string>
+	<string name="create_account">Account aanmaken</string>
+	<string name="create_an_account">Maak een account aan</string>
+	<string name="creating_account">Aanmaken account<xliff:g id="ellipsis" example="…">…</xliff:g></string>
+	<string name="send">Versturen</string>
+	<string name="thumbnail">Miniatuur</string>
+	<string name="delivered">Afgeleverd</string>
+	<string name="send_receipts">Stuur gelezen ontvangsten</string>
+	<string name="set_passcode">Versleutel <xliff:g id="application_name">Silent Text</xliff:g></string>
+	<string name="set_passcode_description">Er is een wachtwoordzin vereist voor de ontsleuteling van <xliff:g id="application_name">Silent Text</xliff:g> elke keer als je het gebruikt.</string>
+	<string name="remove_passcode">Wachtwoordzin verwijderen</string>
+	<string name="remove_passcode_description">Je moet je huidige wachtwoordzin bevestigen, voordat je hem kan verwijderen.</string>
+	<string name="change_passcode">Wachtwoordzin wijzigen</string>
+	<string name="sending">Verstuur<xliff:g id="ellipsis" example="…">…</xliff:g></string>
+	<string name="clear_history">Geschiedenis wissen</string>
+	<string name="save_conversation">Gesprek opslaan</string>
+	<string name="share_from">Delen van</string>
+	<string name="search_hint">Gebruikersnaam</string>
+	<string name="message_timestamp"><xliff:g id="sent_or_received" example="Sent">%1$s</xliff:g>: <xliff:g id="time_sent_or_received">%2$s</xliff:g><xliff:g id="delivered" example="Delivered">%3$s</xliff:g></string>
+	<string name="secure">Beveiligen</string>
+	<string name="unlocked_title">Ontgrendeld</string>
+	<string name="unlocked_description">Tik om te vergrendelen <xliff:g id="application_name" example="Silent Text">%1$s</xliff:g>.</string>
+	<string name="attachment">Bijlage</string>
+	<string name="unknown">Onbekend</string>
+	<string name="verify_description_verified">Om redenen van extra veiligheid heb je dit bericht geverifieerd bij de ontvanger.</string>
+	<string name="verify_description_unverified">Verifieer dit bericht om redenen van extra veiligheid bij de ontvanger.</string>
+	<string name="ringtone">Beltoon</string>
+	<string name="ringtone_none">Geen</string>
+	<string name="enable_notification_vibrate">Trillen</string>
+	<string name="someone">iemand</string>
+	<string name="silence">Geen berichten om weer te geven.</string>
+	<string name="application_locked">Applicatie vergendeld.</string>
+	<string name="copied_to_clipboard">Gekopieerd naar klembord</string>
+	<string name="expires_n">Verloopt <xliff:g id="time_remaining" example="in 23 seconds">%1$s</xliff:g></string>
+	<string name="unable_to_display_file">Kon dit bestand niet weergeven</string>
+	<string name="unable_to_display_image">Kon deze afbeelding niet weergeven</string>
+	<string name="not_downloaded">Niet gedownload</string>
+	<string name="create_username">Kies een gebruikersnaam</string>
+	<string name="create_password">Maak een wachtwoord aan</string>
+	<string name="required_email_address">Om belangrijke updates en voordeelaanbiedingen te ontvangen is een alternatief e-mailadres noodzakelijk.</string>
+	<string name="required_username">Met je gebruikersnaam nemen anderen contact met je op via het <xliff:g id="company_name">Silent Circle</xliff:g> netwerk.</string>
+	<string name="required_password">Kies een sterk wachtwoord. Daarmee beveilig je je account voor niet-geautoriseerd gebruik.</string>
+	<string name="optional_personal_information">Deze informatie is volledig naar eigen keuze en bepaalt hoe je account in de mappenlijst wordt weergegeven.</string>
+	<string name="email_address">E-mailadres</string>
+	<string name="personal_information">Persoonlijke informatie</string>
+	<string name="first_name">Voornaam</string>
+	<string name="last_name">Achternaam</string>
+	<string name="tap_to_reveal">(tik om te onthullen)</string>
+	<string name="password_not_shown">(wachtwoord niet getoond)</string>
+	<string name="accept_terms">Ik heb de privacyverklaring en de gebruiksvoorwaarden gelezen en geaccepteerd</string>
+	<string name="terms">Voorwaarden</string>
+	<string name="permission_read">Lees beveiligde berichten</string>
+	<string name="permission_identify_senders">Lees de naam van de afzender van binnenkomende, beveiligde berichten</string>
+	<string name="permission_write">Schrijf beveiligde berichten</string>
+	<string name="permission_access_accounts">Ga naar je <xliff:g id="company_name">Silent Circle</xliff:g> account</string>
+	<string name="not_connected">Niet verbonden</string>
+	<string name="performing_srv_lookup">Bezig met SRV-opzoeken</string>
+	<string name="connecting">Verbinden...</string>
+	<string name="connected">Verbonden</string>
+	<string name="error_activity_not_found">Geen applicatie gevonden om deze actie weer te geven.</string>
+	<string name="error_format">Fout: <xliff:g id="error_message" example="Protocol error">%1$s</xliff:g></string>
+	<string name="error_unknown">Er is een onverwachte fout opgetreden. Probeer opnieuw.</string>
+	<string name="error_username_required">Je moet een gebruikersnaam invoeren.</string>
+	<string name="error_password_required">Je moet een wachtwoord invoeren.</string>
+	<string name="error_accept_terms">Je moet onze voorwaarden accepteren om een account aan te kunnen maken.</string>
+	<string name="error_invalid_activation_code">De activeringscode die je hebt ingevoerd is ongeldig.</string>
+	<string name="error_incorrect_passcode">De wachtwoordzin die je hebt ingevoerd is niet correct.</string>
+	<string name="error_invalid_passcode">Een wachtwoordzin moet minstens 3 tekens bevatten.</string>
+	<string name="error_invalid_credentials">De verificatiegegevens die je hebt ingevoerd zijn ongeldig.</string>
+	<string name="error_invalid_api_key">Je verificatiegegevens zijn verlopen.</string>
+	<string name="error">Fout</string>
+	<string name="error_large_file">Het bestand dat je hebt geselecteerd is te groot.</string>
+	<string name="warning">Waarschuwing</string>
+	<string name="warning_large_file">Het kan enige tijd kosten om dit bestand te versturen en de kans bestaat dat het mislukt. Toch doorgaan?</string>
+	<string name="account_welcome">Welkom bij <xliff:g id="company_name">Silent Circle</xliff:g>.</string>
+	<string name="account_creation_prologue">Wij zijn een revolutionair, mondiaal peer-to-peer platform voor versleutelde communicatieservices voor consumenten en bedrijven.</string>
+	<string name="partner_welcome">Welkom bij <xliff:g id="company_name" example="Silent Circle">%1$s</xliff:g> in partnerverband met <xliff:g id="partner" example="ACME">%2$s</xliff:g>.</string>
+	<string name="partner_account_creation_prologue">Als klant van <xliff:g id="partner" example="ACME">%2$s</xliff:g> kun je genieten van <xliff:g id="free_trial_period" example="12 months">%3$s</xliff:g> extra toegang tot <xliff:g id="company_name" example="Silent Circle">%1$s</xliff:g>\'s versleutelde communicatieservices.</string>
+	<string name="partner_free_trial_period">12 maanden</string>
+	<string name="call">Bellen</string>
+	<string name="show_password">Wachtwoord tonen</string>
+	<string name="welcome_greeting">Welkom bij <xliff:g id="application_name">Silent Text</xliff:g>!</string>
+	<string name="welcome_tips_header">Hier zijn wat tips om je te helpen de veiligheid van je gegevens te verbeteren:</string>
+	<string name="welcome_tip_passcode">Stel een sterk wachtwoordslot in op <xliff:g id="application_name">Silent Text</xliff:g>.</string>
+	<string name="welcome_tip_encrypt_device">Schakel op je toestel de full-disk versleuteling in.</string>
+	<string name="welcome_no_tips">Alles is ingesteld!</string>
+	<string name="encrypt_device">Toestel coderen</string>
+	<string name="warning_weak_disk_encryption_title">Je gegevens lopen gevaar.</string>
+	<string name="warning_weak_disk_encryption_description">Het sleutelmateriaal dat <xliff:g id="application_name">Silent Text</xliff:g> beveiligt kan gemakkelijk worden geraden.</string>
+	<string name="warning_weak_disk_encryption_action_encrypt_application">Stel een wachtwoordzin in</string>
+	<string name="warning_weak_disk_encryption_action_encrypt_device">Versleutel dit apparaat</string>
+	<string name="feedback">Feedback</string>
+	<string name="current_passcode_hint">Huidige wachtwoordzin</string>
+	<string name="new_passcode_hint">Nieuwe wachtwoordzin</string>
+	<string name="show_passcode">Toon wachtwoordzin</string>
+	<string name="_continue">Doorgaan</string>
+	<string name="n_selected"><xliff:g id="count">%1$d</xliff:g> geselecteerd</string>
+	<string name="security_rating_description">Het aantal sterren naast een gebruikersnaam geeft aan hoeveel vertouwen je erin kan hebben dat je communicatie veilig is.</string>
+	<string name="security_rating_0">Er is geen beveiliging tot stand gebracht.</string>
+	<string name="security_rating_1">Communicatie is beveiligd door openbare sleutelcryptografie.</string>
+	<string name="security_rating_2">Communicatie is beveilgd door peer-to-peer sleuteluitwisseling.</string>
+	<string name="security_rating_3">De identiteit van elke peer in het gesprek is geverifieerd.</string>
+	<string name="send_feedback">Feedback versturen</string>
+	<string name="developer_options">Opties ontwikkelaar</string>
+	<string name="accounts">Accounts</string>
+	<string name="tap_to_remove">Tik om te verwijderen</string>
+	<string name="remove">Verwijderen</string>
+	<string name="preserve_user_data">Gebruikersgegevens behouden</string>
+	<string name="confirm_account_removal">Je staat op het punt om het volgende account van dit toestel te verwijderen:<xliff:g example="alice@silentcircle.com" id="account_name">\n\n%1$s</xliff:g></string>
+	<string name="debug_information">Informatie over foutopsporing</string>
+	<string name="optional">(optioneel)</string>
+	<string name="license_code">Licentiecode</string>
+	<string name="undisclosed_location">(verborgen locatie)</string>
+	<string name="record_voice_memo">Spraakbericht opnemen</string>
+	<string name="notify_resend_request">De ontvanger heeft gevraagd om dit bericht opnieuw te sturen.</string>
+	<string name="security_warning">Beveiligingswaarschuwing</string>
+	<string name="dont_ask_again">Toon dit niet nog eens</string>
+	<string name="verify_ok_media_to_be_decrypted">Deze media is momenteel versleuteld. Om jou toe te staan het te zien, moet <xliff:g id="application_name">Silent Text</xliff:g> het tijdelijk ontsleutelen en opslaan op de schijf.</string>
+	<string name="verify_ok_media_to_be_exported">Deze media is momenteel privé. Om door te kunnen gaan moet <xliff:g id="application_name">Silent Text</xliff:g> andere applicaties toegang verlenen tot het versleutelde bestand.</string>
+</resources>

@@ -1,19 +1,18 @@
 /*
-Copyright © 2013, Silent Circle, LLC.
-All rights reserved.
+Copyright (C) 2013-2015, Silent Circle, LLC. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
-    * Any redistribution, use, or modification is done solely for personal 
+    * Any redistribution, use, or modification is done solely for personal
       benefit and not for any commercial purpose or for monetary gain
     * Redistributions of source code must retain the above copyright
       notice, this list of conditions and the following disclaimer.
     * Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-    * Neither the name Silent Circle nor the names of its contributors may 
-      be used to endorse or promote products derived from this software 
-      without specific prior written permission.
+    * Neither the name Silent Circle nor the
+      names of its contributors may be used to endorse or promote products
+      derived from this software without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -49,6 +48,7 @@ import com.silentcircle.silenttext.repository.SCloudObjectRepository;
 public class FileEventRepository extends BaseFileRepository<Event> implements EventRepository {
 
 	private final JSONEventAdapter adapter = new JSONEventAdapter();
+
 	private final Map<String, SCloudObjectRepository> objects = new HashMap<String, SCloudObjectRepository>();
 	private final File ephemeralRoot;
 
@@ -90,11 +90,25 @@ public class FileEventRepository extends BaseFileRepository<Event> implements Ev
 		if( event instanceof Message ) {
 			Message message = (Message) event;
 			if( message.isExpired() ) {
+				log.info( "#findById removing expired id:%s", id );
 				remove( message );
 				return null;
 			}
 		}
 		return event;
+	}
+
+	@Override
+	public void flush() {
+		super.flush();
+		for( SCloudObjectRepository repository : objects.values() ) {
+			BaseFileRepository.flush( repository );
+		}
+	}
+
+	@Override
+	protected String getLogTag() {
+		return "FileEventRepository";
 	}
 
 	@Override
@@ -110,6 +124,7 @@ public class FileEventRepository extends BaseFileRepository<Event> implements Ev
 			if( event instanceof Message ) {
 				Message message = (Message) event;
 				if( message.isExpired() ) {
+					log.info( "#list removing expired id:%s", message.getId() );
 					remove( message );
 					list.remove( i );
 					i--;

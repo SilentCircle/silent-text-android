@@ -1,19 +1,18 @@
 /*
-Copyright © 2013, Silent Circle, LLC.
-All rights reserved.
+Copyright (C) 2013-2015, Silent Circle, LLC. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
-    * Any redistribution, use, or modification is done solely for personal 
+    * Any redistribution, use, or modification is done solely for personal
       benefit and not for any commercial purpose or for monetary gain
     * Redistributions of source code must retain the above copyright
       notice, this list of conditions and the following disclaimer.
     * Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-    * Neither the name Silent Circle nor the names of its contributors may 
-      be used to endorse or promote products derived from this software 
-      without specific prior written permission.
+    * Neither the name Silent Circle nor the
+      names of its contributors may be used to endorse or promote products
+      derived from this software without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -28,13 +27,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package com.silentcircle.silenttext.receiver;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
 
-import org.jivesoftware.smack.util.Base64;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -49,7 +47,10 @@ import android.net.Uri;
 import android.provider.MediaStore.MediaColumns;
 import android.webkit.MimeTypeMap;
 
+import com.silentcircle.core.util.StringUtils;
+import com.silentcircle.http.client.exception.http.client.HTTPClientForbiddenException;
 import com.silentcircle.scloud.model.SCloudObject;
+import com.silentcircle.silentstorage.util.Base64;
 import com.silentcircle.silenttext.Action;
 import com.silentcircle.silenttext.Extra;
 import com.silentcircle.silenttext.Manifest;
@@ -57,30 +58,43 @@ import com.silentcircle.silenttext.R;
 import com.silentcircle.silenttext.application.SilentTextApplication;
 import com.silentcircle.silenttext.crypto.CryptoUtils;
 import com.silentcircle.silenttext.log.Log;
+import com.silentcircle.silenttext.model.Attachment;
 import com.silentcircle.silenttext.model.Conversation;
 import com.silentcircle.silenttext.model.MessageState;
 import com.silentcircle.silenttext.model.event.Event;
 import com.silentcircle.silenttext.model.event.OutgoingMessage;
+import com.silentcircle.silenttext.provider.PictureProvider;
+import com.silentcircle.silenttext.provider.VideoProvider;
 import com.silentcircle.silenttext.repository.ConversationRepository;
 import com.silentcircle.silenttext.repository.EventRepository;
 import com.silentcircle.silenttext.repository.SCloudObjectRepository;
 import com.silentcircle.silenttext.thread.CreateThumbnail;
-import com.silentcircle.silenttext.thread.Encrypt;
-import com.silentcircle.silenttext.thread.PrepareUpload;
-import com.silentcircle.silenttext.thread.Upload;
+import com.silentcircle.silenttext.thread.Deactivation;
+import com.silentcircle.silenttext.thread.NamedThread;
+import com.silentcircle.silenttext.thread.SCloudEncrypt;
+import com.silentcircle.silenttext.thread.SCloudPrepareUpload;
+import com.silentcircle.silenttext.thread.SCloudUpload;
+import com.silentcircle.silenttext.util.AttachmentUtils;
+import com.silentcircle.silenttext.util.Constants;
+import com.silentcircle.silenttext.util.CursorUtils;
 import com.silentcircle.silenttext.util.IOUtils;
+import com.silentcircle.silenttext.util.MIME;
 import com.silentcircle.silenttext.util.UTI;
 
 public class SCloudEncryptor extends BroadcastReceiver {
 
+	private static final String [] PROJECTION_getPathFromURI = new String [] {
+		MediaColumns.DATA
+	};
 	private static final Log LOG = new Log( "SCloud" );
 
 	protected static void abort( Context context, Intent intent ) {
-
+		Constants.mIsSharePhoto = false;
 		Intent cancel = Action.CANCEL.intent();
 
 		Extra.PARTNER.to( cancel, Extra.PARTNER.from( intent ) );
 		Extra.ID.to( cancel, Extra.ID.from( intent ) );
+		Extra.TEXT.to( cancel, Extra.TEXT.from( intent ) );
 
 		context.sendBroadcast( cancel, Manifest.permission.WRITE );
 
@@ -90,11 +104,15 @@ public class SCloudEncryptor extends BroadcastReceiver {
 
 	protected static void abort( Context context, Intent intent, String reason ) {
 		LOG.error( "#abort reason:%s", reason );
+		Extra.TEXT.to( intent, reason );
 		abort( context, intent );
 	}
 
 	protected static void abort( Context context, Intent intent, Throwable exception ) {
 		LOG.error( exception, "#abort" );
+		if( exception != null ) {
+			Extra.TEXT.to( intent, exception.getLocalizedMessage() );
+		}
 		abort( context, intent );
 	}
 
@@ -177,7 +195,7 @@ public class SCloudEncryptor extends BroadcastReceiver {
 		}
 		ByteArrayOutputStream thumbnailBytes = new ByteArrayOutputStream();
 		bitmap.compress( CompressFormat.JPEG, 60, thumbnailBytes );
-		String encodedThumbnail = Base64.encodeBytes( thumbnailBytes.toByteArray() );
+		String encodedThumbnail = Base64.encodeBase64String( thumbnailBytes.toByteArray() );
 		return encodedThumbnail;
 	}
 
@@ -186,27 +204,32 @@ public class SCloudEncryptor extends BroadcastReceiver {
 		return path == null ? null : new File( path );
 	}
 
+	protected static String getFileName( ContentResolver resolver, Uri uri, String contentType ) {
+		String fileName = getFileNameFromURI( resolver, uri, contentType );
+		if( fileName == null ) {
+			String extension = MimeTypeMap.getSingleton().getExtensionFromMimeType( contentType );
+			fileName = Integer.toHexString( uri == null ? CryptoUtils.randomInt() : uri.getPath().hashCode() );
+			if( extension != null ) {
+				fileName += "." + extension;
+			}
+		}
+		return fileName;
+	}
+
 	private static String getFileNameFromURI( ContentResolver resolver, Uri uri, String contentType ) {
 		File file = getFileFromURI( resolver, uri, contentType );
 		return file == null ? null : file.getName();
 	}
 
-	private static JSONObject getMetaDataFromIntent( ContentResolver resolver, Uri uri, String contentType ) {
+	private static JSONObject getMetaDataFromIntent( Context context, Uri uri, String contentType ) {
 
 		JSONObject metaData = new JSONObject();
 
 		try {
 			metaData.put( "MediaType", getUTI( contentType ) );
-			metaData.put( "ContentType", contentType );
-			String fileName = getFileNameFromURI( resolver, uri, contentType );
-			if( fileName == null ) {
-				String extension = MimeTypeMap.getSingleton().getExtensionFromMimeType( contentType );
-				fileName = Integer.toHexString( uri.getPath().hashCode() );
-				if( extension != null ) {
-					fileName += "." + extension;
-				}
-			}
-			metaData.put( "FileName", fileName );
+			metaData.put( "MimeType", contentType );
+			metaData.put( "FileName", getFileName( context.getContentResolver(), uri, contentType ) );
+			metaData.put( "FileSize", AttachmentUtils.getFileSize( context, uri ) );
 		} catch( JSONException ignore ) {
 			// Damn.
 		}
@@ -222,20 +245,31 @@ public class SCloudEncryptor extends BroadcastReceiver {
 	 * @return
 	 */
 	private static String getPathFromURI( ContentResolver resolver, Uri uri, String contentType ) {
-		String path = uri.getPath();
+		if( uri == null ) {
+			return null;
+		}
+		// we temp saved picture into internal storage, uri is for contentProvider and it's
+		// different from path to the file.Same as Video.
+		if( uri.toString().contains( PictureProvider.CONTENT_URL_PREFIX ) ) {
+			return uri.getPath();
+		} else if( uri.equals( VideoProvider.CONTENT_URL_PREFIX ) ) {
+			return uri.getPath();
+		}
+
 		Cursor cursor = null;
 		try {
-			cursor = resolver.query( uri, new String [] {
-				MediaColumns.DATA
-			}, null, null, null );
+			cursor = resolver.query( uri, PROJECTION_getPathFromURI, null, null, null );
+		} catch( UnsupportedOperationException exception ) {
+			return null;
 		} catch( IllegalArgumentException exception ) {
 			return null;
 		}
+		String path = uri.getPath();
 		if( cursor == null ) {
 			return path;
 		}
 		if( cursor.moveToFirst() ) {
-			path = cursor.getString( cursor.getColumnIndex( MediaColumns.DATA ) );
+			path = CursorUtils.getString( cursor, MediaColumns.DATA );
 		}
 		cursor.close();
 		return path;
@@ -264,7 +298,7 @@ public class SCloudEncryptor extends BroadcastReceiver {
 	protected static Runnable prepareUpload( final Context context, final Intent intent, final SCloudObjectRepository objectRepository ) {
 
 		reportProgress( context, R.string.progress_preparing, Extra.PARTNER.from( intent ), Extra.ID.from( intent ), 1 );
-		return new PrepareUpload( objectRepository.list(), SilentTextApplication.from( context ).getBroker() ) {
+		return new SCloudPrepareUpload( objectRepository.list(), SilentTextApplication.from( context ).getBroker() ) {
 
 			private int count;
 
@@ -276,13 +310,16 @@ public class SCloudEncryptor extends BroadcastReceiver {
 			}
 
 			@Override
-			protected void onPrepareUploadComplete( List<SCloudObject> objects ) {
+			protected void onPrepareUploadComplete() {
 				upload( context, intent, objectRepository ).run();
 			}
 
 			@Override
 			protected void onPrepareUploadError( Throwable exception ) {
 				abort( context, intent, exception );
+				if( exception instanceof HTTPClientForbiddenException ) {
+					new Thread( new Deactivation( context ), "deactivation" ).start();
+				}
 			}
 
 		};
@@ -315,7 +352,7 @@ public class SCloudEncryptor extends BroadcastReceiver {
 
 	protected static Runnable upload( final Context context, final Intent intent, final SCloudObjectRepository objectRepository ) {
 
-		return new Upload( objectRepository ) {
+		return new SCloudUpload( objectRepository ) {
 
 			@Override
 			protected void onObjectUploaded( SCloudObject object ) {
@@ -332,17 +369,20 @@ public class SCloudEncryptor extends BroadcastReceiver {
 
 			@Override
 			protected void onUploadCancelled() {
-				abort( context, intent, "upload cancelled" );
+				abort( context, intent, "Upload cancelled" );
+				AttachmentUtils.deleteFile( intent.getData() );
 			}
 
 			@Override
 			protected void onUploadComplete() {
 				createThumbnail( context, intent ).run();
+				AttachmentUtils.deleteFile( intent.getData() );
 			}
 
 			@Override
 			protected void onUploadError( Throwable exception ) {
 				abort( context, intent, exception );
+				AttachmentUtils.deleteFile( intent.getData() );
 			}
 
 		};
@@ -353,13 +393,20 @@ public class SCloudEncryptor extends BroadcastReceiver {
 	public void onReceive( final Context context, final Intent intent ) {
 
 		Uri uri = intent.getData();
+		final String mimeType = intent.getType();
+		final CharSequence plainText = Extra.TEXT.getCharSequence( intent );
+		final boolean isPlainText = MIME.isText( mimeType ) && plainText != null;
 
-		if( uri == null ) {
-			uri = (Uri) intent.getParcelableExtra( Intent.EXTRA_STREAM );
-		}
+		if( !isPlainText ) {
 
-		if( uri == null ) {
-			return;
+			if( uri == null ) {
+				uri = (Uri) intent.getParcelableExtra( Intent.EXTRA_STREAM );
+			}
+
+			if( uri == null ) {
+				return;
+			}
+
 		}
 
 		SilentTextApplication application = SilentTextApplication.from( context );
@@ -385,14 +432,18 @@ public class SCloudEncryptor extends BroadcastReceiver {
 		InputStream input = null;
 
 		try {
-			input = context.getContentResolver().openInputStream( uri );
+			if( isPlainText ) {
+				input = new ByteArrayInputStream( String.valueOf( plainText ).getBytes() );
+			} else {
+				input = context.getContentResolver().openInputStream( uri );
+			}
 		} catch( IOException exception ) {
 			IOUtils.close( input );
 			return;
 		}
 
-		String encryptionContext = Base64.encodeBytes( CryptoUtils.randomBytes( 16 ) );
-		Runnable encrypt = new Encrypt( encryptionContext, getMetaDataFromIntent( context.getContentResolver(), uri, intent.getType() ), events.objectsOf( event ), input ) {
+		String encryptionContext = Base64.encodeBase64String( CryptoUtils.randomBytes( 16 ) );
+		new NamedThread( new SCloudEncrypt( encryptionContext, getMetaDataFromIntent( context, uri, mimeType ), events.objectsOf( event ), input ) {
 
 			@Override
 			protected void onEncrypted( SCloudObject object ) {
@@ -449,13 +500,26 @@ public class SCloudEncryptor extends BroadcastReceiver {
 
 				final SCloudObjectRepository objectRepository = events.objectsOf( event );
 
+				Uri uri = intent.getData();
+
+				if( uri == null ) {
+					uri = (Uri) intent.getParcelableExtra( Intent.EXTRA_STREAM );
+				}
+
+				Attachment attachment = new Attachment();
+				attachment.setKey( StringUtils.toByteArray( index.getKey() ) );
+				attachment.setLocator( StringUtils.toByteArray( index.getLocator() ) );
+				attachment.setType( StringUtils.toByteArray( mimeType ) );
+				attachment.setName( StringUtils.toByteArray( getFileName( context.getContentResolver(), uri, mimeType ) ) );
+				application.getAttachments().save( attachment );
+
 				JSONObject json = null;
 				try {
 
 					json = new JSONObject( event.getText() );
 
-					json.put( "mime_type", intent.getType() );
-					json.put( "media_type", UTI.fromMIMEType( intent.getType() ) );
+					json.put( "mime_type", mimeType );
+					json.put( "media_type", UTI.fromMIMEType( mimeType ) );
 					json.put( "cloud_url", index.getLocator() );
 					json.put( "cloud_key", index.getKey() );
 
@@ -485,9 +549,7 @@ public class SCloudEncryptor extends BroadcastReceiver {
 				abort( context, intent, exception );
 			}
 
-		};
-
-		new Thread( encrypt, "SCloud" ).start();
+		} ).start();
 
 	}
 

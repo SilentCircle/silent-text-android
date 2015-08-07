@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" style="@style/Widget.Silence.LinearLayout.Vertical">
+	<RelativeLayout style="@style/Widget.Silence.RelativeLayout" android:layout_height="wrap_content" android:padding="@dimen/spacing_normal" android:background="#ff222222">
+		<LinearLayout style="@style/Widget.Silence.LinearLayout.Horizontal" android:layout_toStartOf="@+id/actions" android:layout_width="fill_parent" android:gravity="center_vertical">
+			<com.silentcircle.silenttext.view.AvatarView android:id="@+id/avatar" style="@style/Widget.Silence.ImageView.Avatar.Small" android:contentDescription="@null"/>
+			<LinearLayout style="@style/Widget.Silence.LinearLayout.Vertical" android:padding="@dimen/spacing_small">
+				<TextView android:id="@+id/display_name" style="@style/Widget.Silence.TextView" android:textStyle="italic" android:textSize="24sp" android:typeface="serif" android:text="@string/sample_name"/>
+				<TextView android:id="@+id/device_name" style="@style/Widget.Silence.TextView" android:text="@string/sample_device" android:textColor="@color/silent_glass"/>
+			</LinearLayout>
+		</LinearLayout>
+		<LinearLayout android:id="@+id/actions" style="@style/Widget.Silence.ActionTray">
+			<ImageView android:id="@+id/action_call" style="@style/Widget.Silence.ImageView.ActionButton" android:src="@drawable/ic_action_call" android:contentDescription="@string/call"/>
+		</LinearLayout>
+	</RelativeLayout>
+	<View style="@style/Widget.Silence.Divider"/>
+</LinearLayout>

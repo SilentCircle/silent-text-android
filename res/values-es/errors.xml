@@ -1,0 +1,31 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<resources>
+
+	<string name="SCIMPError_NONE">Sin errores</string>
+	<string name="SCIMPError_NOP">No disp.</string>
+	<string name="SCIMPError_UNKNOWN">Ocurrió un error inesperado</string>
+	<string name="SCIMPError_BAD_PARAMS">Parámetros incorrectos</string>
+	<string name="SCIMPError_OUT_OF_MEMORY">Sin memoria suficiente</string>
+	<string name="SCIMPError_BUFFER_TOO_SMALL">Búfer demasiado reducida</string>
+	<string name="SCIMPError_USER_ABORT">Anulado por el usuario</string>
+	<string name="SCIMPError_UNKNOWN_REQUEST">Solicitud desconocida</string>
+	<string name="SCIMPError_LAZY_PROGRAMMER">Programador diferido</string>
+	<string name="SCIMPError_ASSERT_FAILED">Error de aserción</string>
+	<string name="SCIMPError_FEATURE_UNAVAILABLE">Función no disponible</string>
+	<string name="SCIMPError_RESOURCE_UNAVAILABLE">Recurso no disponible</string>
+	<string name="SCIMPError_NOT_CONNECTED">Se intentó enviar un mensaje antes de establecer un contexto seguro.</string>
+	<string name="SCIMPError_IMPROPER_INITIALIZATION">Inicialización inadecuada</string>
+	<string name="SCIMPError_CORRUPT_DATA">El contexto seguro se dañó y se está restableciendo en este momento.</string>
+	<string name="SCIMPError_SELF_TEST_FAILED">La autoevaluación falló</string>
+	<string name="SCIMPError_BAD_INTEGRITY">La verificación de integridad del protocolo falló.</string>
+	<string name="SCIMPError_BAD_HASH_NUMBER">Hash incorrecto</string>
+	<string name="SCIMPError_BAD_CIPHER_NUMBER">Se recibió un paquete de protocolo que especifica un conjunto de cifrado no compatible.</string>
+	<string name="SCIMPError_BAD_RANDOM_NUMBER">Se recibió un paquete de protocolo que especifica un generador de números pseudoaleatorio no compatible.</string>
+	<string name="SCIMPError_SECRETS_MISMATCH">Se perdió la continuidad de la clave con el contexto seguro establecido anteriormente.</string>
+	<string name="SCIMPError_KEY_NOT_FOUND">Se recibió un mensaje indescifrable. Solicitando retransmisión.</string>
+	<string name="SCIMPError_PROTOCOL_ERROR">Se recibió un paquete de protocolo errante.</string>
+	<string name="SCIMPError_PROTOCOL_CONTENTION">Se recibió un paquete de protocolo inesperado.</string>
+	<string name="SCIMPError_KEY_LOCKED">Clave bloqueada</string>
+	<string name="SCIMPError_END_OF_ITERATION">Fin de iteración</string>
+
+</resources>

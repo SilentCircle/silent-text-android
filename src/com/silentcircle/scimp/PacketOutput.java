@@ -1,19 +1,18 @@
 /*
-Copyright © 2013, Silent Circle, LLC.
-All rights reserved.
+Copyright (C) 2013-2015, Silent Circle, LLC. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
-    * Any redistribution, use, or modification is done solely for personal 
+    * Any redistribution, use, or modification is done solely for personal
       benefit and not for any commercial purpose or for monetary gain
     * Redistributions of source code must retain the above copyright
       notice, this list of conditions and the following disclaimer.
     * Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-    * Neither the name Silent Circle nor the names of its contributors may 
-      be used to endorse or promote products derived from this software 
-      without specific prior written permission.
+    * Neither the name Silent Circle nor the
+      names of its contributors may be used to endorse or promote products
+      derived from this software without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -32,14 +31,14 @@ public interface PacketOutput {
 
 	public void onConnect( byte [] storageKey, String packetID, String localUserID, String remoteUserID, String context, String secret );
 
-	public void onError( byte [] storageKey, String packetID, String localUserID, String remoteUserID, int errorCode );
+	public void onError( byte [] storageKey, String packetID, String localUserID, String remoteUserID, int errorCode, int state );
 
-	public void onReceivePacket( byte [] storageKey, String packetID, String localUserID, String remoteUserID, String data, String context, String secret, boolean notifiable, boolean badgeworthy );
+	public void onReceivePacket( byte [] storageKey, String packetID, String localUserID, String remoteUserID, byte [] data, String context, String secret, boolean notifiable, boolean badgeworthy );
 
-	public void onSendPacket( byte [] storageKey, String packetID, String localUserID, String remoteUserID, String data, String context, String secret, boolean notifiable, boolean badgeworthy );
+	public void onSendPacket( byte [] storageKey, String packetID, String localUserID, String remoteUserID, byte [] data, String context, String secret, boolean notifiable, boolean badgeworthy );
 
 	public void onStateTransition( byte [] storageKey, String localUserID, String remoteUserID, int toState );
 
-	public void onWarning( byte [] storageKey, String packetID, String localUserID, String remoteUserID, int warningCode );
+	public void onWarning( byte [] storageKey, String packetID, String localUserID, String remoteUserID, int warningCode, int state );
 
 }

@@ -6,8 +6,8 @@
     <item name="android:layout_height">wrap_content</item>
     <item name="android:background">@color/silent_darken</item>
     <item name="android:padding">@dimen/spacing_small</item>
-    <item name="android:layout_alignParentBottom">true</item>
     <item name="android:gravity">center_vertical</item>
+    <item name="android:layout_alignParentBottom">true</item>
   </style>
 
   <style name="_ComposeText">
@@ -33,7 +33,7 @@
     <item name="android:padding">@dimen/spacing_small</item>
     <item name="android:scaleType">fitEnd</item>
     <item name="android:background">@drawable/bg_selectable</item>
-    <item name="android:src">@drawable/ic_action_camera</item>
+    <item name="android:src">@drawable/ic_action_attachment_2</item>
   </style>
 
 </resources>

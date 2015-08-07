@@ -1,0 +1,6 @@
+require_modules \
+  java \
+  apache-ant \
+  android-sdk
+
+ant_build $*

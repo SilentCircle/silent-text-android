@@ -1,9 +1,9 @@
 /*
-Copyright © 2012-2013, Silent Circle, LLC.  All rights reserved.
+Copyright (C) 2013-2015, Silent Circle, LLC. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
-    * Any redistribution, use, or modification is done solely for personal 
+    * Any redistribution, use, or modification is done solely for personal
       benefit and not for any commercial purpose or for monetary gain
     * Redistributions of source code must retain the above copyright
       notice, this list of conditions and the following disclaimer.
@@ -27,28 +27,36 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package com.silentcircle.silenttext.repository.remote;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.MatrixCursor;
+import android.database.MatrixCursor.RowBuilder;
+import android.graphics.Bitmap;
 import android.support.v4.content.CursorLoader;
+import android.util.LruCache;
 import android.view.View;
 
 import com.silentcircle.api.Session;
 import com.silentcircle.api.model.User;
+import com.silentcircle.api.model.UserSearchResult;
+import com.silentcircle.core.util.CollectionUtils;
+import com.silentcircle.http.client.exception.NetworkException;
+import com.silentcircle.silenttext.application.SilentTextApplication;
 import com.silentcircle.silenttext.log.Log;
 import com.silentcircle.silenttext.model.Contact;
 import com.silentcircle.silenttext.repository.ContactRepository;
 import com.silentcircle.silenttext.util.CursorUtils;
+import com.silentcircle.silenttext.util.IOUtils;
+import com.silentcircle.silenttext.util.StringUtils;
 
 /**
  * A contacts repository that directly consults the Silent Circle directory server API.
- * 
- * @deprecated This repository is not yet ready to be used.
  */
-@Deprecated
 public class RemoteContactRepository implements ContactRepository {
 
 	private static final String CONTACT_ID = "id";
@@ -61,35 +69,101 @@ public class RemoteContactRepository implements ContactRepository {
 		CONTACT_DEVICE
 	};
 
-	private static MatrixCursor add( MatrixCursor cursor, User user ) {
-		cursor.newRow().add( user.getID() ).add( getDisplayName( user ) ).add( null );
+	private static final LruCache<String, Bitmap> AVATAR_CACHE = new LruCache<String, Bitmap>( 4 * 1024 * 1024 ) {
+
+		@Override
+		protected int sizeOf( String key, Bitmap value ) {
+			return value.getByteCount();
+		}
+
+	};
+
+	private static MatrixCursor add( MatrixCursor cursor, UserSearchResult userSearchResult ) {
+
+		RowBuilder row = cursor.newRow();
+
+		row.add( userSearchResult.getUserID() );
+		row.add( userSearchResult.getDisplayName() );
+		row.add( null );
+
 		return cursor;
+
 	}
 
-	private static String getDisplayName( User user ) {
+	public static void cacheAvatar( String username, Bitmap bitmap ) {
+		AVATAR_CACHE.put( username, bitmap );
+	}
+
+	public static InputStream getAvatar( Context context, String username ) {
+		User user = null;
+		user = SilentTextApplication.from( context ).getUser( username );
+
+		CharSequence avatarURL = user != null ? user.getAvatarURL() : null;
+		if( avatarURL != null ) {
+			String APIURL = SilentTextApplication.from( context ).getAPIURL();
+			avatarURL = String.format( "%s%s", APIURL, avatarURL );
+
+			try {
+				return IOUtils.openURL( avatarURL );
+			} catch( IOException exception ) {
+				// Avatar fetch failure, not a big deal :)
+			}
+		}
+		return null;
+	}
+
+	public static Bitmap getCachedAvatar( String username ) {
+		return AVATAR_CACHE.get( username );
+	}
+
+	public static String getDisplayName( User user ) {
+
 		if( user == null ) {
 			return null;
 		}
+
+		String displayName = user.getDisplayName() == null ? null : user.getDisplayName().toString();
+
+		if( StringUtils.isMinimumLength( displayName, 1 ) ) {
+			return displayName;
+		}
+
 		String firstName = user.getFirstName() == null ? null : user.getFirstName().toString();
 		String lastName = user.getLastName() == null ? null : user.getLastName().toString();
+
+		if( !StringUtils.isMinimumLength( firstName, 1 ) ) {
+			firstName = null;
+		}
+
+		if( !StringUtils.isMinimumLength( lastName, 1 ) ) {
+			lastName = null;
+		}
+
 		if( firstName == null ) {
 			return lastName;
 		}
+
 		if( lastName == null ) {
 			return firstName;
 		}
+
 		return String.format( "%s %s", firstName, lastName );
+
 	}
 
-	private static Cursor toCursor( User user ) {
-		if( user == null ) {
-			return null;
+	private static Cursor toCursor( List<UserSearchResult> userSearchResults ) {
+		MatrixCursor cursor = new MatrixCursor( PROJECTION );
+		if( !CollectionUtils.isEmpty( userSearchResults ) ) {
+			for( UserSearchResult userSearchResult : userSearchResults ) {
+				add( cursor, userSearchResult );
+			}
 		}
-		return add( new MatrixCursor( PROJECTION ), user );
+		return cursor;
 	}
 
 	private final Session session;
-	private final Log log = new Log( getClass().getSimpleName() );
+
+	private final Log log = new Log( "RemoteContactRepository" );
 
 	public RemoteContactRepository( Session session ) {
 		this.session = session;
@@ -98,7 +172,7 @@ public class RemoteContactRepository implements ContactRepository {
 	@Override
 	public boolean exists( String id ) {
 		try {
-			return session.getUser( id ) != null;
+			return session.findUser( id ) != null;
 		} catch( Throwable exception ) {
 			log.warn( exception, "#exists id:%s", id );
 			return false;
@@ -107,6 +181,15 @@ public class RemoteContactRepository implements ContactRepository {
 
 	@Override
 	public InputStream getAvatar( String id ) {
+		User user = getUser( id );
+		CharSequence avatarURL = user != null ? user.getAvatarURL() : null;
+		if( avatarURL != null ) {
+			try {
+				return IOUtils.openURL( avatarURL );
+			} catch( IOException exception ) {
+				throw new NetworkException( exception );
+			}
+		}
 		return null;
 	}
 
@@ -132,7 +215,7 @@ public class RemoteContactRepository implements ContactRepository {
 
 	private User getUser( String id ) {
 		try {
-			return session.getUser( id );
+			return session.findUser( id );
 		} catch( Throwable exception ) {
 			log.warn( exception, "#getUser id:%s", id );
 		}
@@ -168,7 +251,7 @@ public class RemoteContactRepository implements ContactRepository {
 
 	@Override
 	public Cursor search( String query ) {
-		return toCursor( getUser( query ) );
+		return toCursor( session.searchUsers( query ) );
 	}
 
 	@Override

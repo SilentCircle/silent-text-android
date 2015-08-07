@@ -1,0 +1,31 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<resources>
+
+	<string name="SCIMPError_NONE">无错误</string>
+	<string name="SCIMPError_NOP">不适用</string>
+	<string name="SCIMPError_UNKNOWN">已发生未知错误。</string>
+	<string name="SCIMPError_BAD_PARAMS">错误参数</string>
+	<string name="SCIMPError_OUT_OF_MEMORY">内存不足</string>
+	<string name="SCIMPError_BUFFER_TOO_SMALL">缓冲区太小</string>
+	<string name="SCIMPError_USER_ABORT">用户异常退出</string>
+	<string name="SCIMPError_UNKNOWN_REQUEST">未知要求</string>
+	<string name="SCIMPError_LAZY_PROGRAMMER">懒惰的程序员</string>
+	<string name="SCIMPError_ASSERT_FAILED">声明失败</string>
+	<string name="SCIMPError_FEATURE_UNAVAILABLE">功能不可用</string>
+	<string name="SCIMPError_RESOURCE_UNAVAILABLE">资源不可用</string>
+	<string name="SCIMPError_NOT_CONNECTED">在建立安全环境前已企图发送信息。</string>
+	<string name="SCIMPError_IMPROPER_INITIALIZATION">初始化不正确</string>
+	<string name="SCIMPError_CORRUPT_DATA">安全环境已损坏，现在正在重建。</string>
+	<string name="SCIMPError_SELF_TEST_FAILED">自检测失败</string>
+	<string name="SCIMPError_BAD_INTEGRITY">协议总校验失败。</string>
+	<string name="SCIMPError_BAD_HASH_NUMBER">错误哈希</string>
+	<string name="SCIMPError_BAD_CIPHER_NUMBER">已收到协议包，指定未经支持的密码组。</string>
+	<string name="SCIMPError_BAD_RANDOM_NUMBER">已接收协议包，指定未受支持的伪随机数生成器。</string>
+	<string name="SCIMPError_SECRETS_MISMATCH">丢失与此前建立的安全环境连接的密钥。</string>
+	<string name="SCIMPError_KEY_NOT_FOUND">收到破译不出的信息。要求重发。</string>
+	<string name="SCIMPError_PROTOCOL_ERROR">收到错误的协议包。</string>
+	<string name="SCIMPError_PROTOCOL_CONTENTION">收到意外的协议包。</string>
+	<string name="SCIMPError_KEY_LOCKED">密钥锁定</string>
+	<string name="SCIMPError_END_OF_ITERATION">结束重复</string>
+
+</resources>

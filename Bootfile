@@ -1,0 +1,24 @@
+require_modules java apache-ant android-sdk android-ndk
+
+# C library dependencies
+# dependency com.silentcircle libscimp-jni 1.0.0 so
+# dependency com.silentcircle libscimp 1.5.0 so
+# dependency org.libtom libtomcrypt 1.17 so
+# dependency org.libtom libtommath 1.0.0 so
+# dependency lloyd libyajl 2.0.1 so
+# dependency com.silentcircle libscloud-jni 1.0.0 so
+# dependency com.silentcircle libscloud 0.2.0 so
+
+# Java library dependencies
+# dependency com.silentcircle silent-storage 1.1.0-SNAPSHOT jar
+
+# Android library dependencies
+# dependency com.example imageviewtouch 1.0.0 apklib
+
+shift
+
+if [ $# -lt 1 ]; then
+  ant_build clean generated release -propertyfile .build-release/debug.properties
+else
+  ant_build $*
+fi

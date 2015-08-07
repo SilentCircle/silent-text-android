@@ -1,19 +1,18 @@
 /*
-Copyright © 2013, Silent Circle, LLC.
-All rights reserved.
+Copyright (C) 2013-2015, Silent Circle, LLC. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
-    * Any redistribution, use, or modification is done solely for personal 
+    * Any redistribution, use, or modification is done solely for personal
       benefit and not for any commercial purpose or for monetary gain
     * Redistributions of source code must retain the above copyright
       notice, this list of conditions and the following disclaimer.
     * Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-    * Neither the name Silent Circle nor the names of its contributors may 
-      be used to endorse or promote products derived from this software 
-      without specific prior written permission.
+    * Neither the name Silent Circle nor the
+      names of its contributors may be used to endorse or promote products
+      derived from this software without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -28,6 +27,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package com.silentcircle.silenttext.crypto;
 
+import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.ReadOnlyBufferException;
@@ -64,11 +64,18 @@ public class CryptoUtils {
 	}
 
 	public static char [] copyAsCharArray( CharSequence in ) {
+		if( in == null ) {
+			return null;
+		}
 		char [] out = new char [in.length()];
 		for( int i = 0; i < out.length; i++ ) {
 			out[i] = in.charAt( i );
 		}
 		return out;
+	}
+
+	public static byte [] copyOf( byte [] array ) {
+		return copyOf( array, array == null ? 0 : array.length );
 	}
 
 	public static byte [] copyOf( byte [] array, int length ) {
@@ -84,6 +91,9 @@ public class CryptoUtils {
 	}
 
 	public static char [] copyOf( char [] array ) {
+		if( array == null ) {
+			return null;
+		}
 		char [] copy = new char [array.length];
 		for( int i = 0; i < array.length; i++ ) {
 			copy[i] = array[i];
@@ -92,15 +102,34 @@ public class CryptoUtils {
 	}
 
 	public static byte [] randomBytes( int length ) {
-		return randomize( new byte [length] );
+		return length < 0 ? null : randomize( new byte [length] );
+	}
+
+	public static int randomInt() {
+		return new BigInteger( CryptoUtils.randomBytes( 4 ) ).intValue();
 	}
 
 	public static byte [] randomize( byte [] buffer ) {
+		if( buffer == null ) {
+			return null;
+		}
 		RANDOM.nextBytes( buffer );
 		return buffer;
 	}
 
+	public static ByteBuffer randomize( ByteBuffer buffer ) {
+		if( buffer != null && buffer.hasArray() ) {
+			for( int i = 0; i < buffer.limit(); i++ ) {
+				buffer.put( i, (byte) RANDOM.nextInt() );
+			}
+		}
+		return buffer;
+	}
+
 	public static char [] randomize( char [] buffer ) {
+		if( buffer == null ) {
+			return null;
+		}
 		for( int i = 0; i < buffer.length; i++ ) {
 			buffer[i] = (char) RANDOM.nextInt();
 		}
@@ -108,7 +137,7 @@ public class CryptoUtils {
 	}
 
 	public static CharBuffer randomize( CharBuffer buffer ) {
-		if( buffer.hasArray() ) {
+		if( buffer != null && buffer.hasArray() ) {
 			for( int i = 0; i < buffer.limit(); i++ ) {
 				buffer.put( i, (char) RANDOM.nextInt() );
 			}
@@ -129,6 +158,9 @@ public class CryptoUtils {
 	}
 
 	public static StringBuffer randomize( StringBuffer buffer ) {
+		if( buffer == null ) {
+			return null;
+		}
 		for( int i = 0; i < buffer.length(); i++ ) {
 			buffer.setCharAt( i, (char) RANDOM.nextInt() );
 		}
@@ -136,18 +168,49 @@ public class CryptoUtils {
 	}
 
 	public static StringBuilder randomize( StringBuilder buffer ) {
+		if( buffer == null ) {
+			return null;
+		}
 		for( int i = 0; i < buffer.length(); i++ ) {
 			buffer.setCharAt( i, (char) RANDOM.nextInt() );
 		}
 		return buffer;
 	}
 
-	public static byte [] toByteArray( char [] buffer ) {
-		return toByteArray( CharBuffer.wrap( buffer ) );
+	/**
+	 * This implementation is broken. Use {@link #toByteArraySafe(ByteBuffer)} instead.
+	 * 
+	 * @deprecated
+	 */
+	@Deprecated
+	public static byte [] toByteArray( ByteBuffer buffer ) {
+		return buffer == null ? null : copyOf( buffer.array() );
 	}
 
+	/**
+	 * This implementation is broken. Use {@link #toByteArraySafe(char[])} instead.
+	 * 
+	 * @deprecated
+	 */
+	@Deprecated
+	public static byte [] toByteArray( char [] buffer ) {
+		return buffer == null ? null : toByteArray( CharBuffer.wrap( buffer ) );
+	}
+
+	/**
+	 * This implementation is broken. Use {@link #toByteArraySafe(CharBuffer)} instead.
+	 * 
+	 * @deprecated
+	 */
+	@Deprecated
 	public static byte [] toByteArray( CharBuffer sensitiveData ) {
-		return UTF8.encode( sensitiveData ).array();
+		if( sensitiveData == null ) {
+			return null;
+		}
+		ByteBuffer bytes = UTF8.encode( sensitiveData );
+		byte [] array = toByteArray( bytes );
+		randomize( bytes );
+		return array;
 	}
 
 	public static byte [] toByteArray( CharSequence sequence ) {
@@ -165,47 +228,152 @@ public class CryptoUtils {
 	}
 
 	public static byte [] toByteArray( SpannableStringBuilder sensitiveData ) {
+		if( sensitiveData == null ) {
+			return null;
+		}
 		char [] buffer = new char [sensitiveData.length()];
 		sensitiveData.getChars( 0, buffer.length, buffer, 0 );
 		return toByteArray( buffer );
 	}
 
 	public static byte [] toByteArray( StringBuffer sensitiveData ) {
+		if( sensitiveData == null ) {
+			return null;
+		}
 		char [] buffer = new char [sensitiveData.length()];
 		sensitiveData.getChars( 0, buffer.length, buffer, 0 );
 		return toByteArray( buffer );
 	}
 
 	public static byte [] toByteArray( StringBuilder sensitiveData ) {
+		if( sensitiveData == null ) {
+			return null;
+		}
 		char [] buffer = new char [sensitiveData.length()];
 		sensitiveData.getChars( 0, buffer.length, buffer, 0 );
 		return toByteArray( buffer );
 	}
 
-	public static char [] toCharArray( byte [] buffer ) {
-		return toCharArray( buffer, false );
-	}
-
-	public static char [] toCharArray( byte [] buffer, boolean nullTerminated ) {
-		return toCharArray( ByteBuffer.wrap( buffer ), nullTerminated );
-	}
-
-	public static char [] toCharArray( ByteBuffer buffer ) {
-		return toCharArray( buffer, false );
-	}
-
-	public static char [] toCharArray( ByteBuffer buffer, boolean nullTerminated ) {
-		return toCharArray( UTF8.decode( buffer ), nullTerminated );
-	}
-
-	public static char [] toCharArray( CharBuffer buffer, boolean nullTerminated ) {
-
+	public static byte [] toByteArraySafe( ByteBuffer buffer ) {
 		if( buffer == null ) {
 			return null;
 		}
+		byte [] array = new byte [buffer.remaining()];
+		for( int i = 0; i < array.length; i++ ) {
+			array[i] = buffer.get( i );
+		}
+		return array;
+	}
 
-		if( !nullTerminated ) {
-			return buffer.array();
+	public static byte [] toByteArraySafe( char [] buffer ) {
+		return buffer == null ? null : toByteArraySafe( CharBuffer.wrap( buffer ) );
+	}
+
+	public static byte [] toByteArraySafe( CharBuffer sensitiveData ) {
+		if( sensitiveData == null ) {
+			return null;
+		}
+		ByteBuffer bytes = UTF8.encode( sensitiveData );
+		byte [] array = toByteArraySafe( bytes );
+		randomize( bytes );
+		return array;
+	}
+
+	/**
+	 * This implementation is broken. Use {@link #toCharArraySafe(byte[])} instead.
+	 * 
+	 * @deprecated
+	 */
+	@Deprecated
+	public static char [] toCharArray( byte [] buffer ) {
+		return buffer == null ? null : toCharArray( ByteBuffer.wrap( buffer ) );
+	}
+
+	/**
+	 * This implementation is broken. Use {@link #toCharArraySafe(ByteBuffer)} instead.
+	 * 
+	 * @deprecated
+	 */
+	@Deprecated
+	public static char [] toCharArray( ByteBuffer buffer ) {
+		if( buffer == null ) {
+			return null;
+		}
+		CharBuffer chars = UTF8.decode( buffer );
+		char [] array = toCharArray( chars );
+		randomize( chars );
+		return array;
+	}
+
+	/**
+	 * This implementation is broken. Use {@link #toCharArraySafe(CharBuffer)} instead.
+	 * 
+	 * @deprecated
+	 */
+	@Deprecated
+	public static char [] toCharArray( CharBuffer buffer ) {
+		return buffer == null ? null : copyOf( buffer.array() );
+	}
+
+	public static char [] toCharArray( CharSequence sequence ) {
+		if( sequence instanceof CharBuffer ) {
+			return toCharArray( (CharBuffer) sequence );
+		} else if( sequence instanceof StringBuffer ) {
+			return toCharArray( (StringBuffer) sequence );
+		} else if( sequence instanceof StringBuilder ) {
+			return toCharArray( (StringBuilder) sequence );
+		} else if( sequence instanceof SpannableStringBuilder ) {
+			return toCharArray( (SpannableStringBuilder) sequence );
+		} else {
+			throw new ReadOnlyBufferException();
+		}
+	}
+
+	public static char [] toCharArray( SpannableStringBuilder buffer ) {
+		if( buffer == null ) {
+			return null;
+		}
+		char [] out = new char [buffer.length()];
+		buffer.getChars( 0, out.length, out, 0 );
+		return out;
+	}
+
+	public static char [] toCharArray( StringBuffer buffer ) {
+		if( buffer == null ) {
+			return null;
+		}
+		char [] out = new char [buffer.length()];
+		buffer.getChars( 0, out.length, out, 0 );
+		return out;
+	}
+
+	public static char [] toCharArray( StringBuilder buffer ) {
+		if( buffer == null ) {
+			return null;
+		}
+		char [] out = new char [buffer.length()];
+		buffer.getChars( 0, out.length, out, 0 );
+		return out;
+	}
+
+	public static char [] toCharArraySafe( byte [] buffer ) {
+		return buffer == null ? null : toCharArraySafe( ByteBuffer.wrap( buffer ) );
+	}
+
+	public static char [] toCharArraySafe( ByteBuffer buffer ) {
+		if( buffer == null ) {
+			return null;
+		}
+		CharBuffer chars = UTF8.decode( buffer );
+		char [] array = toCharArraySafe( chars );
+		randomize( chars );
+		return array;
+	}
+
+	public static char [] toCharArraySafe( CharBuffer buffer ) {
+
+		if( buffer == null ) {
+			return null;
 		}
 
 		char [] array = new char [buffer.remaining()];
@@ -214,7 +382,7 @@ public class CryptoUtils {
 
 		for( int i = 0; i < length; i++ ) {
 			char c = buffer.charAt( i );
-			if( c == '\0' && nullTerminated ) {
+			if( c == '\0' ) {
 				length = i;
 				break;
 			}
@@ -230,42 +398,6 @@ public class CryptoUtils {
 
 		return array;
 
-	}
-
-	public static char [] toCharArray( CharSequence sequence ) {
-		return toCharArray( sequence, false );
-	}
-
-	public static char [] toCharArray( CharSequence sequence, boolean nullTerminated ) {
-		if( sequence instanceof CharBuffer ) {
-			return toCharArray( sequence, nullTerminated );
-		} else if( sequence instanceof StringBuffer ) {
-			return toCharArray( (StringBuffer) sequence );
-		} else if( sequence instanceof StringBuilder ) {
-			return toCharArray( (StringBuilder) sequence );
-		} else if( sequence instanceof SpannableStringBuilder ) {
-			return toCharArray( (SpannableStringBuilder) sequence );
-		} else {
-			throw new ReadOnlyBufferException();
-		}
-	}
-
-	public static char [] toCharArray( SpannableStringBuilder buffer ) {
-		char [] out = new char [buffer.length()];
-		buffer.getChars( 0, out.length, out, 0 );
-		return out;
-	}
-
-	public static char [] toCharArray( StringBuffer buffer ) {
-		char [] out = new char [buffer.length()];
-		buffer.getChars( 0, out.length, out, 0 );
-		return out;
-	}
-
-	public static char [] toCharArray( StringBuilder buffer ) {
-		char [] out = new char [buffer.length()];
-		buffer.getChars( 0, out.length, out, 0 );
-		return out;
 	}
 
 }

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+    
+	<style name="Widget.Silence.SubtleButton.Device">
+		<item name="android:drawableStart">@drawable/ic_action_tablet</item>
+	</style>
+
+</resources>

@@ -1,19 +1,18 @@
 /*
-Copyright © 2013, Silent Circle, LLC.
-All rights reserved.
+Copyright (C) 2013-2015, Silent Circle, LLC. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
-    * Any redistribution, use, or modification is done solely for personal 
+    * Any redistribution, use, or modification is done solely for personal
       benefit and not for any commercial purpose or for monetary gain
     * Redistributions of source code must retain the above copyright
       notice, this list of conditions and the following disclaimer.
     * Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-    * Neither the name Silent Circle nor the names of its contributors may 
-      be used to endorse or promote products derived from this software 
-      without specific prior written permission.
+    * Neither the name Silent Circle nor the
+      names of its contributors may be used to endorse or promote products
+      derived from this software without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -30,11 +29,13 @@ package com.silentcircle.silenttext.view;
 
 import java.util.List;
 
-import org.json.JSONException;
-
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.graphics.Typeface;
+import android.os.AsyncTask;
+import android.os.Build;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.DynamicDrawableSpan;
@@ -44,11 +45,10 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Checkable;
-import android.widget.RelativeLayout;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.TextView.BufferType;
 
-import com.silentcircle.scimp.model.ResourceState;
 import com.silentcircle.silenttext.Action;
 import com.silentcircle.silenttext.Extra;
 import com.silentcircle.silenttext.Manifest;
@@ -57,19 +57,71 @@ import com.silentcircle.silenttext.activity.ConversationActivity;
 import com.silentcircle.silenttext.application.SilentTextApplication;
 import com.silentcircle.silenttext.model.Conversation;
 import com.silentcircle.silenttext.model.MessageState;
+import com.silentcircle.silenttext.model.SCIMPError;
+import com.silentcircle.silenttext.model.Siren;
 import com.silentcircle.silenttext.model.event.ErrorEvent;
 import com.silentcircle.silenttext.model.event.Event;
 import com.silentcircle.silenttext.model.event.HandshakeEvent;
 import com.silentcircle.silenttext.model.event.IncomingMessage;
+import com.silentcircle.silenttext.model.event.Message;
 import com.silentcircle.silenttext.model.event.OutgoingMessage;
 import com.silentcircle.silenttext.model.event.WarningEvent;
-import com.silentcircle.silenttext.model.siren.SirenObject;
-import com.silentcircle.silenttext.repository.ContactRepository;
 import com.silentcircle.silenttext.repository.ConversationRepository;
 import com.silentcircle.silenttext.repository.EventRepository;
-import com.silentcircle.silenttext.repository.ResourceStateRepository;
+import com.silentcircle.silenttext.util.AsyncUtils;
+import com.silentcircle.silenttext.util.Constants;
+import com.silentcircle.silenttext.util.DateUtils;
+import com.silentcircle.silenttext.util.StringUtils;
+import com.silentcircle.silenttext.util.ViewUtils;
 
-public class ConversationView extends RelativeLayout implements OnClickListener, Checkable, HasChoiceMode {
+public class ConversationView extends LinearLayout implements OnClickListener, Checkable, HasChoiceMode {
+
+	class UpdateDisplayNameTask extends AsyncTask<String, Void, String> {
+
+		private final Object tag;
+
+		UpdateDisplayNameTask( Object tag ) {
+			this.tag = tag;
+		}
+
+		@Override
+		protected String doInBackground( String... args ) {
+			return SilentTextApplication.from( getContext() ).getDisplayName( args[0] );
+		}
+
+		@Override
+		protected void onPostExecute( String displayName ) {
+
+			if( tag != getTag() ) {
+				return;
+			}
+
+			Conversation conversation = (Conversation) getTag();
+
+			if( StringUtils.isMinimumLength( displayName, 1 ) ) {
+				conversation.getPartner().setAlias( displayName );
+				setText( R.id.alias, conversation.getPartner().getAlias() );
+			}
+
+		}
+	}
+
+	private static void setDrawableLeft( TextView view, int drawableResourceID ) {
+		view.setCompoundDrawablesWithIntrinsicBounds( drawableResourceID, 0, 0, 0 );
+	}
+
+	@TargetApi( Build.VERSION_CODES.JELLY_BEAN_MR1 )
+	private static void setDrawableStart( TextView view, int drawableResourceID ) {
+		view.setCompoundDrawablesRelativeWithIntrinsicBounds( drawableResourceID, 0, 0, 0 );
+	}
+
+	private static void setDrawableStartSupport( TextView tv, int drawableResourceID ) {
+		if( Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR1 ) {
+			setDrawableLeft( tv, drawableResourceID );
+		} else {
+			setDrawableStart( tv, drawableResourceID );
+		}
+	}
 
 	protected boolean inChoiceMode;
 	protected boolean checked;
@@ -82,20 +134,31 @@ public class ConversationView extends RelativeLayout implements OnClickListener,
 		super( context, attributes );
 	}
 
+	@TargetApi( Build.VERSION_CODES.HONEYCOMB )
 	public ConversationView( Context context, AttributeSet attributes, int defaultStyle ) {
 		super( context, attributes, defaultStyle );
 	}
 
+	private void enableMarquee( int... viewResourceIDs ) {
+		for( int i = 0; i < viewResourceIDs.length; i++ ) {
+			int id = viewResourceIDs[i];
+			View view = findViewById( id );
+			if( view != null ) {
+				view.setSelected( true );
+			}
+		}
+	}
+
 	private String formatDate( long time ) {
-		return MessageView.getTimeString( getContext(), time );
+		return DateUtils.getTimeString( getContext(), time );
+	}
+
+	private String formatString( int stringResourceID, String message ) {
+		return getContext().getResources().getString( stringResourceID, message );
 	}
 
 	private SilentTextApplication getApplication() {
 		return (SilentTextApplication) getContext().getApplicationContext();
-	}
-
-	private ContactRepository getContacts() {
-		return getApplication().getContacts();
 	}
 
 	private ConversationRepository getConversations() {
@@ -103,7 +166,19 @@ public class ConversationView extends RelativeLayout implements OnClickListener,
 	}
 
 	private EventRepository getEvents( Conversation conversation ) {
-		return getConversations().historyOf( conversation );
+		ConversationRepository conversations = getConversations();
+		return conversations != null ? conversations.historyOf( conversation ) : null;
+	}
+
+	private String getLocalizedErrorString( int formatStringResourceID, SCIMPError error ) {
+		return formatString( formatStringResourceID, getLocalizedErrorString( error ) );
+	}
+
+	private String getLocalizedErrorString( SCIMPError error ) {
+		Resources resources = getResources();
+		String key = String.format( "SCIMPError_%s", error.getName() );
+		int identifier = resources.getIdentifier( key, "string", getContext().getPackageName() );
+		return resources.getString( identifier );
 	}
 
 	protected String getText( int id ) {
@@ -120,15 +195,6 @@ public class ConversationView extends RelativeLayout implements OnClickListener,
 		return inChoiceMode;
 	}
 
-	private boolean isVerified( Conversation conversation ) {
-		if( getApplication().isSelf( conversation.getPartner().getUsername() ) ) {
-			return true;
-		}
-		ResourceStateRepository states = getConversations().contextOf( conversation );
-		ResourceState state = states.findById( conversation.getPartner().getDevice() );
-		return state != null && states.isVerified( state );
-	}
-
 	@Override
 	public void onClick( View _this ) {
 		if( isInChoiceMode() ) {
@@ -136,19 +202,42 @@ public class ConversationView extends RelativeLayout implements OnClickListener,
 		}
 		Object tag = getTag();
 		if( tag != null && tag instanceof Conversation ) {
+			Constants.mConversationListItemClicked = true;
 			Intent intent = new Intent( getContext(), ConversationActivity.class );
 			intent.putExtra( Extra.PARTNER.getName(), ( (Conversation) tag ).getPartner().getUsername() );
-			getContext().startActivity( intent );
+			ViewUtils.startActivity( getContext(), intent, R.anim.slide_in_from_right, R.anim.slide_out_to_left );
+		}
+	}
+
+	@Override
+	protected int [] onCreateDrawableState( int extraSpace ) {
+		final int [] state = super.onCreateDrawableState( extraSpace + 1 );
+		if( checked ) {
+			mergeDrawableStates( state, ViewUtils.STATE_CHECKED );
+		}
+		return state;
+	}
+
+	private void save( Conversation conversation ) {
+		ConversationRepository conversations = getConversations();
+		if( conversations != null ) {
+			conversations.save( conversation );
 		}
 	}
 
 	@Override
 	public void setChecked( boolean checked ) {
-		this.checked = checked;
-		if( getBackground().isStateful() ) {
-			getBackground().setState( new int [] {
-				( isChecked() ? 1 : -1 ) * android.R.attr.state_checked
-			} );
+		if( checked != this.checked ) {
+			this.checked = checked;
+			refreshDrawableState();
+		}
+	}
+
+	protected void setDrawableStart( int id, int drawableResourceID ) {
+		View view = findViewById( id );
+		if( view instanceof TextView ) {
+			TextView tv = (TextView) view;
+			setDrawableStartSupport( tv, drawableResourceID );
 		}
 	}
 
@@ -162,51 +251,72 @@ public class ConversationView extends RelativeLayout implements OnClickListener,
 	}
 
 	@Override
-	public void setTag( Object tag ) {
+	public void setTag( final Object tag ) {
 
 		super.setTag( tag );
+
+		enableMarquee( R.id.alias, R.id.snippet );
 
 		if( tag != null && tag instanceof Conversation ) {
 
 			Conversation conversation = (Conversation) tag;
 			String remoteUserID = conversation.getPartner().getUsername();
-			conversation.getPartner().setAlias( getContacts().getDisplayName( remoteUserID ) );
+
+			setTag( R.id.username, remoteUserID );
+			setText( R.id.alias, conversation.getPartner().getAlias() );
+
+			AsyncUtils.execute( new UpdateDisplayNameTask( tag ), remoteUserID );
+
 			AvatarView badge = (AvatarView) findViewById( R.id.avatar );
 			badge.setContact( conversation.getPartner() );
 			badge.setSecondaryOnClickListener( this );
 
-			setText( R.id.alias, conversation.getPartner().getAlias() );
-			setText( R.id.device, conversation.getPartner().getDevice() );
-
-			findViewById( R.id.secure_icon ).setVisibility( isVerified( conversation ) ? VISIBLE : GONE );
-
 			EventRepository events = getEvents( conversation );
-			Event preview = events.findById( conversation.getPreviewEventID() );
+			Event preview = events != null ? events.findById( conversation.getPreviewEventID() ) : null;
+
+			if( events != null ) {
+				for( int i = events.list().size() - 1; i > 0; i-- ) {
+					if( events.list().get( i ) != null && events.list().get( i ) instanceof Message && !SilentTextApplication.isResendRequest( (Message) events.list().get( i ) ) && ( (Message) events.list().get( i ) ).getSiren() != null ) {
+						preview = events.list().get( i );
+
+						break;
+					}
+				}
+			}
 
 			if( conversation.getPreviewEventID() != null && preview == null ) {
 				transition( conversation.getPartner().getUsername(), conversation.getPreviewEventID() );
-				List<Event> history = events.list();
-				if( history.size() > 0 ) {
+				List<Event> history = events != null ? events.list() : null;
+				if( history != null && history.size() > 0 ) {
 					Event e = history.get( history.size() - 1 );
 					conversation.setPreviewEventID( e.getId() );
 					conversation.setLastModified( e.getTime() );
+
+					preview = e;
 				} else {
-					conversation.setPreviewEventID( null );
+					conversation.setPreviewEventID( (byte []) null );
 				}
 				conversation.setUnreadMessageCount( 0 );
-				for( int i = 0; i < history.size(); i++ ) {
-					Event e = history.get( i );
-					if( e instanceof IncomingMessage ) {
-						IncomingMessage m = (IncomingMessage) e;
-						if( MessageState.DECRYPTED.equals( m.getState() ) ) {
-							conversation.offsetUnreadMessageCount( 1 );
+				if( history != null ) {
+					for( int i = 0; i < history.size(); i++ ) {
+						Event e = history.get( i );
+						if( e instanceof IncomingMessage ) {
+							IncomingMessage m = (IncomingMessage) e;
+							if( MessageState.DECRYPTED.equals( m.getState() ) ) {
+								conversation.offsetUnreadMessageCount( 1 );
+							}
 						}
 					}
 				}
-				getConversations().save( conversation );
+				save( conversation );
 			}
 
-			setText( R.id.count, Integer.toString( conversation.getUnreadMessageCount() ) );
+			if( conversation.getUnreadMessageCount() > 0 ) {
+				setText( R.id.count, Integer.toString( conversation.getUnreadMessageCount() ) );
+				findViewById( R.id.count ).setVisibility( VISIBLE );
+			} else {
+				findViewById( R.id.count ).setVisibility( GONE );
+			}
 
 			int color = R.color.conversation_summary_snippet_message;
 
@@ -235,23 +345,44 @@ public class ConversationView extends RelativeLayout implements OnClickListener,
 				snippet.append( getResources().getString( R.string.silence ) );
 				snippet.setSpan( new StyleSpan( Typeface.ITALIC ), 0, snippet.length(), Spanned.SPAN_INCLUSIVE_INCLUSIVE );
 			} else {
-				try {
-					SirenObject siren = new SirenObject( preview.getText() );
-					if( siren.getString( "thumbnail" ) != null ) {
-						snippet.setSpan( new ImageSpan( getContext(), R.drawable.ic_attached_photo, DynamicDrawableSpan.ALIGN_BOTTOM ), snippet.length() - 1, snippet.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE );
-					}
-					if( siren.getString( "message" ) != null ) {
-						snippet.append( siren.getString( "message" ) );
-					} else {
-						snippet.setSpan( new StyleSpan( Typeface.ITALIC ), snippet.length() - 1, snippet.length(), Spanned.SPAN_EXCLUSIVE_INCLUSIVE );
-						if( siren.getString( "thumbnail" ) != null ) {
-							snippet.append( getResources().getString( R.string.attachment ) );
+				Siren siren = preview instanceof Message ? ( (Message) preview ).getSiren() : null;
+				if( siren == null ) {
+					if( preview instanceof WarningEvent ) {
+						SCIMPError warning = ( (WarningEvent) preview ).getWarning();
+						if( SCIMPError.NONE.equals( warning ) ) {
+							snippet.append( preview.getText() );
 						} else {
-							snippet.append( getResources().getString( R.string.silence ) );
+							snippet.append( getLocalizedErrorString( R.string.error_format, warning ) );
+						}
+					} else if( preview instanceof ErrorEvent ) {
+						SCIMPError error = ( (ErrorEvent) preview ).getError();
+						if( SCIMPError.NONE.equals( error ) ) {
+							snippet.append( preview.getText() );
+						} else {
+							snippet.append( getLocalizedErrorString( R.string.error_format, error ) );
+						}
+					} else {
+						snippet.clear();
+					}
+				} else {
+					if( siren.isVoicemail() ) {
+						snippet.clear();
+						snippet.append( siren.getVoicemailName() );
+					} else {
+						if( siren.getThumbnail() != null ) {
+							snippet.setSpan( new ImageSpan( getContext(), R.drawable.ic_attached_photo, DynamicDrawableSpan.ALIGN_BOTTOM ), snippet.length() - 1, snippet.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE );
+						}
+						if( siren.getChatMessage() != null ) {
+							snippet.append( siren.getChatMessage() );
+						} else {
+							snippet.setSpan( new StyleSpan( Typeface.ITALIC ), snippet.length() - 1, snippet.length(), Spanned.SPAN_EXCLUSIVE_INCLUSIVE );
+							if( siren.getThumbnail() != null ) {
+								snippet.append( getResources().getString( R.string.attachment ) );
+							} else {
+								snippet.append( getResources().getString( R.string.silence ) );
+							}
 						}
 					}
-				} catch( JSONException exception ) {
-					snippet.append( preview.getText() );
 				}
 			}
 

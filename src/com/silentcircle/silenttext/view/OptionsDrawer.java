@@ -1,19 +1,18 @@
 /*
-Copyright © 2013, Silent Circle, LLC.
-All rights reserved.
+Copyright (C) 2013-2015, Silent Circle, LLC. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
-    * Any redistribution, use, or modification is done solely for personal 
+    * Any redistribution, use, or modification is done solely for personal
       benefit and not for any commercial purpose or for monetary gain
     * Redistributions of source code must retain the above copyright
       notice, this list of conditions and the following disclaimer.
     * Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-    * Neither the name Silent Circle nor the names of its contributors may 
-      be used to endorse or promote products derived from this software 
-      without specific prior written permission.
+    * Neither the name Silent Circle nor the
+      names of its contributors may be used to endorse or promote products
+      derived from this software without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -34,87 +33,203 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.util.AttributeSet;
 import android.view.View;
-import android.widget.CheckBox;
-import android.widget.Checkable;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.EditText;
 import android.widget.ScrollView;
-import android.widget.SeekBar;
-import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 
-import com.silentcircle.silenttext.Extra;
 import com.silentcircle.silenttext.R;
-import com.silentcircle.silenttext.activity.AdvancedActivity;
-import com.silentcircle.silenttext.activity.LicenseActivity;
-import com.silentcircle.silenttext.activity.LockActivity;
-import com.silentcircle.silenttext.activity.PrivacyPolicyActivity;
-import com.silentcircle.silenttext.activity.UnlockActivity;
-import com.silentcircle.silenttext.listener.DeactivateApplicationOnConfirm;
-import com.silentcircle.silenttext.listener.LaunchActivityOnClick;
-import com.silentcircle.silenttext.listener.LaunchConfirmDialogOnClick;
-import com.silentcircle.silenttext.listener.LockApplicationOnClick;
-import com.silentcircle.silenttext.listener.SetPreferenceAndSiblingVisibilityOnChecked;
-import com.silentcircle.silenttext.listener.SetPreferenceOnChecked;
-import com.silentcircle.silenttext.receiver.NotificationBroadcaster;
+import com.silentcircle.silenttext.application.SilentTextApplication;
+import com.silentcircle.silenttext.model.UserPreferences;
+import com.silentcircle.silenttext.preference.RingtonePreference;
+import com.silentcircle.silenttext.preference.RingtonePreference.OnRingtoneChangeListener;
 import com.silentcircle.silenttext.util.InactivityTimeout;
 
-public class OptionsDrawer extends ScrollView {
+public class OptionsDrawer extends ScrollView implements OnRingtoneChangeListener {
 
-	private static final String KEY_ENABLE_SCREENSHOTS = "enable_screenshots";
+	public static abstract class SetApplicationPreferenceAndToggleSiblingVisibilityOnCheckedChange extends SetApplicationPreferenceOnCheckedChange {
+
+		protected static void setSiblingVisibility( View view, int siblingViewResourceID, boolean visible ) {
+			if( view != null ) {
+				View parent = (View) view.getParent();
+				if( parent != null ) {
+					View sibling = parent.findViewById( siblingViewResourceID );
+					if( sibling != null ) {
+						sibling.setVisibility( visible ? View.VISIBLE : View.GONE );
+					}
+				}
+			}
+		}
+
+		private final int siblingViewResourceID;
+
+		public SetApplicationPreferenceAndToggleSiblingVisibilityOnCheckedChange( int siblingViewResourceID ) {
+			this.siblingViewResourceID = siblingViewResourceID;
+		}
+
+		@Override
+		public void onCheckedChanged( CompoundButton view, boolean enabled ) {
+			super.onCheckedChanged( view, enabled );
+			setSiblingVisibility( view, siblingViewResourceID, enabled );
+		}
+
+	}
+
+	public static abstract class SetApplicationPreferenceOnCheckedChange extends SetPreferenceOnCheckedChange {
+
+		@Override
+		protected UserPreferences getPreferences( Context context ) {
+			return SilentTextApplication.from( context ).getGlobalPreferences();
+		}
+
+		@Override
+		protected void savePreferences( Context context, UserPreferences preferences ) {
+			SilentTextApplication.from( context ).saveApplicationPreferences( preferences );
+		}
+
+	}
+
+	public static abstract class SetPreferenceOnCheckedChange implements OnCheckedChangeListener {
+
+		protected abstract UserPreferences getPreferences( Context context );
+
+		@Override
+		public void onCheckedChanged( CompoundButton view, boolean enabled ) {
+			setPreference( view, enabled );
+		}
+
+		protected abstract void savePreferences( Context context, UserPreferences preferences );
+
+		private void setPreference( Context context, boolean enabled ) {
+			UserPreferences preferences = getPreferences( context );
+			if( preferences != null ) {
+				if( setPreference( preferences, enabled ) ) {
+					savePreferences( context, preferences );
+				}
+			}
+		}
+
+		protected abstract boolean setPreference( UserPreferences preferences, boolean enabled );
+
+		private void setPreference( View view, boolean enabled ) {
+			setPreference( view == null ? null : view.getContext(), enabled );
+		}
+
+	}
+
+	public static abstract class SetUserPreferenceOnCheckedChange extends SetPreferenceOnCheckedChange {
+
+		@Override
+		protected UserPreferences getPreferences( Context context ) {
+			return SilentTextApplication.from( context ).getUserPreferences();
+		}
+
+		@Override
+		protected void savePreferences( Context context, UserPreferences preferences ) {
+			SilentTextApplication.from( context ).saveUserPreferences( preferences );
+		}
+
+	}
+
 	private static final String KEY_INACTIVITY_TIMEOUT = "inactivity_timeout";
 	private static final String KEY_PASSCODE_SET = "passcode_set";
 	private static final String KEY_SEND_RECEIPTS = "send_receipts";
-
 	private static final String PREFERENCES = "passcode_options";
 
+	public static UserPreferences getApplicationPreferences( Context context ) {
+		SilentTextApplication application = SilentTextApplication.from( context );
+		UserPreferences preferences = application.getGlobalPreferences();
+		return preferences == null ? application.createDefaultApplicationPreferences() : preferences;
+	}
+
 	public static int getInactivityTimeout( Context context ) {
-		SharedPreferences preferences = getPreferences( context );
+		UserPreferences preferences = getApplicationPreferences( context );
+		return preferences.isPasscodeSet ? preferences.passcodeUnlockValidityPeriod : -1;
+	}
+
+	public static int getInactivityTimeoutLegacy( Context context ) {
+		SharedPreferences preferences = getPreferencesLegacy( context );
 		if( !preferences.getBoolean( KEY_PASSCODE_SET, false ) ) {
 			return -1;
 		}
 		return preferences.getInt( KEY_INACTIVITY_TIMEOUT, -1 );
 	}
 
-	private static boolean getPreference( Context context, String key, boolean defaultValue ) {
-		return getPreferences( context ).getBoolean( key, defaultValue );
+	@Deprecated
+	private static boolean getPreferenceLegacy( Context context, String key, boolean defaultValue ) {
+		return getPreferencesLegacy( context ).getBoolean( key, defaultValue );
 	}
 
-	private static SharedPreferences getPreferences( Context context ) {
+	@Deprecated
+	private static SharedPreferences getPreferencesLegacy( Context context ) {
 		return context.getSharedPreferences( PREFERENCES, Context.MODE_PRIVATE );
 	}
 
-	public static boolean isEmptyPasscode( Context context ) {
-		return !getPreference( context, KEY_PASSCODE_SET, false );
+	public static UserPreferences getUserPreferences( Context context ) {
+		SilentTextApplication application = SilentTextApplication.from( context );
+		UserPreferences preferences = application.getUserPreferences();
+		return preferences == null ? application.createDefaultUserPreferences() : preferences;
 	}
 
-	public static boolean isSecureOutputRequired( Context context ) {
-		return !getPreference( context, KEY_ENABLE_SCREENSHOTS, false );
+	public static boolean isEmptyPasscode( Context context ) {
+		UserPreferences preferences = getApplicationPreferences( context );
+		return !preferences.isPasscodeSet;
+	}
+
+	public static boolean isEmptyPasscodeLegacy( Context context ) {
+		return !getPreferenceLegacy( context, KEY_PASSCODE_SET, false );
 	}
 
 	public static boolean isSendReceiptsEnabled( Context context ) {
-		return getPreference( context, KEY_SEND_RECEIPTS, false );
+		UserPreferences preferences = getUserPreferences( context );
+		return preferences.sendDeliveryAcknowledgments;
+	}
+
+	public static boolean isSendReceiptsEnabledLegacy( Context context ) {
+		return getPreferenceLegacy( context, KEY_SEND_RECEIPTS, false );
+	}
+
+	protected static void saveApplicationPreferences( Context context, UserPreferences preferences ) {
+		SilentTextApplication.from( context ).saveApplicationPreferences( preferences );
+	}
+
+	protected static void saveUserPreferences( Context context, UserPreferences preferences ) {
+		SilentTextApplication.from( context ).saveUserPreferences( preferences );
 	}
 
 	public static void setEmptyPasscode( Context context, boolean emptyPasscode ) {
-		setPreference( context, KEY_PASSCODE_SET, !emptyPasscode );
+		UserPreferences preferences = getApplicationPreferences( context );
+		preferences.isPasscodeSet = !emptyPasscode;
+		saveApplicationPreferences( context, preferences );
 	}
 
-	private static void setPreference( Context context, String key, boolean value ) {
-		getPreferences( context ).edit().putBoolean( key, value ).commit();
-	}
-
-	private static void setPreference( Context context, String key, int value ) {
-		getPreferences( context ).edit().putInt( key, value ).commit();
+	public static void setInactivityTimeout( Context context, int inactivityTimeout ) {
+		UserPreferences preferences = getApplicationPreferences( context );
+		preferences.passcodeUnlockValidityPeriod = inactivityTimeout;
+		saveApplicationPreferences( context, preferences );
 	}
 
 	public static void setSendReceipts( Context context, boolean sendReceipts ) {
-		setPreference( context, KEY_SEND_RECEIPTS, sendReceipts );
+		UserPreferences preferences = getUserPreferences( context );
+		preferences.sendDeliveryAcknowledgments = sendReceipts;
+		saveUserPreferences( context, preferences );
+	}
+
+	protected static void setText( View view, CharSequence text, CharSequence hint ) {
+		if( view instanceof TextView ) {
+			( (TextView) view ).setText( text );
+		}
+		if( view instanceof EditText ) {
+			( (EditText) view ).setHint( hint );
+		}
 	}
 
 	private SoftReference<Activity> activityReference;
+	private final RingtonePreference ringtonePreference = new RingtonePreference();
 
 	public OptionsDrawer( Context context ) {
 		super( context );
@@ -128,34 +243,9 @@ public class OptionsDrawer extends ScrollView {
 		super( context, attrs, defStyle );
 	}
 
-	private void assign( int viewResourceID, OnCheckedChangeListener onCheckedChangeListener ) {
-		( (CheckBox) findViewById( viewResourceID ) ).setOnCheckedChangeListener( onCheckedChangeListener );
-	}
-
-	private void assign( int viewResourceID, String preferences, String preferencesKey ) {
-		assign( viewResourceID, new SetPreferenceOnChecked( preferences, preferencesKey ) );
-	}
-
 	public void attach( Activity activity ) {
 		activityReference = new SoftReference<Activity>( activity );
-		prepareNotificationOptions();
-		preparePrivacyOptions();
-		prepareAboutInformation();
-		prepareDeactivationOption();
-	}
-
-	private Intent createRemovePasscodeIntent() {
-		Intent intent = new Intent( getActivity(), UnlockActivity.class );
-		Extra.FORCE.flag( intent );
-		Extra.NEXT.to( intent, Extra.SILENT.flag( new Intent( getActivity(), LockActivity.class ) ) );
-		return intent;
-	}
-
-	private Intent createSetPasscodeIntent() {
-		Intent intent = new Intent( getActivity(), UnlockActivity.class );
-		Extra.FORCE.flag( intent );
-		Extra.NEXT.to( intent, new Intent( getActivity(), LockActivity.class ) );
-		return intent;
+		update();
 	}
 
 	public void detach() {
@@ -173,133 +263,83 @@ public class OptionsDrawer extends ScrollView {
 		return activity;
 	}
 
-	protected int getInactivityTimeout() {
+	protected long getInactivityTimeout() {
 		return getInactivityTimeout( getContext() );
 	}
 
 	protected int getInactivityTimeoutLevel() {
-		return InactivityTimeout.Defaults.getLevel( getInactivityTimeout() );
+		return InactivityTimeout.Defaults.getLevel( (int) getInactivityTimeout() );
 	}
 
-	public void onPasscodeUpdate() {
-
-		Context context = getContext();
-
-		if( isEmptyPasscode( context ) ) {
-			setText( R.id.set_passcode, R.string.set_passcode );
-			setVisibleIf( false, R.id.lock, R.id.inactivity_timeout, R.id.remove_passcode );
-			setVisibleIf( true, R.id.enable_screenshots );
-		} else {
-			setText( R.id.set_passcode, R.string.change_passcode );
-			setVisibleIf( true, R.id.lock, R.id.inactivity_timeout, R.id.remove_passcode );
-			setVisibleIf( false, R.id.enable_screenshots );
+	public char [] getRingtoneName() {
+		UserPreferences preferences = getApplicationPreferences( getContext() );
+		if( preferences.notificationSound ) {
+			if( preferences.ringtoneName == null ) {
+				try {
+					return RingtonePreference.getDefaultRingtone().toString().toCharArray();
+				} catch( NullPointerException exception ) {
+					return preferences.ringtoneName;
+				}
+			}
+			return preferences.ringtoneName;
 		}
+		return preferences.ringtoneName;
+	}
 
+	protected SilentTextApplication getSilentTextApplication() {
+		return SilentTextApplication.from( getContext() );
+	}
+
+	public void onActivityResult( int requestCode, int resultCode, Intent extras ) {
+		ringtonePreference.onActivityResult( requestCode, resultCode, extras );
 	}
 
 	@Override
-	protected void onWindowVisibilityChanged( int visibility ) {
-		super.onWindowVisibilityChanged( visibility );
-		setVisibleIf( false, R.id.enable_screenshots_pending );
+	public void onRingtoneChange( Uri ringtone ) {
+		UserPreferences preferences = getApplicationPreferences( getContext() );
+		preferences.ringtoneName = ringtone != null ? ringtone.toString().toCharArray() : null;
+		preferences.notificationSound = ringtone != null;
+		getSilentTextApplication().saveApplicationPreferences( preferences );
+		( (TextView) findViewById( R.id.notification_ringtone_value ) ).setText( ringtonePreference.getRingtoneTitle( getContext() ) );
 	}
 
-	private void prepareAboutInformation() {
-		findViewById( R.id.privacy_policy ).setOnClickListener( new LaunchActivityOnClick( getActivity(), PrivacyPolicyActivity.class ) );
-		findViewById( R.id.license ).setOnClickListener( new LaunchActivityOnClick( getActivity(), LicenseActivity.class ) );
-		findViewById( R.id.advanced ).setOnClickListener( new LaunchActivityOnClick( getActivity(), AdvancedActivity.class ) );
-	}
-
-	private void prepareDeactivationOption() {
-		findViewById( R.id.deactivate ).setOnClickListener( new LaunchConfirmDialogOnClick( R.string.are_you_sure, R.string.cannot_be_undone, getActivity(), new DeactivateApplicationOnConfirm() ) );
+	protected void pickRingtone() {
+		ringtonePreference.pickRingtone( getActivity() );
 	}
 
 	private void prepareNotificationOptions() {
 
-		assign( R.id.enable_notifications, new SetPreferenceAndSiblingVisibilityOnChecked( NotificationBroadcaster.PREFERENCES, NotificationBroadcaster.KEY_ENABLE_NOTIFICATIONS, R.id.if_notifications_enabled ) );
-		assign( R.id.enable_notification_sound, NotificationBroadcaster.PREFERENCES, NotificationBroadcaster.KEY_ENABLE_SOUND );
-		assign( R.id.enable_notification_vibrate, NotificationBroadcaster.PREFERENCES, NotificationBroadcaster.KEY_ENABLE_VIBRATE );
+		ringtonePreference.setOnRingtoneChangeListener( null );
+		ringtonePreference.setRingtone( getRingtoneName() );
+		ringtonePreference.setOnRingtoneChangeListener( this );
 
-		SharedPreferences preferences = NotificationBroadcaster.getPreferences( getContext() );
-
-		setCheckedIf( NotificationBroadcaster.isEnabled( preferences ), R.id.enable_notifications );
-		setCheckedIf( NotificationBroadcaster.isSoundEnabled( preferences ), R.id.enable_notification_sound );
-		setCheckedIf( NotificationBroadcaster.isVibrateEnabled( preferences ), R.id.enable_notification_vibrate );
-
-		setVisibleIf( NotificationBroadcaster.isEnabled( preferences ), R.id.if_notifications_enabled );
-
-	}
-
-	private void preparePrivacyOptions() {
-
-		assign( R.id.send_receipts, PREFERENCES, KEY_SEND_RECEIPTS );
-
-		assign( R.id.enable_screenshots, new SetPreferenceOnChecked( PREFERENCES, KEY_ENABLE_SCREENSHOTS ) {
+		findViewById( R.id.notification_ringtone ).setOnClickListener( new OnClickListener() {
 
 			@Override
-			public void onCheckedChanged( CompoundButton view, boolean isChecked ) {
-				super.onCheckedChanged( view, isChecked );
-				setVisibleIf( true, R.id.enable_screenshots_pending );
-			}
-
-		} );
-		setCheckedIf( isSendReceiptsEnabled( getContext() ), R.id.send_receipts );
-		setCheckedIf( !isSecureOutputRequired( getContext() ), R.id.enable_screenshots );
-		setVisibleIf( false, R.id.enable_screenshots_pending );
-
-		findViewById( R.id.set_passcode ).setOnClickListener( new LaunchActivityOnClick( getActivity(), createSetPasscodeIntent(), R.string.none ) );
-		findViewById( R.id.remove_passcode ).setOnClickListener( new LaunchActivityOnClick( getActivity(), createRemovePasscodeIntent(), R.string.none ) );
-		findViewById( R.id.lock ).setOnClickListener( new LockApplicationOnClick( getActivity() ) );
-
-		SeekBar seeker = (SeekBar) findViewById( R.id.inactivity_timeout_seeker );
-		seeker.setProgress( getInactivityTimeoutLevel() );
-
-		setText( R.id.inactivity_timeout_label, InactivityTimeout.Defaults.getLabel( getContext(), seeker.getProgress() ) );
-
-		seeker.setOnSeekBarChangeListener( new OnSeekBarChangeListener() {
-
-			@Override
-			public void onProgressChanged( SeekBar seekBar, int progress, boolean fromUser ) {
-				setText( R.id.inactivity_timeout_label, InactivityTimeout.Defaults.getLabel( getContext(), progress ) );
-			}
-
-			@Override
-			public void onStartTrackingTouch( SeekBar seekBar ) {
-				// Ignore this.
-			}
-
-			@Override
-			public void onStopTrackingTouch( SeekBar seekBar ) {
-				setInactivityTimeoutLevel( seekBar.getProgress() );
+			public void onClick( View v ) {
+				pickRingtone();
 			}
 
 		} );
 
-	}
+		( (TextView) findViewById( R.id.notification_ringtone_value ) ).setText( ringtonePreference.getRingtoneTitle( getContext() ) );
 
-	private void setCheckedIf( boolean condition, int... viewResourceIDs ) {
-		for( int i = 0; i < viewResourceIDs.length; i++ ) {
-			int id = viewResourceIDs[i];
-			View view = findViewById( id );
-			if( view instanceof Checkable ) {
-				( (Checkable) view ).setChecked( condition );
-			}
-		}
 	}
 
 	protected void setInactivityTimeout( int timeout ) {
-		setPreference( KEY_INACTIVITY_TIMEOUT, timeout );
+		setInactivityTimeout( getContext(), timeout );
 	}
 
 	protected void setInactivityTimeoutLevel( int level ) {
 		setInactivityTimeout( InactivityTimeout.Defaults.getDelay( level ) );
 	}
 
-	private void setPreference( String key, int value ) {
-		setPreference( getContext(), key, value );
+	protected void setText( int viewResourceID, CharSequence text ) {
+		setText( viewResourceID, text, null );
 	}
 
-	protected void setText( int viewResourceID, CharSequence text ) {
-		( (TextView) findViewById( viewResourceID ) ).setText( text );
+	protected void setText( int viewResourceID, CharSequence text, CharSequence hint ) {
+		setText( findViewById( viewResourceID ), text, hint );
 	}
 
 	protected void setText( int viewResourceID, int stringResourceID ) {
@@ -315,6 +355,10 @@ public class OptionsDrawer extends ScrollView {
 				view.setVisibility( visibility );
 			}
 		}
+	}
+
+	public void update() {
+		prepareNotificationOptions();
 	}
 
 }

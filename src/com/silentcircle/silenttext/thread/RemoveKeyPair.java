@@ -1,9 +1,9 @@
 /*
-Copyright © 2012-2013, Silent Circle, LLC.  All rights reserved.
+Copyright (C) 2013-2015, Silent Circle, LLC. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
-    * Any redistribution, use, or modification is done solely for personal 
+    * Any redistribution, use, or modification is done solely for personal
       benefit and not for any commercial purpose or for monetary gain
     * Redistributions of source code must retain the above copyright
       notice, this list of conditions and the following disclaimer.
@@ -28,11 +28,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 package com.silentcircle.silenttext.thread;
 
 import com.silentcircle.api.Session;
+import com.silentcircle.http.client.exception.NetworkException;
+import com.silentcircle.http.client.exception.http.HTTPException;
 import com.silentcircle.scimp.NamedKeyPair;
 import com.silentcircle.silentstorage.repository.Repository;
+import com.silentcircle.silentstorage.repository.file.RepositoryLockedException;
 import com.silentcircle.silenttext.crypto.CryptoUtils;
+import com.silentcircle.silenttext.log.Log;
+import com.silentcircle.silenttext.thread.NamedThread.HasThreadName;
 
-public class RemoveKeyPair implements Runnable {
+public class RemoveKeyPair implements Runnable, HasThreadName {
+
+	private static final Log LOG = new Log( "RemoveKeyPair" );
 
 	private final Session session;
 	private final CharSequence locator;
@@ -45,9 +52,24 @@ public class RemoveKeyPair implements Runnable {
 	}
 
 	@Override
+	public String getThreadName() {
+		return "RemoveKeyPair";
+	}
+
+	@Override
 	public void run() {
-		session.removeKey( locator );
-		keyPairs.removeByID( CryptoUtils.copyAsCharArray( locator ) );
+		try {
+			session.revokeKey( locator );
+		} catch( HTTPException exception ) {
+			LOG.warn( exception, "#remove locator:%s", locator );
+		} catch( NetworkException exception ) {
+			LOG.warn( exception, "#remove locator:%s", locator );
+		}
+		try {
+			keyPairs.removeByID( CryptoUtils.copyAsCharArray( locator ) );
+		} catch( RepositoryLockedException exception ) {
+			LOG.warn( exception, "#remove locator:%s", locator );
+		}
 	}
 
 }

@@ -1,19 +1,18 @@
 /*
-Copyright © 2013, Silent Circle, LLC.
-All rights reserved.
+Copyright (C) 2013-2015, Silent Circle, LLC. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
-    * Any redistribution, use, or modification is done solely for personal 
+    * Any redistribution, use, or modification is done solely for personal
       benefit and not for any commercial purpose or for monetary gain
     * Redistributions of source code must retain the above copyright
       notice, this list of conditions and the following disclaimer.
     * Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-    * Neither the name Silent Circle nor the names of its contributors may 
-      be used to endorse or promote products derived from this software 
-      without specific prior written permission.
+    * Neither the name Silent Circle nor the
+      names of its contributors may be used to endorse or promote products
+      derived from this software without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -28,54 +27,73 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package com.silentcircle.silenttext.activity;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import android.accounts.Account;
-import android.accounts.AccountManager;
+import android.annotation.SuppressLint;
+import android.app.ActivityManager;
+import android.app.ActivityManager.RunningAppProcessInfo;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
+import android.app.LoaderManager.LoaderCallbacks;
 import android.app.SearchManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.CursorLoader;
 import android.content.Intent;
+import android.content.Loader;
+import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.app.LoaderManager.LoaderCallbacks;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
-import android.support.v4.widget.CursorAdapter;
+import android.os.Handler;
+import android.os.Message;
+import android.text.TextUtils;
+import android.view.ActionMode;
+import android.view.Gravity;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.MenuItem.OnActionExpandListener;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.CheckBox;
+import android.widget.CursorAdapter;
+import android.widget.ProgressBar;
+import android.widget.SearchView.OnQueryTextListener;
+import android.widget.SearchView.OnSuggestionListener;
+import android.widget.Toast;
 
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuItem;
-import com.actionbarsherlock.widget.SearchView;
-import com.actionbarsherlock.widget.SearchView.OnQueryTextListener;
-import com.actionbarsherlock.widget.SearchView.OnSuggestionListener;
 import com.silentcircle.silenttext.Action;
 import com.silentcircle.silenttext.Extra;
 import com.silentcircle.silenttext.Manifest;
 import com.silentcircle.silenttext.R;
-import com.silentcircle.silenttext.listener.ClickthroughWhenNotInChoiceMode;
-import com.silentcircle.silenttext.listener.MultipleChoiceSelector;
-import com.silentcircle.silenttext.listener.MultipleChoiceSelector.ActionPerformer;
-import com.silentcircle.silenttext.listener.OnAccountSelectedListener;
+import com.silentcircle.silenttext.application.SilentTextApplication;
+import com.silentcircle.silenttext.fragment.ChatsFragment;
+import com.silentcircle.silenttext.fragment.DirectorySearchListFragment;
+import com.silentcircle.silenttext.listener.OnHomePressedListener;
 import com.silentcircle.silenttext.listener.OnObjectReceiveListener;
-import com.silentcircle.silenttext.model.Contact;
-import com.silentcircle.silenttext.model.Conversation;
-import com.silentcircle.silenttext.repository.ConversationRepository;
-import com.silentcircle.silenttext.task.ClearConversationsTask;
-import com.silentcircle.silenttext.task.ConversationListTask;
+import com.silentcircle.silenttext.loader.ContactUser;
+import com.silentcircle.silenttext.loader.ScContactsLoader;
+import com.silentcircle.silenttext.loader.ScDirectoryLoader;
+import com.silentcircle.silenttext.loader.ScDirectoryLoader.UserData;
+import com.silentcircle.silenttext.model.Server;
+import com.silentcircle.silenttext.provider.ContactProvider;
+import com.silentcircle.silenttext.receiver.NotificationBroadcaster;
+import com.silentcircle.silenttext.service.OrgNameService;
+import com.silentcircle.silenttext.service.PassphraseIntentService;
+import com.silentcircle.silenttext.service.RefreshSelfIntentService;
+import com.silentcircle.silenttext.util.AsyncUtils;
+import com.silentcircle.silenttext.util.Constants;
 import com.silentcircle.silenttext.util.StringUtils;
-import com.silentcircle.silenttext.view.ListView;
 import com.silentcircle.silenttext.view.OptionsDrawer;
-import com.silentcircle.silenttext.view.adapter.AccountNavigationAdapter;
+import com.silentcircle.silenttext.view.SearchView;
 import com.silentcircle.silenttext.view.adapter.ContactSuggestionAdapter;
-import com.silentcircle.silenttext.view.adapter.ConversationAdapter;
-import com.silentcircle.silenttext.view.adapter.ListAdapter;
-import com.silentcircle.silenttext.view.adapter.ListAdapter.OnItemRemovedListener;
 
-public class ConversationListActivity extends SilentActivity implements ActionPerformer, LoaderCallbacks<Cursor>, OnQueryTextListener {
+public class ConversationListActivity extends SilentActivity implements OnClickListener, LoaderCallbacks<Cursor>, OnQueryTextListener, OnHomePressedListener {
 
 	private class AutoRefresh extends TimerTask {
 
@@ -84,23 +102,29 @@ public class ConversationListActivity extends SilentActivity implements ActionPe
 
 		@Override
 		public void run() {
-			runOnUiThread( new Runnable() {
-
-				@Override
-				public void run() {
-					refresh();
-				}
-
-			} );
+			runOnUiThread( new Refresher() );
 		}
 
 	}
 
-	class ClearConversationsAndRefreshTask extends ClearConversationsTask {
+	class DeactivationListener extends BroadcastReceiver {
 
 		@Override
-		protected void onPostExecute( Void result ) {
-			refresh();
+		public void onReceive( Context context, Intent intent ) {
+
+			Action action = Action.from( intent );
+
+			if( Action.BEGIN_DEACTIVATE.equals( action ) ) {
+				getActionBar().hide();
+				beginLoading( R.id.chats );
+				deactivating = true;
+			} else {
+				deactivating = false;
+				onDeactivated();
+				unregisterReceiver( this );
+				deactivationListener = null;
+			}
+
 		}
 
 	}
@@ -114,17 +138,11 @@ public class ConversationListActivity extends SilentActivity implements ActionPe
 
 	}
 
-	class RefreshTask extends ConversationListTask {
-
-		RefreshTask( ConversationRepository repository, ListAdapter<Conversation> adapter ) {
-			super( repository, adapter );
-		}
+	class Refresher implements Runnable {
 
 		@Override
-		protected void onPostExecute( List<Conversation> conversations ) {
-			super.onPostExecute( conversations );
-			updateTitle();
-			finishLoading( R.id.conversations );
+		public void run() {
+			refresh();
 		}
 
 	}
@@ -138,16 +156,126 @@ public class ConversationListActivity extends SilentActivity implements ActionPe
 
 	}
 
-	protected static final int R_id_search = 0xFFFF & R.id.search;
+	protected boolean deactivating;
+	protected static final int R_id_search = 0xFFFF & R.id.action_search;
 
 	private BroadcastReceiver viewUpdater;
-	protected ConversationListTask task;
 	private Menu actionMenu;
 	private BroadcastReceiver titleUpdater;
-	protected ClearConversationsAndRefreshTask clearConversationsAndRefreshTask;
+	protected BroadcastReceiver deactivationListener;
 	protected SearchView search;
 	protected CursorAdapter searchSuggestions;
+
 	protected Timer timer;
+
+	protected boolean intendToComposeNewMessage;
+	protected boolean updatingTitle;
+	// Directory Search
+	public static final String KEY_IS_DIRECTORY_SEARCH_FRAGMENT = "is_directory_search_fragment";
+	public static final String KEY_IS_LAUNCH_SPA = "is_launch_spa";
+	private String mCurrentSearch;
+	private CheckBox mSCDirectoryCheckBox, mOrgnizationCheckBox;
+	ProgressBar mProgressBar;
+	DirectorySearchListFragment mDirectorySearchListFragment;
+
+	List<UserData> mDirectorySearchList = new ArrayList<UserData>();
+	List<ContactUser> mScContactsList = new ArrayList<ContactUser>();
+
+	Loader<Cursor> mLoader;
+
+	Loader<Cursor> mContactsLoader;
+
+	private ScContactsLoader mSCLoader;
+
+	private final Handler mScHandler = new Handler() {
+
+		@Override
+		public void handleMessage( Message msg ) {
+			if( msg.getData().getInt( ScDirectoryLoader.DIRECTORY_SEARCH_WHAT ) == ScDirectoryLoader.NO_ORGANIZATION ) {
+				String error = msg.getData().getString( ScDirectoryLoader.DIRECTORY_SEARCH_ERROR_MESSAGE );
+				Toast toast = Toast.makeText( getActivity(), error, Toast.LENGTH_LONG );
+				toast.setGravity( Gravity.CENTER, 0, 0 );
+				toast.show();
+			}
+		}
+	};
+
+	// This mOrgNameRunnable is originally used for find orgName for directory purpose.
+	// It's now used for find Account Expiration date too.
+	Runnable mOrgNameRunnable = new Runnable() {
+
+		@Override
+		public void run() {
+			Intent intent = new Intent( ConversationListActivity.this, OrgNameService.class );
+			startService( intent );
+		}
+	};
+
+	boolean mQueryTextSubmit;
+
+	public static final String SCDialog_TAG = "directory_search_dialog";
+
+	private boolean mDontChangeQuery;
+
+	private com.silentcircle.silenttext.receiver.HomeWatcher mHomeWatcher;
+
+	private final Runnable userNameRunnable = new Runnable() {
+
+		@Override
+		public void run() {
+			Intent debugLogIn = new Intent( ConversationListActivity.this, PassphraseIntentService.class );
+			startService( debugLogIn );
+		}
+	};
+
+	private final Handler mDelayedHandler = new Handler() {
+
+		@Override
+		public void handleMessage( Message msg ) {
+			String query = msg.getData().getString( SEARCH_QUERY_KEY );
+			boolean isResetStart = msg.getData().getBoolean( SEARCH_QUERY_RESET_START, false );
+			Bundle args = new Bundle();
+			Extra.TEXT.to( args, query );
+			if( isResetStart ) {
+				ScDirectoryLoader.setStart( 0 );
+			}
+			ScDirectoryLoader.setSearchQuery( query );
+			ConversationListActivity.this.getLoaderManager().restartLoader( R.id.directory_search, args, ConversationListActivity.this ).forceLoad();
+
+		}
+	};
+
+	private static final String SEARCH_QUERY_KEY = "search_query_key";
+	private static final String SEARCH_QUERY_RESET_START = "search_query_reset_start";
+
+	private static final int SEARCH_QUERY_WHAT = 113;
+
+	protected void assertPermissionToView() {
+		assertPermissionToView( this, true, true, true );
+	}
+
+	private void attachNewMessageAction() {
+		View v = findViewById( R.id.action_new_message );
+
+		if( v != null ) {
+
+			v.setOnClickListener( new OnClickListener() {
+
+				@Override
+				public void onClick( View v ) {
+					intendToComposeNewMessage = true;
+					invalidateSupportOptionsMenu();
+
+					if( Constants.mIsDirectorySearchEnabled && Constants.mIsShowDirectorySerachCheckBox ) {
+						setVisibleIf( true, R.id.actions, R.id.directory_cb_layout_id );
+					}
+				}
+
+			} );
+
+		}
+
+	}
 
 	protected void cancelAutoRefresh() {
 		if( timer != null ) {
@@ -156,30 +284,78 @@ public class ConversationListActivity extends SilentActivity implements ActionPe
 		}
 	}
 
-	protected void cancelTasks() {
-		if( task != null ) {
-			task.cancel( true );
-			task = null;
+	public void directorySearch( String query, boolean isResetStart ) {
+
+		Bundle args = new Bundle();
+		Extra.TEXT.to( args, query );
+		if( isResetStart ) {
+			ScDirectoryLoader.setStart( 0 );
 		}
-	}
+		ScDirectoryLoader.setSearchQuery( query );
+		// getLoaderManager().restartLoader( R.id.directory_search, args, this ).forceLoad();
 
-	protected void createOptionsDrawer() {
-		getOptionsDrawer().attach( this );
-	}
-
-	protected void destroyClearConversationsAndRefreshTask() {
-		if( clearConversationsAndRefreshTask != null ) {
-			clearConversationsAndRefreshTask.cancel( true );
-			clearConversationsAndRefreshTask = null;
+		if( mLoader != null && mLoader.isReset() ) {
+			getLoaderManager().restartLoader( R.id.directory_search, args, this ).forceLoad();
+		} else {
+			getLoaderManager().initLoader( R.id.directory_search, args, this ).forceLoad();
 		}
+
+		return;
 	}
 
-	protected Conversation getConversation( int position ) {
-		return (Conversation) getAdapter( R.id.conversations ).getItem( position );
+	public void directorySearchDelayed( String query, boolean isResetStart ) {
+		mDelayedHandler.removeMessages( SEARCH_QUERY_WHAT );
+		Message msg = new Message();
+		Bundle b = new Bundle();
+		b.putString( SEARCH_QUERY_KEY, query );
+		b.putBoolean( SEARCH_QUERY_RESET_START, isResetStart );
+		msg.setData( b );
+		msg.what = SEARCH_QUERY_WHAT;
+		mDelayedHandler.sendMessageDelayed( msg, 1000 );
 	}
 
-	protected OptionsDrawer getOptionsDrawer() {
-		return (OptionsDrawer) findViewById( R.id.drawer_content );
+	protected void dismissSearch() {
+
+		runOnUiThread( new Runnable() {
+
+			@Override
+			public void run() {
+				onSearchDismissed();
+			}
+
+		} );
+
+	}
+
+	protected ChatsFragment getChatsFragment() {
+		if( Constants.mIsDirectorySearchEnabled ) {
+			FragmentManager fm = getFragmentManager();
+			ChatsFragment fragment = null;
+			if( fm.findFragmentById( R.id.chats ) != null ) {
+				if( fm.findFragmentById( R.id.chats ) instanceof ChatsFragment ) {
+					fragment = (ChatsFragment) fm.findFragmentById( R.id.chats );
+				}
+			} else {
+				fragment = new ChatsFragment();
+				fm.beginTransaction().replace( R.id.chats, fragment ).addToBackStack( ChatsFragment.TAG ).commit();
+			}
+			return fragment;
+		}
+
+		// original implemented by Devin without DirectorySearchListFragment.
+		FragmentManager fm = getFragmentManager();
+		ChatsFragment fragment = (ChatsFragment) fm.findFragmentById( R.id.chats );
+
+		if( fragment == null ) {
+			fragment = new ChatsFragment();
+			fm.beginTransaction().add( R.id.chats, fragment ).commit();
+		}
+
+		return fragment;
+	}
+
+	public String getCurrentSearchQuery() {
+		return mCurrentSearch;
 	}
 
 	protected String getSearchQuery() {
@@ -197,26 +373,60 @@ public class ConversationListActivity extends SilentActivity implements ActionPe
 			String query = intent.getStringExtra( SearchManager.QUERY );
 			handleSearch( query );
 		} else {
-			onSearchDismissed();
+			dismissSearch();
 		}
 	}
 
 	protected void handleSearch( String query ) {
+		Server server = getServer( "xmpp" );
+		String domain = server != null ? server.getServiceName() : null;
+		domain = domain != null ? domain.replaceAll( "@", "" ) : null;
 
-		final String username = ( query.contains( "@" ) ? query : String.format( "%s@%s", query, getServer( "xmpp" ).getServiceName() ) ).toLowerCase( Locale.ENGLISH );
-		final String displayUsername = username.contains( getServer( "xmpp" ).getServiceName() ) ? username.replaceAll( "@.+$", "" ) : username;
+		if( domain == null ) {
+			toast( R.string.username_unavailable, query );
+			return;
+		}
+
+		final String username = ( query.contains( "@" ) ? query : String.format( "%s@%s", query.trim(), domain ) ).toLowerCase( Locale.ENGLISH );
+		final String displayUsername = username.contains( domain ) ? username.replaceAll( "@.+$", "" ) : username;
+
+		hideSoftKeyboard( search );
+		beginLoading( R.id.chats );
 
 		isAccessible( username, new OnObjectReceiveListener<Boolean>() {
 
 			@Override
 			public void onObjectReceived( Boolean accessible ) {
+				finishLoading( R.id.chats );
 				if( accessible.booleanValue() ) {
-					Intent intent = new Intent( getBaseContext(), ConversationActivity.class );
-					intent.addFlags( Intent.FLAG_ACTIVITY_REORDER_TO_FRONT );
-					intent.putExtra( Extra.PARTNER.getName(), username );
-					startActivityForResult( intent, R_id_search );
+					// if DirectorySearchListFragment is shown before added Favorite Contact
+					// (clicked on Favorite in directory search section. after come back from SPA,
+					// DirectorySearchListFragment needs to be shown again.
+					if( getFragmentManager().findFragmentById( R.id.chats ) instanceof DirectorySearchListFragment && !mQueryTextSubmit || !mQueryTextSubmit && !Constants.mIsMessageClicked ) {
+						return;
+					}
+					mQueryTextSubmit = false;
+					dismissSearch();
+					launchConversationActivity( username );
+					// Rong: moved the following code to launchConverstionActivity(),
+					// in order to be shared by called from SPA app -- onResume().
+					// Intent intent = new Intent( getBaseContext(), ConversationActivity.class );
+					// intent.addFlags( Intent.FLAG_ACTIVITY_REORDER_TO_FRONT );
+					// intent.putExtra( Extra.PARTNER.getName(), username );
+					// startActivityForResult( intent, R_id_search );
 				} else {
-					toast( R.string.username_unavailable, displayUsername );
+					// if DirectorySearchListFragment is shown, Toast with unrelated message should
+					// not be shown
+					if( Constants.mIsDirectorySearchEnabled ) {
+						if( getFragmentManager().findFragmentById( R.id.chats ) instanceof DirectorySearchListFragment ) {
+							return;
+						}
+					}
+					if( !isActivated() ) {
+						toast( R.string.error_invalid_api_key );
+					} else {
+						toast( R.string.username_unavailable, displayUsername );
+					}
 				}
 			}
 
@@ -227,113 +437,290 @@ public class ConversationListActivity extends SilentActivity implements ActionPe
 	protected void inflate( Menu menu ) {
 
 		actionMenu = menu;
-		getSupportMenuInflater().inflate( R.menu.conversation_list, menu );
+		getMenuInflater().inflate( R.menu.conversation_list, menu );
 
-		search = (SearchView) menu.findItem( R.id.search ).getActionView();
+		search = (SearchView) menu.findItem( R.id.action_search ).getActionView();
 
-		search.setSuggestionsAdapter( searchSuggestions );
+		// Rong: this list does not meet requirement. move into if{} block.
+		// search.setSuggestionsAdapter( searchSuggestions );
 		search.setQueryHint( getString( R.string.search_hint ) );
+		search.setSearchBackgroundResource( R.drawable.bg_text_input );
 		search.setOnQueryTextListener( this );
-		search.setOnSuggestionListener( new OnSuggestionListener() {
+		if( !Constants.mIsDirectorySearchEnabled ) {
+			search.setSuggestionsAdapter( searchSuggestions );
+			search.setOnSuggestionListener( new OnSuggestionListener() {
 
-			@Override
-			public boolean onSuggestionClick( int position ) {
-				Cursor cursor = searchSuggestions.getCursor();
-				cursor.moveToPosition( position );
-				Contact contact = getContacts().getContact( cursor );
-				getSupportLoaderManager().destroyLoader( R.id.search );
-				handleSearch( contact.getUsername() );
-				return true;
+				@Override
+				public boolean onSuggestionClick( int position ) {
+					Cursor cursor = searchSuggestions.getCursor();
+					cursor.moveToPosition( position );
+					String username = ContactProvider.getUsername( cursor );
+					getLoaderManager().destroyLoader( R.id.action_search );
+					handleSearch( username );
+					return true;
+				}
+
+				@Override
+				public boolean onSuggestionSelect( int position ) {
+					// Do nothing.
+					return false;
+				}
+			} );
+		}
+
+	}
+
+	public boolean isSPARunnung() {
+		ActivityManager activityManager = (ActivityManager) getSystemService( ACTIVITY_SERVICE );
+		List<RunningAppProcessInfo> procInfos = activityManager.getRunningAppProcesses();
+		for( int i = 0; i < procInfos.size(); i++ ) {
+			if( procInfos.get( i ).processName.equals( Constants.SPA_PACKAGE_NAME ) ) {
+				if( procInfos.get( i ).importance == RunningAppProcessInfo.IMPORTANCE_FOREGROUND || procInfos.get( i ).importance == RunningAppProcessInfo.IMPORTANCE_VISIBLE ) {
+					return true;
+				} else if( procInfos.get( i ).importance == RunningAppProcessInfo.IMPORTANCE_BACKGROUND && procInfos.get( i ).lru == Constants.BG_IMPORTANCE_LIVE ) {
+					return true;
+				}
 			}
+		}
+		return false;
+	}
 
-			@Override
-			public boolean onSuggestionSelect( int position ) {
-				// Do nothing.
-				return false;
-			}
+	public void launchConversationActivity( String username ) {
+		Intent intent = new Intent( getBaseContext(), ConversationActivity.class );
+		intent.addFlags( Intent.FLAG_ACTIVITY_REORDER_TO_FRONT );
+		intent.putExtra( Extra.PARTNER.getName(), username );
+		startActivityForResult( intent, R.id.directory_search_request_code );
+		finish();
+	}
 
-		} );
-
+	public void loadingData() {
+		directorySearch( mCurrentSearch, false );
 	}
 
 	@Override
 	protected void lockContentView() {
 		super.lockContentView();
-		getSupportActionBar().setTitle( "" );
-		getSupportActionBar().setSubtitle( "" );
+		getActionBar().setTitle( "" );
+		getActionBar().setSubtitle( null );
 	}
 
 	@Override
-	public void onActionPerformed() {
-		refresh();
+	public void onActionModeFinished( ActionMode mode ) {
+		super.onActionModeFinished( mode );
+		setVisibleIf( true, R.id.actions );
+	}
+
+	@Override
+	public void onActionModeStarted( ActionMode mode ) {
+		super.onActionModeStarted( mode );
+		setVisibleIf( true, R.id.actions );
 	}
 
 	@Override
 	protected void onActivityResult( int requestCode, int resultCode, Intent intent ) {
 		switch( requestCode ) {
 			case R_id_search:
-				onSearchDismissed();
+				dismissSearch();
 				break;
+			case R.id.directory_search_request_code:
+				// TODO: The following code is only for directory search.
+				if( Constants.mIsDirectorySearchEnabled ) {
+					if( Constants.mIsMessageClicked ) {
+						// STA-832: result back from ConversationActivity
+						Constants.mIsMessageClicked = false;
+					} else {
+						// SPA-454: result back from ConversationActivity which was called by SPA
+						if( Constants.OnConversationListActivityCreateCalled == 0 ) {
+							Constants.OnConversationListActivityCreateCalled++;
+						} else {
+							Constants.OnConversationListActivityCreateCalled++;
+							finish();
+						}
+					}
+				}
 		}
 		super.onActivityResult( requestCode, resultCode, intent );
 	}
 
 	@Override
+	public void onBackPressed() {
+		if( Constants.mIsDirectorySearchEnabled ) {
+			int count = getFragmentManager().getBackStackEntryCount();
+			if( count > 0 && getFragmentManager().getBackStackEntryAt( count - 1 ).getName().equals( DirectorySearchListFragment.TAG ) ) {
+				getFragmentManager().popBackStack();
+			}
+			if( count > 0 && getFragmentManager().getBackStackEntryAt( count - 1 ).getName().equals( ChatsFragment.TAG ) ) {
+				finish();
+			}
+		}
+		super.onBackPressed();
+	}
+
+	@Override
+	public void onClick( View v ) {
+		if( v.getId() == R.id.sc_directory_cb_id ) {
+			if( mSCDirectoryCheckBox.isChecked() ) {
+				// mIsDirectorySearch = true;
+				// getLoaderManager().destroyLoader( R.id.action_search );
+				// directorySearch( mCurrentSearch );
+			}
+			// if( !useScDirectory( mSCDirectoryCheckBox.isChecked() ) ) {
+			// return;
+			// }
+		}
+	}
+
+	@Override
 	protected void onCreate( Bundle savedInstanceState ) {
-
 		super.onCreate( savedInstanceState );
-		setContentView( R.layout.activity_conversation_list_with_drawer );
-		hideSoftKeyboardOnDrawerToggle();
-		beginLoading( R.id.conversations );
+		setContentView( R.layout.activity_conversations );
 
-		searchSuggestions = new ContactSuggestionAdapter( this, null, 0 );
+		// STA-832: for directory search only.
+		mProgressBar = (ProgressBar) findViewById( R.id.progressBar_id );
+		mSCDirectoryCheckBox = (CheckBox) findViewById( R.id.sc_directory_cb_id );
+		mSCDirectoryCheckBox.setOnClickListener( this );
+		mOrgnizationCheckBox = (CheckBox) findViewById( R.id.orgnization_directory_cb_id );
+		mOrgnizationCheckBox.setOnClickListener( this );
+		if( Constants.mIsDirectorySearchEnabled && Constants.mIsShowDirectorySerachCheckBox ) {
+			mSCDirectoryCheckBox.setVisibility( View.VISIBLE );
+			mOrgnizationCheckBox.setVisibility( View.VISIBLE );
+		}
+
+		if( !Constants.mIsDirectorySearchEnabled ) {
+			searchSuggestions = new ContactSuggestionAdapter( this, null, 0 );
+		}
 
 		handleIntent( getIntent() );
 
-		ListView conversations = findListViewById( R.id.conversations );
+		attachNewMessageAction();
 
-		conversations.setEmptyView( findViewById( R.id.empty ) );
-		ConversationAdapter adapter = new ConversationAdapter();
-		conversations.setAdapter( adapter );
-		conversations.setOnItemClickListener( new ClickthroughWhenNotInChoiceMode() );
-		conversations.setMultiChoiceModeListener( new MultipleChoiceSelector<Conversation>( adapter, R.menu.multiselect_conversation, this ) );
-		conversations.setSwipeEnabled( false );
-		conversations.setDivider( null );
-		conversations.setDividerHeight( 0 );
+		// listening Home button clicked.
+		mHomeWatcher = new com.silentcircle.silenttext.receiver.HomeWatcher( this );
+		mHomeWatcher.setOnHomePressedListener( this );
+		mHomeWatcher.startWatch();
 
-		createOptionsDrawer();
+		SilentTextApplication.from( this ).getDeletedUsers();
 
-		AccountManager accountManager = (AccountManager) getSystemService( ACCOUNT_SERVICE );
-		if( accountManager != null ) {
-			Account [] accounts = accountManager.getAccountsByType( "com.silentcircle" );
-			if( accounts.length > 0 ) {
-				getSupportActionBar().setDisplayShowHomeEnabled( false );
-				getSupportActionBar().setDisplayShowTitleEnabled( false );
-				getSupportActionBar().setNavigationMode( ActionBar.NAVIGATION_MODE_LIST );
-				AccountNavigationAdapter accountAdapter = new AccountNavigationAdapter( accounts );
-				getSupportActionBar().setListNavigationCallbacks( accountAdapter, new OnAccountSelectedListener( this, accountAdapter ) );
-			}
+		// the following block of code will not be executed if and only if the passCode be set.
+		SilentTextApplication app = SilentTextApplication.from( this );
+		SharedPreferences prefs = app.getSharedPreferences( LockActivity.PASS_CODE_SET, Context.MODE_PRIVATE );
+		if( !prefs.getBoolean( LockActivity.PASS_CODE_SET, false ) ) {
+			// Check username, once get valid username, it starts ConversationListActivity again
+			// from UnlockActivity to get rid of "Passphrase" dialog
+			new Handler().postDelayed( userNameRunnable, 1000 );
 		}
-
 	}
 
 	@Override
 	public Loader<Cursor> onCreateLoader( int id, Bundle arguments ) {
+		if( Constants.mIsDirectorySearchEnabled ) {
+			String query = Extra.TEXT.from( arguments );
+			if( id == R.id.directory_search ) {
+				mLoader = new ScDirectoryLoader( this, query, mScHandler, mOrgnizationCheckBox.isChecked() );
+				ScDirectoryLoader.setStart( 0 );
+				return mLoader;
+			}
+			return null;
+		}
+
 		String query = Extra.TEXT.from( arguments );
-		CursorLoader cursor = getContacts().search( this, query );
+		CursorLoader cursor = ContactProvider.loaderForSearch( this, query );
 		return cursor;
 	}
 
 	@Override
 	public boolean onCreateOptionsMenu( Menu menu ) {
+
 		inflate( menu );
+
+		menu.findItem( R.id.action_lock ).setVisible( !OptionsDrawer.isEmptyPasscode( this ) );
+
+		MenuItem searchMenuItem = menu.findItem( R.id.action_search );
+
+		if( intendToComposeNewMessage ) {
+			intendToComposeNewMessage = false;
+			searchMenuItem.expandActionView();
+		}
+
+		searchMenuItem.setOnActionExpandListener( new OnActionExpandListener() {
+
+			@SuppressLint( "NewApi" )
+			@Override
+			public boolean onMenuItemActionCollapse( MenuItem item ) {
+				item.setVisible( false );
+				setVisibleIf( true, R.id.actions );
+
+				if( Constants.mIsDirectorySearchEnabled ) {
+					setVisibleIf( false, R.id.directory_cb_layout_id );
+					if( getFragmentManager().getBackStackEntryCount() > 0 ) {
+						if( Build.VERSION.SDK_INT >= 17 ) {
+							if( !ConversationListActivity.this.isDestroyed() || !ConversationListActivity.this.isFinishing() ) {
+								getFragmentManager().popBackStack();
+							}
+						} else {
+							if( !ConversationListActivity.this.isFinishing() ) {
+								getFragmentManager().popBackStack();
+							}
+						}
+						if( mDirectorySearchListFragment != null ) {
+							mDirectorySearchListFragment = null;
+						}
+					}
+				}
+
+				return true;
+			}
+
+			@Override
+			public boolean onMenuItemActionExpand( MenuItem item ) {
+				item.setVisible( true );
+				setVisibleIf( false, R.id.actions );
+				return true;
+			}
+
+		} );
+
+		searchMenuItem.setVisible( searchMenuItem.isActionViewExpanded() );
+		setVisibleIf( !searchMenuItem.isActionViewExpanded(), R.id.actions );
+
+		// try to reset the query string back after restore
+		if( Constants.mIsDirectorySearchEnabled ) {
+			search = (SearchView) searchMenuItem.getActionView();
+			SearchManager searchManager = (SearchManager) getSystemService( Context.SEARCH_SERVICE );
+			search.setSearchableInfo( searchManager.getSearchableInfo( getComponentName() ) );
+
+			if( !TextUtils.isEmpty( mCurrentSearch ) ) {
+				searchMenuItem.expandActionView();
+				search.setQuery( mCurrentSearch, true );
+				search.clearFocus();
+			}
+		}
+		//
 		return super.onCreateOptionsMenu( menu );
+
 	}
 
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		destroyClearConversationsAndRefreshTask();
+		mHomeWatcher.stopWatch();
+	}
+
+	@Override
+	public void onHomeLongPressed() {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void onHomePressed() {
+		if( search != null ) {
+			Constants.mIsHomeClicked = true;
+			if( !TextUtils.isEmpty( search.getQuery() ) ) {
+				mCurrentSearch = search.getQuery().toString();
+			} else {
+				mCurrentSearch = null;
+			}
+		}
 	}
 
 	@Override
@@ -345,13 +732,27 @@ public class ConversationListActivity extends SilentActivity implements ActionPe
 
 	@Override
 	public void onLoadFinished( Loader<Cursor> loader, Cursor cursor ) {
-		if( searchSuggestions != null ) {
-			if( cursor == null || cursor.isClosed() ) {
-				searchSuggestions.swapCursor( null );
-			} else {
-				searchSuggestions.swapCursor( cursor );
+		if( Constants.mIsDirectorySearchEnabled ) {
+			if( loader.getId() == R.id.directory_search && mDirectorySearchListFragment != null ) {
+				mDirectorySearchListFragment.setDirectorySearchList( cursor, loader.getId() );
+			}
+			mProgressBar.setVisibility( View.INVISIBLE );
+		} else {
+			if( searchSuggestions != null ) {
+				if( cursor == null || cursor.isClosed() ) {
+					searchSuggestions.swapCursor( null );
+				} else {
+					searchSuggestions.swapCursor( cursor );
+				}
 			}
 		}
+
+	}
+
+	@Override
+	public boolean onMenuOpened( int featureId, Menu menu ) {
+		setVisibleIf( false, R.id.actions );
+		return super.onMenuOpened( featureId, menu );
 	}
 
 	@Override
@@ -363,12 +764,13 @@ public class ConversationListActivity extends SilentActivity implements ActionPe
 
 	@Override
 	public boolean onOptionsItemSelected( MenuItem item ) {
-
 		switch( item.getItemId() ) {
+			case R.id.action_lock:
+				lock();
+				break;
 
-			case R.id.options:
-				toggleDrawer();
-				hideSoftKeyboard( search );
+			case R.id.action_settings:
+				startActivity( SettingsActivity.getIntent( this ) );
 				break;
 
 		}
@@ -378,17 +780,116 @@ public class ConversationListActivity extends SilentActivity implements ActionPe
 	}
 
 	@Override
+	public void onPanelClosed( int featureId, Menu menu ) {
+		super.onPanelClosed( featureId, menu );
+		if( Constants.mIsDirectorySearchEnabled ) {
+			if( search.getVisibility() == View.VISIBLE || getFragmentManager().findFragmentById( R.id.chats ) instanceof DirectorySearchListFragment ) {
+				return;
+			}
+		}
+		setVisibleIf( true, R.id.actions );
+	}
+
+	@Override
 	protected void onPause() {
 		super.onPause();
-		cancelTasks();
 		unregisterReceivers();
 		cancelAutoRefresh();
+		if( deactivating && !isFinishing() ) {
+			finish();
+			deactivating = false;
+		}
 	}
 
 	@Override
 	public boolean onQueryTextChange( String query ) {
+		// STA-832: directory search feature.
+		if( Constants.mIsDirectorySearchEnabled ) {
+			// do not make a search if the search string is set #.
+			if( mDontChangeQuery ) {
+				mDontChangeQuery = false;
+				return false;
+			}
+			if( !TextUtils.isEmpty( query ) ) {
+				Constants.mIsExitApp = false;
+				mProgressBar.setVisibility( View.VISIBLE );
+				mSCDirectoryCheckBox.setChecked( true );
+			} else {
+				mProgressBar.setVisibility( View.GONE );
+				Constants.mIsExitApp = true;
+				ScDirectoryLoader.setStart( 0 );
+				if( mDirectorySearchListFragment != null ) {
+					mDirectorySearchListFragment.setSearchString( "" );
+					mDirectorySearchListFragment.setDirectorySearchList( null, Constants.DIRECTORY_SECTION );
+					mDirectorySearchListFragment.setContactsSearchList( null );
+				}
+				int count = getFragmentManager().getBackStackEntryCount();
+				if( count > 0 && getFragmentManager().getBackStackEntryAt( count - 1 ).getName().equals( DirectorySearchListFragment.TAG ) ) {
+					// if count = 2, just pop the top DirectorySearchListFragment, the next
+					// ChatsFragment will be shown
+					getFragmentManager().popBackStack();
 
-		getSupportLoaderManager().destroyLoader( R.id.search );
+					// if count = 1, the top DirectorySearchListFragment is the only fragment in the
+					// stack, after pop, the ChatsFragment needs to be added.
+					if( count == 1 ) {
+						ChatsFragment fragment = new ChatsFragment();
+						getFragmentManager().beginTransaction().replace( R.id.chats, fragment ).addToBackStack( ChatsFragment.TAG ).commit();
+					}
+				}
+
+				return false;
+			}
+			mCurrentSearch = query;
+			if( mSCDirectoryCheckBox.isChecked() ) {
+				int count = getFragmentManager().getBackStackEntryCount();
+				if( mDirectorySearchListFragment == null || count > 0 ) {
+					if( count > 0 ) {
+						getFragmentManager().popBackStack();
+					}
+					mDirectorySearchListFragment = new DirectorySearchListFragment( this, mDirectorySearchList, mScContactsList );
+					FragmentTransaction transaction = getFragmentManager().beginTransaction();
+					transaction.replace( R.id.chats, mDirectorySearchListFragment );
+					transaction.addToBackStack( DirectorySearchListFragment.TAG );
+					transaction.commit();
+				}
+				// if( mDirectorySearchListFragment == null ) {
+				// mDirectorySearchListFragment = new DirectorySearchListFragment( this,
+				// mDirectorySearchList, mScContactsList );
+				// FragmentTransaction transaction = getFragmentManager().beginTransaction();
+				// transaction.replace( R.id.chats, mDirectorySearchListFragment );
+				// transaction.addToBackStack( DirectorySearchListFragment.TAG );
+				// transaction.commit();
+				// } else {
+				// int count = getFragmentManager().getBackStackEntryCount();
+				// if( count > 0 ) {
+				// getFragmentManager().getBackStackEntryAt( count - 1 ).getName() );
+				// }
+				// if( count > 0 ) {
+				// getFragmentManager().popBackStack();
+				// mDirectorySearchListFragment = new DirectorySearchListFragment( this,
+				// mDirectorySearchList, mScContactsList );
+				// FragmentTransaction transaction = getFragmentManager().beginTransaction();
+				// transaction.replace( R.id.chats, mDirectorySearchListFragment );
+				// transaction.addToBackStack( DirectorySearchListFragment.TAG );
+				// transaction.commit();
+				// }
+				// }
+				mDirectorySearchListFragment.setSearchString( query );
+				if( mLoader != null ) {
+					( (ScDirectoryLoader) mLoader ).setQueryString( query );
+				}
+				ScDirectoryLoader.setStart( 0 );
+				directorySearchDelayed( mCurrentSearch, true );
+				if( isSPARunnung() ) {
+					scContactsSearch( mCurrentSearch );
+				}
+				return false;
+			}
+			return false;
+		}
+
+		// implemented by Devin - Original search for user.
+		getLoaderManager().destroyLoader( R.id.action_search );
 
 		if( !StringUtils.isMinimumLength( query, 2 ) ) {
 			return false;
@@ -396,7 +897,7 @@ public class ConversationListActivity extends SilentActivity implements ActionPe
 
 		Bundle arguments = new Bundle();
 		Extra.TEXT.to( arguments, query );
-		getSupportLoaderManager().initLoader( R.id.search, arguments, this );
+		getLoaderManager().initLoader( R.id.action_search, arguments, this );
 
 		return false;
 
@@ -404,53 +905,106 @@ public class ConversationListActivity extends SilentActivity implements ActionPe
 
 	@Override
 	public boolean onQueryTextSubmit( String query ) {
+		mQueryTextSubmit = true;
 		handleSearch( query );
 		return true;
 	}
 
 	@Override
 	protected void onResume() {
-
 		super.onResume();
+		// SPA-454: may not need the following code to access STA, commented out for now.
+		// // SPA-454: called from SPA and pass jid to ConversationActivity
+		// Bundle b = getIntent().getExtras();
+		// if( b != null ) {
+		// String jid = b.getString( "jid" );
+		// if( jid != null ) {
+		// launchConversationActivity( jid );
+		// return;
+		// }
+		// }
 
-		if( !isUnlocked() ) {
-			lockContentView();
-			requestUnlock();
+		try {
+			assertPermissionToView();
+		} catch( IllegalStateException exception ) {
 			return;
 		}
 
-		if( !isActivated() ) {
-			lockContentView();
-			requestActivation();
-			return;
-		}
-
-		if( isInactive() ) {
-			lockContentView();
-			lock();
-			return;
+		if( !RefreshSelfIntentService.wasSuccessful && !RefreshSelfIntentService.isRunning ) {
+			getActivity().startService( new Intent( getActivity(), RefreshSelfIntentService.class ) );
 		}
 
 		unlockContentView();
 
-		getOptionsDrawer().onPasscodeUpdate();
-
+		updateTitle();
+		invalidateOptionsMenu();
 		registerReceivers();
-		refresh();
 		scheduleAutoRefresh();
+		NotificationBroadcaster.cancel( this );
 
+		if( Constants.mIsDirectorySearchEnabled ) {
+			// directory search results replaces ChatsFragment
+			FragmentManager fm = getFragmentManager();
+			if( fm.findFragmentById( R.id.chats ) instanceof DirectorySearchListFragment || Constants.mIsDirectorySearchFragment ) {
+				if( Constants.mIsDirectorySearchFragment && Constants.mConversationListItemClicked ) {
+					Constants.mConversationListItemClicked = false;
+					getChatsFragment().update();
+				}
+				// else if( Constants.mIsHomeClicked ) {
+				// Constants.mIsHomeClicked = false;
+				// if( getChatsFragment() != null ) {
+				// getChatsFragment().update();
+				// }
+				// }
+				Constants.mIsDirectorySearchFragment = false;
+				if( search != null ) {
+					mDontChangeQuery = true;
+					search.clearFocus();
+					search.setQuery( mCurrentSearch, false );
+				}
+			} else {
+				getChatsFragment().update();
+			}
+			if( Constants.mIsHomeClicked ) {
+				Constants.mIsHomeClicked = false;
+				if( search != null ) {
+					mDontChangeQuery = true;
+					search.clearFocus();
+					search.setQuery( mCurrentSearch, false );
+				}
+			}
+			if( TextUtils.isEmpty( Constants.mOrgName ) ) {
+				new Handler().post( mOrgNameRunnable );
+			}
+		} else {
+			getChatsFragment().update();
+		}
 	}
 
 	protected boolean onSearchDismissed() {
 		if( actionMenu == null ) {
 			return false;
 		}
-		MenuItem item = actionMenu.findItem( R.id.search );
+
+		MenuItem item = actionMenu.findItem( R.id.action_search );
+
 		if( item == null ) {
 			return false;
 		}
+
 		item.collapseActionView();
+
+		SearchView s = (SearchView) item.getActionView();
+
+		if( s != null ) {
+			s.setQuery( "", false );
+		}
+
+		if( Constants.mIsDirectorySearchEnabled ) {
+			mSCDirectoryCheckBox.setChecked( false );
+		}
 		return true;
+
 	}
 
 	@Override
@@ -458,7 +1012,7 @@ public class ConversationListActivity extends SilentActivity implements ActionPe
 		if( actionMenu == null ) {
 			return false;
 		}
-		MenuItem item = actionMenu.findItem( R.id.search );
+		MenuItem item = actionMenu.findItem( R.id.action_search );
 		if( item == null ) {
 			return false;
 		}
@@ -466,55 +1020,37 @@ public class ConversationListActivity extends SilentActivity implements ActionPe
 		return true;
 	}
 
-	protected void performAction( int actionId, Conversation conversation ) {
-
-		switch( actionId ) {
-
-			case R.id.burn:
-				getSilentTextApplication().getUsers().removeByID( conversation.getPartner().getUsername().toCharArray() );
-				getConversations().remove( conversation );
-				break;
-
-			default:
-				// Unknown or unhandled action.
-				break;
-
-		}
-
-	}
-
-	@Override
-	public void performAction( int actionId, int position ) {
-		performAction( actionId, getConversation( position ) );
+	protected void postRefresh() {
+		runOnUiThread( new Refresher() );
 	}
 
 	protected void refresh() {
 
-		cancelTasks();
-		updateTitle();
-
-		ConversationAdapter adapter = getAdapter( R.id.conversations );
-		adapter.setOnItemRemovedListener( new OnItemRemovedListener() {
-
-			@Override
-			public void onItemRemoved( Object item ) {
-				if( item instanceof Conversation ) {
-					performAction( R.id.burn, (Conversation) item );
-				}
-			}
-
-		} );
-		ConversationRepository conversations = getConversations();
-		if( conversations != null ) {
-			task = new RefreshTask( getConversations(), adapter );
-			task.execute();
+		try {
+			assertPermissionToView();
+		} catch( IllegalStateException exception ) {
+			return;
 		}
 
+		updateTitle();
+		if( getChatsFragment() != null ) {
+			getChatsFragment().update();
+		}
+		finishLoading( R.id.chats );
+		getActionBar().show();
+
+	}
+
+	private void registerBeginDeactivating() {
+		deactivationListener = new DeactivationListener();
+		registerReceiver( deactivationListener, Action.BEGIN_DEACTIVATE, Manifest.permission.READ );
+		registerReceiver( deactivationListener, Action.FINISH_DEACTIVATE, Manifest.permission.READ );
 	}
 
 	protected void registerReceivers() {
 		registerTitleUpdater();
 		registerViewUpdater();
+		registerBeginDeactivating();
 	}
 
 	private void registerTitleUpdater() {
@@ -529,14 +1065,26 @@ public class ConversationListActivity extends SilentActivity implements ActionPe
 		registerReceiver( viewUpdater, Action.UPDATE_CONVERSATION, Manifest.permission.READ );
 	}
 
+	private void scContactsSearch( String query ) {
+		if( mSCLoader == null ) {
+			mSCLoader = new ScContactsLoader( this, query );
+		}
+		mSCLoader.setSearchQuery( query );
+		mDirectorySearchListFragment.setContacts( mSCLoader.loadScContants() );
+	}
+
 	protected void scheduleAutoRefresh() {
 		scheduleAutoRefresh( 10000 );
 	}
 
 	protected void scheduleAutoRefresh( long autoRefreshInterval ) {
 		cancelAutoRefresh();
-		timer = new Timer();
+		timer = new Timer( "conversation-list:auto-refresh" );
 		timer.schedule( new AutoRefresh(), autoRefreshInterval, autoRefreshInterval );
+	}
+
+	public void setCurrentQuery( String query ) {
+		mCurrentSearch = query;
 	}
 
 	protected void unregisterReceivers() {
@@ -554,11 +1102,33 @@ public class ConversationListActivity extends SilentActivity implements ActionPe
 	}
 
 	protected void updateTitle() {
-		if( !isActivated() ) {
+
+		if( !isActivated() || updatingTitle ) {
 			return;
 		}
-		getSupportActionBar().setTitle( getShortUsername() );
-		getSupportActionBar().setSubtitle( getString( isOnline() ? R.string.online : R.string.offline ) );
+
+		getActionBar().setSubtitle( StringUtils.formatUsername( getUsername() ) );
+
+		updatingTitle = true;
+		AsyncUtils.execute( new AsyncTask<Void, Void, String>() {
+
+			@Override
+			protected String doInBackground( Void... params ) {
+				return getSilentTextApplication().getDisplayName( getUsername() );
+			}
+
+			@Override
+			protected void onPostExecute( String displayName ) {
+				if( StringUtils.isMinimumLength( displayName, 1 ) ) {
+					getActionBar().setTitle( displayName );
+				} else {
+					getActionBar().setTitle( R.string.silent_text );
+				}
+				updatingTitle = false;
+			}
+
+		} );
+
 	}
 
 }

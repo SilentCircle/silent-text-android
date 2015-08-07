@@ -1,0 +1,31 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<resources>
+
+	<string name="SCIMPError_NONE">Без ошибок</string>
+	<string name="SCIMPError_NOP">Не применимо</string>
+	<string name="SCIMPError_UNKNOWN">Возникла неизвестная ошибка.</string>
+	<string name="SCIMPError_BAD_PARAMS">Неверные параметры</string>
+	<string name="SCIMPError_OUT_OF_MEMORY">Не хватает памяти</string>
+	<string name="SCIMPError_BUFFER_TOO_SMALL">Слишком маленький буфер</string>
+	<string name="SCIMPError_USER_ABORT">Отменено пользователем</string>
+	<string name="SCIMPError_UNKNOWN_REQUEST">Неизвестный запрос</string>
+	<string name="SCIMPError_LAZY_PROGRAMMER">Ленивый программист</string>
+	<string name="SCIMPError_ASSERT_FAILED">Сбой утверждения</string>
+	<string name="SCIMPError_FEATURE_UNAVAILABLE">Функция недоступна</string>
+	<string name="SCIMPError_RESOURCE_UNAVAILABLE">Ресурс недоступен</string>
+	<string name="SCIMPError_NOT_CONNECTED">Попытка отправки сообщения до установления защищенной среды.</string>
+	<string name="SCIMPError_IMPROPER_INITIALIZATION">Неверная инициализация</string>
+	<string name="SCIMPError_CORRUPT_DATA">Произошел сбой защищенной среды, которая сейчас снова устанавливается.</string>
+	<string name="SCIMPError_SELF_TEST_FAILED">Cамотестирование не пройдено</string>
+	<string name="SCIMPError_BAD_INTEGRITY">Сбой проверки целостности протокола.</string>
+	<string name="SCIMPError_BAD_HASH_NUMBER">Неверный хэш</string>
+	<string name="SCIMPError_BAD_CIPHER_NUMBER">Получен пакет протокола с указанием неподдерживаемого набора шифров.</string>
+	<string name="SCIMPError_BAD_RANDOM_NUMBER">Получен пакет протокола с указанием неподдерживаемого генератора псевдослучайных чисел.</string>
+	<string name="SCIMPError_SECRETS_MISMATCH">Потеряна связь ключа с ранее установленной защищенной средой.</string>
+	<string name="SCIMPError_KEY_NOT_FOUND">Получено не поддающееся расшифровке сообщение. Отправляется запрос на повторную передачу.</string>
+	<string name="SCIMPError_PROTOCOL_ERROR">Получен ошибочный пакет протокола.</string>
+	<string name="SCIMPError_PROTOCOL_CONTENTION">Получен неожиданный пакет протокола.</string>
+	<string name="SCIMPError_KEY_LOCKED">Ключ заблокироан</string>
+	<string name="SCIMPError_END_OF_ITERATION">Конец итерации</string>
+
+</resources>

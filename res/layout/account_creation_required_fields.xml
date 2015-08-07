@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android" style="@style/Widget.Silence.RelativeLayout">
+<com.silentcircle.silenttext.view.RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android" style="@style/Widget.Silence.RelativeLayout">
 	<TextView android:id="@+id/partner_message" style="@style/Widget.Silence.TextView.PartnerMessaging" android:text="@string/partner_account_creation_prologue" android:paddingTop="@dimen/spacing_large"/>
 	<LinearLayout style="@style/Widget.Silence.LinearLayout.Rotatable" android:layout_height="fill_parent" android:gravity="center_vertical" android:layout_above="@+id/navigation">
 		<LinearLayout style="@style/Widget.Silence.LinearLayout.Vertical" android:padding="@dimen/spacing_large" android:gravity="center" android:layout_weight="1">
-			<TextView style="@style/Widget.Silence.TextView.Title" android:text="@string/create_username" android:layout_marginLeft="@dimen/spacing_large" android:layout_marginRight="@dimen/spacing_large" android:layout_gravity="left"/>
+			<TextView style="@style/Widget.Silence.TextView.Title" android:text="@string/create_username" android:layout_marginLeft="@dimen/spacing_large" android:layout_marginRight="@dimen/spacing_large" android:layout_gravity="start|left"/>
 			<EditText android:id="@+id/username" style="@style/Widget.Silence.EditText" android:hint="@string/username" android:inputType="textNoSuggestions|textEmailAddress">
 				<requestFocus/>
 			</EditText>
-			<TextView style="@style/Widget.Silence.TextView" android:gravity="right" android:text="@string/required_username" android:layout_marginRight="@dimen/spacing_large" android:layout_marginLeft="@dimen/spacing_large"/>
+			<TextView style="@style/Widget.Silence.TextView" android:gravity="start|left" android:text="@string/required_username" android:layout_marginRight="@dimen/spacing_large" android:layout_marginLeft="@dimen/spacing_large"/>
 		</LinearLayout>
 		<LinearLayout style="@style/Widget.Silence.LinearLayout.Vertical" android:padding="@dimen/spacing_large" android:gravity="center" android:layout_weight="1">
-			<TextView style="@style/Widget.Silence.TextView.Title" android:text="@string/create_password" android:layout_marginLeft="@dimen/spacing_large" android:layout_marginRight="@dimen/spacing_large" android:layout_gravity="left"/>
+			<TextView style="@style/Widget.Silence.TextView.Title" android:text="@string/create_password" android:layout_marginLeft="@dimen/spacing_large" android:layout_marginRight="@dimen/spacing_large" android:layout_gravity="left|start"/>
 			<EditText android:id="@+id/password" style="@style/Widget.Silence.EditText.Password" android:hint="@string/password" android:imeOptions="actionNext|flagNoExtractUi"/>
-			<TextView style="@style/Widget.Silence.TextView" android:gravity="right" android:text="@string/required_password" android:layout_marginRight="@dimen/spacing_large" android:layout_marginLeft="@dimen/spacing_large"/>
+			<TextView style="@style/Widget.Silence.TextView" android:gravity="start|left" android:text="@string/required_password" android:layout_marginRight="@dimen/spacing_large" android:layout_marginLeft="@dimen/spacing_large"/>
 		</LinearLayout>
 	</LinearLayout>
 	<include android:id="@+id/navigation" layout="@layout/account_creation_navigation" android:layout_height="wrap_content" android:layout_width="fill_parent" android:layout_alignParentBottom="true"/>
-</RelativeLayout>
+</com.silentcircle.silenttext.view.RelativeLayout>

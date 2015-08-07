@@ -1,19 +1,18 @@
 /*
-Copyright © 2013, Silent Circle, LLC.
-All rights reserved.
+Copyright (C) 2013-2015, Silent Circle, LLC. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
-    * Any redistribution, use, or modification is done solely for personal 
+    * Any redistribution, use, or modification is done solely for personal
       benefit and not for any commercial purpose or for monetary gain
     * Redistributions of source code must retain the above copyright
       notice, this list of conditions and the following disclaimer.
     * Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-    * Neither the name Silent Circle nor the names of its contributors may 
-      be used to endorse or promote products derived from this software 
-      without specific prior written permission.
+    * Neither the name Silent Circle nor the
+      names of its contributors may be used to endorse or promote products
+      derived from this software without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -29,89 +28,135 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 package com.silentcircle.silenttext.client;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.security.KeyStore;
+import java.util.List;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import org.twuni.twoson.JSONGenerator;
 
-import com.silentcircle.silentstorage.repository.Repository;
+import com.silentcircle.core.util.StringUtils;
+import com.silentcircle.http.client.AbstractHTTPClient;
+import com.silentcircle.http.client.HTTPContent;
+import com.silentcircle.http.client.URLBuilder;
+import com.silentcircle.http.client.apache.ApacheHTTPClient;
+import com.silentcircle.http.client.apache.HttpClient;
+import com.silentcircle.http.client.listener.JSONResponseListener;
+import com.silentcircle.http.client.listener.JSONValueListener;
+import com.silentcircle.scloud.model.SCloudObject;
 import com.silentcircle.silenttext.ServiceConfiguration;
-import com.silentcircle.silenttext.client.model.ServiceEndpoint;
-import com.silentcircle.silenttext.listener.JSONObjectListener;
-import com.silentcircle.silenttext.listener.JSONResponseListener;
-import com.silentcircle.silenttext.log.Log;
+import com.silentcircle.silenttext.client.dns.CachingSRVResolver;
 import com.silentcircle.silenttext.model.Credential;
 
 public class SCloudBroker {
 
 	private static final String BROKER_URI = "/broker/";
 
-	protected final Log log = new Log( getClass().getSimpleName() );
-	private final Credential serverCredential;
-	private final Repository<ServiceEndpoint> networks;
-	protected final SimpleHTTPClient http;
-	protected String deviceId;
+	private final CachingSRVResolver networks;
+	private final AbstractHTTPClient http;
+	private final CharSequence accessToken;
 
 	/**
 	 * @deprecated This constructor will not validate connections against the embedded trust store.
 	 *             Consider using {@link SCloudBroker#SCloudBroker(Credential,KeyStore)} instead.
 	 */
 	@Deprecated
-	public SCloudBroker( Credential serverCredential ) {
-		this( serverCredential, new SimpleHTTPClient() );
+	public SCloudBroker( CharSequence accessToken ) {
+		this( accessToken, new ApacheHTTPClient( new HttpClient() ) );
 	}
 
-	public SCloudBroker( Credential serverCredential, KeyStore trustStore ) {
-		this( serverCredential, trustStore, null );
+	public SCloudBroker( CharSequence accessToken, AbstractHTTPClient http ) {
+		this( accessToken, http, null );
 	}
 
-	public SCloudBroker( Credential serverCredential, KeyStore trustStore, Repository<ServiceEndpoint> networks ) {
-		this( serverCredential, new SimpleHTTPClient( trustStore ), networks );
-	}
+	public SCloudBroker( CharSequence accessToken, AbstractHTTPClient http, CachingSRVResolver networks ) {
 
-	public SCloudBroker( Credential serverCredential, SimpleHTTPClient http ) {
-		this( serverCredential, http, null );
-	}
+		if( accessToken == null ) {
+			throw new IllegalArgumentException( "Missing required parameter: accessToken" );
+		}
 
-	public SCloudBroker( Credential serverCredential, SimpleHTTPClient http, Repository<ServiceEndpoint> networks ) {
-		this.serverCredential = serverCredential;
+		if( http == null ) {
+			throw new IllegalArgumentException( "Missing required parameter: http" );
+		}
+
+		this.accessToken = StringUtils.clone( accessToken );
 		this.http = http;
 		this.networks = networks;
+
+	}
+
+	public SCloudBroker( CharSequence accessToken, KeyStore trustStore ) {
+		this( accessToken, trustStore, null );
+	}
+
+	public SCloudBroker( CharSequence accessToken, KeyStore trustStore, CachingSRVResolver networks ) {
+		this( accessToken, new ApacheHTTPClient( new HttpClient( trustStore ) ), networks );
 	}
 
 	private String getBaseURL() {
-		return ServiceConfiguration.getInstance().api.getURL( networks );
+		return ServiceConfiguration.getInstance().getAPIURL( networks );
 	}
 
-	public void prepareSCloudUpload( JSONObject files, JSONObjectListener onObjectReceivedListener ) {
+	public void prepareSCloudUpload( List<SCloudObject> objects, long expirationTime, JSONValueListener onObjectReceivedListener ) throws IOException {
 
-		JSONObject request = new JSONObject();
-
-		try {
-			request.put( "operation", "upload" );
-			request.put( "api_key", serverCredential.getPassword() );
-			request.put( "files", files );
-		} catch( JSONException impossible ) {
-			// Don't worry about it.
+		if( StringUtils.isEmpty( accessToken ) ) {
+			throw new IllegalStateException( "Missing field: accessToken" );
 		}
 
-		byte [] requestData = request.toString().getBytes();
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		JSONGenerator request = new JSONGenerator( out );
+
+		request.openObject();
+
+		request.writeKey( "operation" );
+		request.writeString( "upload" );
+
+		request.next();
+
+		request.writeKey( "api_key" );
+		request.writeString( StringUtils.toByteArray( accessToken ) );
+
+		request.next();
+
+		request.writeKey( "files" );
+		request.openObject();
+
+		int objectsCount = objects.size();
+
+		for( int i = 0; i < objectsCount; i++ ) {
+
+			SCloudObject object = objects.get( i );
+
+			if( i > 0 ) {
+				request.next();
+			}
+
+			request.writeKey( String.valueOf( object.getLocator() ) );
+			request.openObject();
+
+			request.writeKey( "shred_date" );
+			request.writeString( StringUtils.getDate( expirationTime ) );
+
+			request.next();
+
+			request.writeKey( "size" );
+			request.write( object.getSize() );
+
+			request.closeObject();// file
+
+		}
+
+		request.closeObject();// files
+		request.closeObject();// ROOT
+
+		byte [] requestData = out.toByteArray();
 		URLBuilder url = new URLBuilder( getBaseURL(), BROKER_URI );
 		InputStream body = new ByteArrayInputStream( requestData );
 		HTTPContent content = new HTTPContent( body, "application/json", requestData.length );
 
-		try {
-			http.post( url.toString(), content, new JSONResponseListener( onObjectReceivedListener ) );
-		} catch( RuntimeException exception ) {
-			ServiceConfiguration.getInstance().api.removeFromCache( networks );
-			throw exception;
-		}
+		http.post( url.toString(), content, new JSONResponseListener( onObjectReceivedListener ) );
 
-	}
-
-	public void setAPIKey( String apiKey ) {
-		serverCredential.setPassword( apiKey );
 	}
 
 }

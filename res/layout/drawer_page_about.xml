@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" style="@style/Widget.Silence.LinearLayout.Vertical">
-  <Button android:id="@+id/privacy_policy" style="@style/Widget.Silence.SubtleButton" android:drawableLeft="@drawable/ic_action_page" android:text="@string/privacy_statement"/>
-  <Button android:id="@+id/license" style="@style/Widget.Silence.SubtleButton" android:drawableLeft="@drawable/ic_action_page" android:text="@string/license_information"/>
-  <Button android:id="@+id/advanced" style="@style/Widget.Silence.SubtleButton" android:drawableLeft="@drawable/ic_action_about" android:text="@string/advanced"/>
-</LinearLayout>

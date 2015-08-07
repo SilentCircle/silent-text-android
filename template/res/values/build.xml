@@ -6,6 +6,7 @@
   <string name="build_date">$build.date$</string>
   <string name="build_scloud_url">$build.scloud_url$</string>
   <string name="build_gcm_sender">$build.gcm_sender$</string>
+  <string name="build_gcm_target">$build.gcm_target$</string>
   <string name="build_partners">$build.partners$</string>
   <item type="bool" name="build_debug" format="boolean">$build.debug$</item>
 </resources>

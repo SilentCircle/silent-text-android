@@ -1,9 +1,9 @@
 /*
-Copyright © 2012-2013, Silent Circle, LLC.  All rights reserved.
+Copyright (C) 2013-2015, Silent Circle, LLC. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
-    * Any redistribution, use, or modification is done solely for personal 
+    * Any redistribution, use, or modification is done solely for personal
       benefit and not for any commercial purpose or for monetary gain
     * Redistributions of source code must retain the above copyright
       notice, this list of conditions and the following disclaimer.
@@ -28,19 +28,63 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 package com.silentcircle.silenttext.fragment;
 
 import android.annotation.TargetApi;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
-
-import com.silentcircle.silenttext.R;
+import android.preference.PreferenceScreen;
 
 @TargetApi( Build.VERSION_CODES.HONEYCOMB )
 public class SettingsFragment extends PreferenceFragment {
 
+	private final SettingsFragmentHelper helper = new SettingsFragmentHelper() {
+
+		@Override
+		protected void addPreferencesFromResource( int xmlResourceID ) {
+			SettingsFragment.this.addPreferencesFromResource( xmlResourceID );
+		}
+
+		@Override
+		protected PreferenceScreen getPreferenceScreen() {
+			return SettingsFragment.this.getPreferenceScreen();
+		}
+
+	};
+
+	@Override
+	public void onActivityResult( int requestCode, int resultCode, Intent data ) {
+		super.onActivityResult( requestCode, resultCode, data );
+		helper.onActivityResult( requestCode, resultCode, data );
+	}
+
 	@Override
 	public void onCreate( Bundle savedInstanceState ) {
 		super.onCreate( savedInstanceState );
-		addPreferencesFromResource( R.xml.preferences );
+		helper.onCreate( savedInstanceState );
+	}
+
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		helper.onDestroy();
+	}
+
+	@Override
+	public void onPause() {
+		super.onPause();
+		helper.onPause();
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
+		helper.onResume();
+	}
+
+	@Override
+	public void onSaveInstanceState( Bundle outState ) {
+		super.onSaveInstanceState( outState );
+		helper.saveState( outState );
 	}
 
 }

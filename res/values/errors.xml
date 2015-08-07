@@ -1,31 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
 
-  <string name="SCIMPError_NONE">No error</string>
-  <string name="SCIMPError_NOP">N/A</string>
-  <string name="SCIMPError_UNKNOWN">Unknown error</string>
-  <string name="SCIMPError_BAD_PARAMS">Bad parameters</string>
-  <string name="SCIMPError_OUT_OF_MEMORY">Out of memory</string>
-  <string name="SCIMPError_BUFFER_TOO_SMALL">Buffer too small</string>
-  <string name="SCIMPError_USER_ABORT">User aborted</string>
-  <string name="SCIMPError_UNKNOWN_REQUEST">Unknown request</string>
-  <string name="SCIMPError_LAZY_PROGRAMMER">Lazy programmer</string>
-  <string name="SCIMPError_ASSERT_FAILED">Assert failed</string>
-  <string name="SCIMPError_FEATURE_UNAVAILABLE">Feature unavailable</string>
-  <string name="SCIMPError_RESOURCE_UNAVAILABLE">Resource unavailable</string>
-  <string name="SCIMPError_NOT_CONNECTED">Not connected</string>
-  <string name="SCIMPError_IMPROPER_INITIALIZATION">Improper initialization</string>
-  <string name="SCIMPError_CORRUPT_DATA">Corrupt data</string>
-  <string name="SCIMPError_SELF_TEST_FAILED">Self-test failed</string>
-  <string name="SCIMPError_BAD_INTEGRITY">Bad integrity</string>
-  <string name="SCIMPError_BAD_HASH_NUMBER">Bad hash</string>
-  <string name="SCIMPError_BAD_CIPHER_NUMBER">Bad cipher</string>
-  <string name="SCIMPError_BAD_RANDOM_NUMBER">Bad PRNG</string>
-  <string name="SCIMPError_SECRETS_MISMATCH">Secrets mismatch</string>
-  <string name="SCIMPError_KEY_NOT_FOUND">Key not found</string>
-  <string name="SCIMPError_PROTOCOL_ERROR">Protocol error</string>
-  <string name="SCIMPError_PROTOCOL_CONTENTION">Protocol contention</string>
-  <string name="SCIMPError_KEY_LOCKED">Key locked</string>
-  <string name="SCIMPError_END_OF_ITERATION">End of iteration</string>
+	<string name="SCIMPError_NONE">No error</string>
+	<string name="SCIMPError_NOP">N/A</string>
+	<string name="SCIMPError_UNKNOWN">An unknown error has occurred.</string>
+	<string name="SCIMPError_BAD_PARAMS">Bad parameters</string>
+	<string name="SCIMPError_OUT_OF_MEMORY">Out of memory</string>
+	<string name="SCIMPError_BUFFER_TOO_SMALL">Buffer too small</string>
+	<string name="SCIMPError_USER_ABORT">User aborted</string>
+	<string name="SCIMPError_UNKNOWN_REQUEST">Unknown request</string>
+	<string name="SCIMPError_LAZY_PROGRAMMER">Lazy programmer</string>
+	<string name="SCIMPError_ASSERT_FAILED">Assert failed</string>
+	<string name="SCIMPError_FEATURE_UNAVAILABLE">Feature unavailable</string>
+	<string name="SCIMPError_RESOURCE_UNAVAILABLE">Resource unavailable</string>
+	<string name="SCIMPError_NOT_CONNECTED">Attempted to send a message prior to establishing a secure context.</string>
+	<string name="SCIMPError_IMPROPER_INITIALIZATION">Improper initialization</string>
+	<string name="SCIMPError_CORRUPT_DATA">The secure context was corrupted, and is now being re-established.</string>
+	<string name="SCIMPError_SELF_TEST_FAILED">Self-test failed</string>
+	<string name="SCIMPError_BAD_INTEGRITY">A protocol integrity check has failed.</string>
+	<string name="SCIMPError_BAD_HASH_NUMBER">Bad hash</string>
+	<string name="SCIMPError_BAD_CIPHER_NUMBER">A protocol packet was received specifying an unsupported cipher suite.</string>
+	<string name="SCIMPError_BAD_RANDOM_NUMBER">A protocol packet was received specifying an unsupported pseudo-random number generator.</string>
+	<string name="SCIMPError_SECRETS_MISMATCH">Lost key continuity with the previously established secure context.</string>
+	<string name="SCIMPError_KEY_NOT_FOUND">An indecipherable message was received. Requesting retransmission.</string>
+	<string name="SCIMPError_PROTOCOL_ERROR">An errant protocol packet was received.</string>
+	<string name="SCIMPError_PROTOCOL_CONTENTION">An unexpected protocol packet was received.</string>
+	<string name="SCIMPError_KEY_LOCKED">Key locked</string>
+	<string name="SCIMPError_END_OF_ITERATION">End of iteration</string>
 
 </resources>

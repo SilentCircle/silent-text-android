@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" style="@style/Widget.Silence.LinearLayout.Horizontal" android:gravity="center_vertical">
+	<ImageView android:id="@+id/message_action_location" style="@style/Widget.Silence.ImageView.ActionButton" android:contentDescription="@string/location" android:src="@drawable/ic_location_selected" android:visibility="gone"/>
+</LinearLayout>

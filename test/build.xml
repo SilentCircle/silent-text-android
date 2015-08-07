@@ -32,27 +32,6 @@
     <delete dir="${test.temp.dir}"/>
   </target>
 
-  <target name="native-test-compile" depends="-set-test-properties, native-compile">
-
-    <exec executable="ndk-build" failonerror="true" dir="${test.dir}">
-      <arg value="all"/>
-    </exec>
-
-    <exec executable="cc" failonerror="true">
-      <arg value="-Wall"/>
-      <arg value="${test.native.dir}/test.c"/>
-      <arg value="-I${test.native.dir}/scloud-test/src"/>
-      <arg value="-I${project.native.dir}/scloud/src"/>
-      <arg value="-I${project.native.dir}/scloud/shared"/>
-      <arg value="-L${project.library.dir}/${build.arch}"/>
-      <arg value="-L${test.library.dir}/${build.arch}"/>
-      <arg value="-lscloud-test"/>
-      <arg value="-o"/>
-      <arg value="${test.output.dir}/native-test"/>
-    </exec>
-
-  </target>
-
   <target name="test-compile" depends="-set-debug-files, -set-debug-mode, -compile, -set-test-properties" description="Compiles all tests.">
 
     <mkdir dir="${test.classes.dir}"/>
@@ -86,10 +65,6 @@
 
   </target>
 
-  <target name="native-test" depends="native-test-compile" description="Runs all native tests.">
-    <exec executable="${test.output.dir}/native-test"/>
-  </target>
-
   <target name="unit-test" depends="test-compile" description="Runs all unit tests.">
 
     <mkdir dir="${test.reports.dir}"/>
@@ -110,8 +85,6 @@
       </batchtest>
 
       <classpath>
-        <pathelement path="${project.support.dir}/ActionBarSherlock/library/bin/classes"/>
-        <fileset dir="${project.support.dir}/ActionBarSherlock/library/libs" includes="**/*.jar"/>
         <pathelement path="${project.classes.dir}"/>
         <pathelement path="${test.classes.dir}"/>
         <fileset dir="${project.library.dir}" includes="**/*.jar"/>

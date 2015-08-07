@@ -1,19 +1,18 @@
 /*
-Copyright © 2013, Silent Circle, LLC.
-All rights reserved.
+Copyright (C) 2013-2015, Silent Circle, LLC. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
-    * Any redistribution, use, or modification is done solely for personal 
+    * Any redistribution, use, or modification is done solely for personal
       benefit and not for any commercial purpose or for monetary gain
     * Redistributions of source code must retain the above copyright
       notice, this list of conditions and the following disclaimer.
     * Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-    * Neither the name Silent Circle nor the names of its contributors may 
-      be used to endorse or promote products derived from this software 
-      without specific prior written permission.
+    * Neither the name Silent Circle nor the
+      names of its contributors may be used to endorse or promote products
+      derived from this software without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -31,7 +30,8 @@ package com.silentcircle.silenttext.crypto;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-import org.jivesoftware.smack.util.Base64;
+import com.silentcircle.silentstorage.util.Base64;
+import com.silentcircle.silenttext.util.StringUtils;
 
 public class Hash {
 
@@ -55,27 +55,23 @@ public class Hash {
 		return digest.digest();
 	}
 
-	public static byte [] hash( String algorithm, byte []... ins ) {
-		return hash( getDigest( algorithm ), ins );
-	}
-
-	public static char [] hash( String algorithm, char []... ins ) {
-		MessageDigest digest = getDigest( algorithm );
+	public static char [] hash( MessageDigest digest, char []... ins ) {
 		digest.reset();
 		for( int i = 0; i < ins.length; i++ ) {
 			char [] in = ins[i];
-			byte [] inBytes = CryptoUtils.toByteArray( in );
+			byte [] inBytes = CryptoUtils.toByteArraySafe( in );
 			digest.update( inBytes );
 			CryptoUtils.randomize( inBytes );
 		}
 		byte [] outBytes = digest.digest();
-		char [] out = CryptoUtils.toCharArray( outBytes );
+		byte [] out = com.silentcircle.silentstorage.util.Base64.encodeBase64( outBytes );
+		char [] hash = CryptoUtils.toCharArraySafe( out );
+		CryptoUtils.randomize( out );
 		CryptoUtils.randomize( outBytes );
-		return out;
+		return hash;
 	}
 
-	public static String hash( String algorithm, String... ins ) {
-		MessageDigest digest = getDigest( algorithm );
+	public static String hash( MessageDigest digest, String... ins ) {
 		digest.reset();
 		for( int i = 0; i < ins.length; i++ ) {
 			String in = ins[i];
@@ -84,7 +80,19 @@ public class Hash {
 			}
 			digest.update( in.getBytes() );
 		}
-		return Base64.encodeBytes( digest.digest(), Base64.URL_SAFE );
+		return StringUtils.pad( Base64.encodeBase64URLSafeString( digest.digest() ), 4, '=' );
+	}
+
+	public static byte [] hash( String algorithm, byte []... ins ) {
+		return hash( getDigest( algorithm ), ins );
+	}
+
+	public static char [] hash( String algorithm, char []... ins ) {
+		return hash( getDigest( algorithm ), ins );
+	}
+
+	public static String hash( String algorithm, String... ins ) {
+		return hash( getDigest( algorithm ), ins );
 	}
 
 	public static byte [] sha1( byte []... ins ) {
@@ -97,6 +105,22 @@ public class Hash {
 
 	public static String sha1( String... ins ) {
 		return hash( SHA1, ins );
+	}
+
+	@Deprecated
+	public static char [] sha1Legacy( char []... ins ) {
+		MessageDigest digest = getDigest( SHA1 );
+		digest.reset();
+		for( int i = 0; i < ins.length; i++ ) {
+			char [] in = ins[i];
+			byte [] inBytes = CryptoUtils.toByteArray( in );
+			digest.update( inBytes );
+			CryptoUtils.randomize( inBytes );
+		}
+		byte [] outBytes = digest.digest();
+		char [] out = CryptoUtils.toCharArray( outBytes );
+		CryptoUtils.randomize( outBytes );
+		return out;
 	}
 
 	public static byte [] toBytes( int n ) {

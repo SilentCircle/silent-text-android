@@ -1,0 +1,31 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<resources>
+
+	<string name="SCIMPError_NONE">Nessun errore</string>
+	<string name="SCIMPError_NOP">N/D</string>
+	<string name="SCIMPError_UNKNOWN">Si è verificato un errore sconosciuto.</string>
+	<string name="SCIMPError_BAD_PARAMS">Parametri errati</string>
+	<string name="SCIMPError_OUT_OF_MEMORY">Memoria esaurita</string>
+	<string name="SCIMPError_BUFFER_TOO_SMALL">Buffer troppo piccolo</string>
+	<string name="SCIMPError_USER_ABORT">Utente interrotto</string>
+	<string name="SCIMPError_UNKNOWN_REQUEST">Richiesta sconosciuta</string>
+	<string name="SCIMPError_LAZY_PROGRAMMER">Programmatore pigro</string>
+	<string name="SCIMPError_ASSERT_FAILED">Asserzione non riuscita</string>
+	<string name="SCIMPError_FEATURE_UNAVAILABLE">Funzione non disponibile</string>
+	<string name="SCIMPError_RESOURCE_UNAVAILABLE">Risorsa non disponibile</string>
+	<string name="SCIMPError_NOT_CONNECTED">Si è tentato di inviare un messaggio prima di stabilire un contesto sicuro.</string>
+	<string name="SCIMPError_IMPROPER_INITIALIZATION">Inizializzazione impropria</string>
+	<string name="SCIMPError_CORRUPT_DATA">Il contesto sicuro è stato danneggiato e ora è in ripristino.</string>
+	<string name="SCIMPError_SELF_TEST_FAILED">Verifica automatica non riuscita</string>
+	<string name="SCIMPError_BAD_INTEGRITY">Il controllo dell\'integrità di un protocollo non è riuscito.</string>
+	<string name="SCIMPError_BAD_HASH_NUMBER">Hash non valido</string>
+	<string name="SCIMPError_BAD_CIPHER_NUMBER">È stato ricevuto un pacchetto di protocollo che specifica un pacchetto di crittografia non supportato.</string>
+	<string name="SCIMPError_BAD_RANDOM_NUMBER">È stato ricevuto un pacchetto di protocollo che specifica un generatore di numeri pseudo-casuali.</string>
+	<string name="SCIMPError_SECRETS_MISMATCH">Continuità della chiave smarrita con il contesto sicuro stabilito in precedente.</string>
+	<string name="SCIMPError_KEY_NOT_FOUND">È stato ricevuto un messaggio indecifrabile. Si richiede la ritrasmissione.</string>
+	<string name="SCIMPError_PROTOCOL_ERROR">È stato ricevuto un pacchetto di protocollo errato.</string>
+	<string name="SCIMPError_PROTOCOL_CONTENTION">È stato ricevuto un pacchetto di protocollo inaspettato.</string>
+	<string name="SCIMPError_KEY_LOCKED">Bloccato con chiave</string>
+	<string name="SCIMPError_END_OF_ITERATION">Fine dell\'iterazione</string>
+
+</resources>

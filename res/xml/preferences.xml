@@ -1,29 +1,88 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-	<PreferenceCategory android:key="xmpp" android:title="Jabber / XMPP">
-		<EditTextPreference android:key="xmpp_host" android:title="Hostname" android:defaultValue="@string/build_environment"/>
-		<EditTextPreference android:key="xmpp_port" android:title="Port" android:defaultValue="5223"/>
-		<EditTextPreference android:key="xmpp_service_name" android:title="Service Name" android:defaultValue="@string/build_environment"/>
-		<CheckBoxPreference android:key="xmpp_perform_srv_lookup" android:title="SRV Lookup" android:defaultValue="true"/>
+	<PreferenceCategory android:key="accounts" android:title="@string/accounts"/>
+	<PreferenceCategory android:key="passcode" android:title="@string/encryption">
+		<Preference android:key="autolock" android:title="@string/autolock"/>
+		<Preference android:key="set_passcode" android:title="@string/set_passcode" android:summary="@string/set_passcode_description"/>
+		<Preference android:key="change_passcode" android:title="@string/change_passcode"/>
+		<Preference android:key="remove_passcode" android:title="@string/remove_passcode" android:summary="@string/remove_passcode_description"/>
 	</PreferenceCategory>
-	<PreferenceCategory android:key="api" android:title="Silent Circle API">
-		<EditTextPreference android:key="api_host" android:title="Hostname" android:defaultValue="@string/build_environment"/>
-		<EditTextPreference android:key="api_port" android:title="Port" android:defaultValue="443"/>
-		<CheckBoxPreference android:key="api_perform_srv_lookup" android:title="SRV Lookup" android:defaultValue="true"/>
+	<PreferenceCategory android:key="notifications" android:title="@string/notifications">
+		<com.silentcircle.silenttext.preference.SilentRingtonePreference android:key="notification_ringtone" android:title="@string/ringtone" android:ringtoneType="notification" android:showDefault="true" android:showSilent="true" android:persistent="false"/>
+		<com.silentcircle.silenttext.preference.SwitchPreference android:key="notification_vibrate" android:title="@string/enable_notification_vibrate" android:defaultValue="true" android:persistent="false"/>
+		<com.silentcircle.silenttext.preference.SwitchPreference android:key="should_send_read_receipts" android:title="@string/send_receipts" android:defaultValue="false" android:persistent="false"/>
 	</PreferenceCategory>
-	<PreferenceCategory android:key="gcm" android:title="Google Cloud Messaging">
-		<EditTextPreference android:key="gcm_sender_id" android:title="Sender ID" android:defaultValue="@string/build_gcm_sender"/>
+	<PreferenceCategory android:key="about" android:title="@string/about">
+		<Preference android:key="privacy_statement" android:title="@string/privacy_statement" android:icon="@drawable/ic_action_page"/>
+		<Preference android:key="terms_and_conditions" android:title="@string/terms_and_conditions" android:icon="@drawable/ic_action_page"/>
+		<Preference android:key="license_information" android:title="@string/license_information" android:icon="@drawable/ic_action_page"/>
+		<Preference android:key="send_feedback" android:title="@string/send_feedback" android:icon="@drawable/ic_action_share"/>
+		<PreferenceScreen android:key="debug_information" android:title="@string/debug_information" android:icon="@drawable/ic_action_bug"/>
 	</PreferenceCategory>
-	<PreferenceCategory android:key="scloud" android:title="SCloud">
-		<EditTextPreference android:key="scloud_url" android:title="S3 Bucket URL" android:defaultValue="@string/build_scloud_url"/>
-	</PreferenceCategory>
-	<PreferenceCategory android:key="scimp" android:title="SCimp">
-		<CheckBoxPreference android:key="scimp_enable_pki" android:title="Public Key Infrastructure (PKI)" android:summaryOn="Messages will be sent immediately using PKI, if available." android:summaryOff="Messages will be delayed until verifiable end-to-end encryption is established." android:defaultValue="false"/>
-	</PreferenceCategory>
-	<PreferenceCategory android:key="security" android:title="Security">
-		<CheckBoxPreference android:key="should_validate_certificates" android:title="Extended SSL Validation" android:summaryOn="SSL certificates will be validated against the embedded trust store." android:summaryOff="SSL certificates not in the embedded trust store may be allowed." android:defaultValue="true"/>
-	</PreferenceCategory>
-	<PreferenceCategory android:key="logging" android:title="Logging">
-		<CheckBoxPreference android:key="enable_logging" android:title="Enable deep logging" android:summary="WARNING! This option logs sensitive data, including account credentials and message plaintext. Enable at your own risk." android:defaultValue="false"/>
-	</PreferenceCategory>
+	<PreferenceScreen android:key="developer_options" android:title="@string/developer_options" android:summary="Heed this warning, traveler. There be dragons beyond this point, so proceed with caution.">
+	    <PreferenceCategory android:key="environment" android:title="Environment">
+			<EditTextPreference android:key="environment_domain" android:title="Profile" android:defaultValue="@string/build_environment" android:summary="@string/build_environment"/>
+			<PreferenceScreen android:key="xmpp" android:title="Jabber / XMPP" android:summary="Adjust settings related to XMPP connectivity.">
+				<com.silentcircle.silenttext.preference.SwitchPreference android:key="xmpp_override" android:title="Override" android:defaultValue="false" android:summaryOn="Overriding the conventional environment configuration with the following options." android:summaryOff="Using the conventional environment configuration."/>
+				<EditTextPreference android:key="xmpp_service_name" android:title="Domain" android:defaultValue="@string/build_environment"/>
+				<com.silentcircle.silenttext.preference.SwitchPreference android:key="xmpp_perform_srv_lookup" android:title="SRV Lookup" android:defaultValue="true" android:disableDependentsState="true" android:summaryOn="Auto-detect the XMPP service endpoint." android:summaryOff="Manually configure the XMPP service endpoint to the specified hostname and port."/>
+				<EditTextPreference android:key="xmpp_host" android:title="Hostname" android:defaultValue="@string/build_environment" android:dependency="xmpp_perform_srv_lookup"/>
+				<EditTextPreference android:key="xmpp_port" android:title="Port" android:defaultValue="5223" android:dependency="xmpp_perform_srv_lookup"/>
+				<com.silentcircle.silenttext.preference.SwitchPreference android:key="xmpp_require_strong_ciphers" android:title="Strict mode" android:defaultValue="false" android:summaryOn="Require a TLS v1.2 connection with a strong cipher suite. May not work on all devices." android:summaryOff="Use the device's preferred secure protocols and cipher suites. Recommended for maximum compatibility."/>
+				<com.silentcircle.silenttext.preference.SwitchPreference android:key="xmpp_background" android:title="Run in background" android:defaultValue="false" android:summaryOn="Allow the XMPP service to run in the background." android:summaryOff="Disconnect from the XMPP server when the application is not in use."/>
+			</PreferenceScreen>
+			<PreferenceScreen android:key="api" android:title="Web Services API" android:summary="Adjust settings related to the Silent Circle web services API.">
+				<com.silentcircle.silenttext.preference.SwitchPreference android:key="api_override" android:title="Override" android:defaultValue="false" android:summaryOn="Overriding the conventional environment configuration with the following options." android:summaryOff="Using the conventional environment configuration."/>
+				<EditTextPreference android:key="api_service_name" android:title="Domain" android:defaultValue="@string/build_environment"/>
+				<com.silentcircle.silenttext.preference.SwitchPreference android:key="api_perform_srv_lookup" android:title="SRV Lookup" android:defaultValue="true" android:disableDependentsState="true" android:summaryOn="Auto-detect the API service endpoint." android:summaryOff="Manually configure the API service endpoint to the specified hostname and port."/>
+				<EditTextPreference android:key="api_host" android:title="Hostname" android:defaultValue="@string/build_environment" android:dependency="api_perform_srv_lookup"/>
+				<EditTextPreference android:key="api_port" android:title="Port" android:defaultValue="443" android:dependency="api_perform_srv_lookup"/>
+				<com.silentcircle.silenttext.preference.SwitchPreference android:key="api_require_strong_ciphers" android:title="Strict mode" android:defaultValue="false" android:summaryOn="Require a TLS v1.2 connection with a strong cipher suite. May not work on all devices." android:summaryOff="Use the device's preferred secure protocols and cipher suites. Recommended for maximum compatibility."/>
+			</PreferenceScreen>
+		</PreferenceCategory>
+		<PreferenceCategory android:key="dns" android:title="DNS">
+			<com.silentcircle.silenttext.preference.SwitchPreference android:key="enable_custom_dns" android:title="Override" android:summaryOn="Using the following DNS server instead of the system default." android:summaryOff="Using the system default DNS server." android:defaultValue="false" android:disableDependentsState="false"/>
+			<EditTextPreference android:key="custom_dns" android:title="DNS Server" android:defaultValue="8.8.8.8" android:dependency="enable_custom_dns"/>
+		</PreferenceCategory>
+		<PreferenceCategory android:key="gcm" android:title="Google Cloud Messaging">
+			<EditTextPreference android:key="gcm_sender_id" android:title="Sender ID" android:defaultValue="@string/build_gcm_sender"/>
+			<EditTextPreference android:key="gcm_target" android:title="Target" android:defaultValue="@string/build_gcm_target"/>
+		</PreferenceCategory>
+		<PreferenceCategory android:key="scloud" android:title="SCloud">
+			<EditTextPreference android:key="scloud_url" android:title="S3 Bucket URL" android:defaultValue="@string/build_scloud_url"/>
+		</PreferenceCategory>
+		<PreferenceCategory android:key="scimp" android:title="SCimp">
+			<com.silentcircle.silenttext.preference.SwitchPreference android:key="scimp_enable_pki" android:title="Public Key Infrastructure (PKI)" android:summaryOn="Messages will be sent immediately using PKI, if available." android:summaryOff="Messages will be delayed until verifiable end-to-end encryption is established." android:defaultValue="true"/>
+		</PreferenceCategory>
+		<PreferenceCategory android:key="security" android:title="Security">
+			<com.silentcircle.silenttext.preference.SwitchPreference android:key="should_validate_certificates" android:title="Extended SSL Validation" android:summaryOn="SSL certificates will be validated against the embedded trust store." android:summaryOff="SSL certificates not in the embedded trust store may be allowed." android:defaultValue="true"/>
+		</PreferenceCategory>
+		<PreferenceCategory android:key="features" android:title="Experimental Features">
+			<com.silentcircle.silenttext.preference.SwitchPreference android:key="ui_generate_default_avatars" android:title="Use generated avatars" android:summaryOn="A default contact photo will be generated if one does not already exist." android:summaryOff="A generic silhouette will be used as the default contact photo." android:defaultValue="true"/>
+			<com.silentcircle.silenttext.preference.SwitchPreference android:key="check_user_availability" android:title="Check user availability" android:summaryOn="Restrict conversations to users validated by the Silent Circle API." android:summaryOff="Allow conversations to be initiated with anyone." android:defaultValue="true"/>
+			<com.silentcircle.silenttext.preference.SwitchPreference android:key="system_contacts_writable" android:title="Contacts Integration" android:summaryOn="Full read/write integration with system contacts is enabled." android:summaryOff="Read-only integration with system contacts." android:defaultValue="false"/>
+		</PreferenceCategory>
+		<PreferenceCategory android:key="logging" android:title="Logging">
+			<com.silentcircle.silenttext.preference.SwitchPreference android:key="enable_logging" android:title="Enable deep logging" android:summary="WARNING! This option logs sensitive data, including account credentials and message plaintext. Enable at your own risk." android:defaultValue="false"/>
+		</PreferenceCategory>
+		<PreferenceScreen android:key="tests" android:title="Tests" android:summary="Trigger certain tests to verify that Silent Text behaves correctly on this device.">
+			<Preference android:key="test_pki_keygen" android:title="PKI Keypair Generation" android:summary="Test the generation of a new key pair for PKI."/>
+			<Preference android:key="test_scimp_KeySerializer" android:title="SCimp Test: Key Serializer" android:summary="Test the JNI implementation of the SCimp protocol."/>
+			<Preference android:key="test_scimp_DHCommunication" android:title="SCimp Test: DH" android:summary="Test the JNI implementation of the SCimp protocol."/>
+			<Preference android:key="test_scimp_DHSimultaneousCommunication" android:title="SCimp Test: DH Simultaneous" android:summary="Test the JNI implementation of the SCimp protocol."/>
+			<Preference android:key="test_scimp_OfflinePKCommunication" android:title="SCimp Test: PK Offline" android:summary="Test the JNI implementation of the SCimp protocol."/>
+			<Preference android:key="test_scimp_PKCommunication" android:title="SCimp Test: PK" android:summary="Test the JNI implementation of the SCimp protocol."/>
+			<Preference android:key="test_scimp_PKContention" android:title="SCimp Test: PK Contention" android:summary="Test the JNI implementation of the SCimp protocol."/>
+			<Preference android:key="test_scimp_PKExpiration" android:title="SCimp Test: PK Expiration" android:summary="Test the JNI implementation of the SCimp protocol."/>
+			<Preference android:key="test_scimp_PKSaveRestore" android:title="SCimp Test: PK Save/Restore" android:summary="Test the JNI implementation of the SCimp protocol."/>
+			<Preference android:key="test_scimp_SimultaneousPKCommunication" android:title="SCimp Test: PK Simultaneous" android:summary="Test the JNI implementation of the SCimp protocol."/>
+		</PreferenceScreen>
+		<PreferenceScreen android:key="data" android:title="Data Management" android:summary="For advanced troubleshooting only!">
+			<Preference android:key="clear_key_pairs" android:title="Clear PKI key-pairs" android:summary="Immediately revoke all key-pairs used for PKI."/>
+			<Preference android:key="clear_packet_queue" android:title="Clear packet queue" android:summary="Immediately expire all outgoing messages from the XMPP packet queue."/>
+			<Preference android:key="clear_object_cache" android:title="Clear SCloud cache" android:summary="Immediately expire all cached SCloud object segments. Attachments will be redownloaded on demand."/>
+			<Preference android:key="clear_user_cache" android:title="Clear user cache" android:summary="Immediately expire all cached user directory information."/>
+			<Preference android:key="clear_network_cache" android:title="Clear network cache" android:summary="Immediately expire all cached SRV lookups."/>
+		</PreferenceScreen>
+	</PreferenceScreen>
 </PreferenceScreen>

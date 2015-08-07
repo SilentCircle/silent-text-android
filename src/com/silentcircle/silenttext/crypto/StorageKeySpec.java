@@ -1,19 +1,18 @@
 /*
-Copyright © 2013, Silent Circle, LLC.
-All rights reserved.
+Copyright (C) 2013-2015, Silent Circle, LLC. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
-    * Any redistribution, use, or modification is done solely for personal 
+    * Any redistribution, use, or modification is done solely for personal
       benefit and not for any commercial purpose or for monetary gain
     * Redistributions of source code must retain the above copyright
       notice, this list of conditions and the following disclaimer.
     * Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-    * Neither the name Silent Circle nor the names of its contributors may 
-      be used to endorse or promote products derived from this software 
-      without specific prior written permission.
+    * Neither the name Silent Circle nor the
+      names of its contributors may be used to endorse or promote products
+      derived from this software without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -36,22 +35,18 @@ import java.io.OutputStream;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 
-import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
-import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
-import com.silentcircle.silenttext.log.Log;
+import com.silentcircle.silentstorage.util.IOUtils;
 
 /**
  * Specifies a password-protected cryptographic storage key.
  */
 public class StorageKeySpec {
 
-	public static final int VERSION = 1;
-	private final Log log = new Log( getClass().getSimpleName() );
+	public static final int VERSION = 2;
 
-	public String cipherAlgorithm;
 	public String keyAlgorithm;
 	public EphemeralKeySpec ephemeralKey;
 	public byte [] encryptedKey;
@@ -64,16 +59,13 @@ public class StorageKeySpec {
 	 *            The passcode which unlocks the given encrypted key.
 	 * @param keyAlgorithm
 	 *            The storage key's algorithm.
-	 * @param cipherAlgorithm
-	 *            The storage key's cipher algorithm.
 	 * @param encryptedKey
 	 *            The raw bytes of a storage key previously encrypted with the given parameters.
 	 * @param ephemeralKey
 	 *            The ephemeral key to use for decrypting and encrypting the storage key.
 	 */
-	public StorageKeySpec( char [] passcode, String keyAlgorithm, String cipherAlgorithm, byte [] encryptedKey, EphemeralKeySpec ephemeralKey ) {
+	public StorageKeySpec( char [] passcode, String keyAlgorithm, byte [] encryptedKey, EphemeralKeySpec ephemeralKey ) {
 		this.keyAlgorithm = keyAlgorithm;
-		this.cipherAlgorithm = cipherAlgorithm;
 		this.ephemeralKey = ephemeralKey;
 		this.encryptedKey = encryptedKey;
 		unlock( passcode );
@@ -87,17 +79,14 @@ public class StorageKeySpec {
 	 *            The passcode that will be used to unlock this storage key.
 	 * @param keyAlgorithm
 	 *            The storage key's algorithm.
-	 * @param cipherAlgorithm
-	 *            The storage key's cipher algorithm.
 	 * @param ephemeralKey
 	 *            The ephemeral key to use for encrypting and decrypting the storage key.
 	 * @throws NoSuchAlgorithmException
 	 *             if the key algorithm is unknown.
 	 */
-	public StorageKeySpec( char [] passcode, String keyAlgorithm, String cipherAlgorithm, EphemeralKeySpec ephemeralKey ) throws NoSuchAlgorithmException {
+	public StorageKeySpec( char [] passcode, String keyAlgorithm, EphemeralKeySpec ephemeralKey ) throws NoSuchAlgorithmException {
 		this.ephemeralKey = ephemeralKey;
 		this.keyAlgorithm = keyAlgorithm;
-		this.cipherAlgorithm = cipherAlgorithm;
 		key = KeyGenerator.getInstance( keyAlgorithm ).generateKey();
 		cycle( passcode );
 	}
@@ -146,14 +135,6 @@ public class StorageKeySpec {
 		encryptedKey = ephemeralKey.encrypt( key.getEncoded(), passcode );
 	}
 
-	public byte [] decrypt( byte [] iv, byte [] data ) {
-		return transform( Cipher.DECRYPT_MODE, iv, data );
-	}
-
-	public byte [] encrypt( byte [] iv, byte [] data ) {
-		return transform( Cipher.ENCRYPT_MODE, iv, data );
-	}
-
 	/**
 	 * Deserializes a storage key from the given input stream.
 	 * 
@@ -175,15 +156,26 @@ public class StorageKeySpec {
 
 		switch( version ) {
 
-			case 1:
+			case 2:
 
 				keyAlgorithm = meta.readUTF();
-				cipherAlgorithm = meta.readUTF();
 
 				ephemeralKey = new EphemeralKeySpec( in );
 
 				encryptedKey = new byte [meta.readInt()];
-				in.read( encryptedKey );
+				IOUtils.fill( in, encryptedKey );
+
+				break;
+
+			case 1:
+
+				keyAlgorithm = meta.readUTF();
+				meta.readUTF();
+
+				ephemeralKey = new EphemeralKeySpec( in );
+
+				encryptedKey = new byte [meta.readInt()];
+				IOUtils.fill( in, encryptedKey );
 
 				break;
 
@@ -191,22 +183,13 @@ public class StorageKeySpec {
 
 	}
 
-	private byte [] transform( int cipherMode, byte [] iv, byte [] data ) {
-		try {
-			Cipher cipher = Cipher.getInstance( cipherAlgorithm );
-			cipher.init( cipherMode, key, new IvParameterSpec( iv ) );
-			return cipher.doFinal( data );
-		} catch( Exception exception ) {
-			log.error( exception, "#transform mode:%d", Integer.valueOf( cipherMode ) );
-			return null;
-		}
-	}
-
 	/**
 	 * Unlocks the encrypted key using the given passcode, then cycles the encryption parameters.
 	 * 
 	 * @param passcode
 	 *            The code used to unlock the key.
+	 * @throws IllegalArgumentException
+	 *             if the given passcode is invalid for this storage key.
 	 */
 	public void unlock( char [] passcode ) {
 		if( encryptedKey == null || passcode == null ) {
@@ -239,7 +222,6 @@ public class StorageKeySpec {
 		meta.writeInt( VERSION );
 
 		meta.writeUTF( keyAlgorithm );
-		meta.writeUTF( cipherAlgorithm );
 
 		ephemeralKey.write( out );
 

@@ -1,19 +1,18 @@
 /*
-Copyright © 2013, Silent Circle, LLC.
-All rights reserved.
+Copyright (C) 2013-2015, Silent Circle, LLC. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
-    * Any redistribution, use, or modification is done solely for personal 
+    * Any redistribution, use, or modification is done solely for personal
       benefit and not for any commercial purpose or for monetary gain
     * Redistributions of source code must retain the above copyright
       notice, this list of conditions and the following disclaimer.
     * Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-    * Neither the name Silent Circle nor the names of its contributors may 
-      be used to endorse or promote products derived from this software 
-      without specific prior written permission.
+    * Neither the name Silent Circle nor the
+      names of its contributors may be used to endorse or promote products
+      derived from this software without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -28,7 +27,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package com.silentcircle.silenttext.application;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.CharArrayWriter;
 import java.io.DataInputStream;
@@ -40,76 +38,124 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.CharBuffer;
-import java.security.Key;
 import java.security.KeyStore;
-import java.security.NoSuchAlgorithmException;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.UUID;
+
+import javax.crypto.spec.SecretKeySpec;
+import javax.net.SocketFactory;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.twuni.twoson.IllegalFormatException;
+import org.twuni.twoson.JSONParser;
 
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
-import android.location.Location;
+import android.content.res.Resources;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.SystemClock;
+import android.os.AsyncTask;
+import android.os.Build;
+import android.text.TextUtils;
 
 import com.silentcircle.api.AuthenticatedSession;
+import com.silentcircle.api.Authenticator;
 import com.silentcircle.api.Session;
+import com.silentcircle.api.UserManager;
+import com.silentcircle.api.model.Entitlement;
+import com.silentcircle.api.model.Key;
 import com.silentcircle.api.model.User;
-import com.silentcircle.keymngrsupport.KeyManagerSupport;
-import com.silentcircle.keymngrsupport.KeyManagerSupport.KeyManagerListener;
+import com.silentcircle.api.web.AuthenticatedSessionClient;
+import com.silentcircle.api.web.AuthenticatorClient;
+import com.silentcircle.api.web.HasSession;
+import com.silentcircle.api.web.UserManagerClient;
+import com.silentcircle.api.web.model.BasicKey;
+import com.silentcircle.api.web.model.BasicUser;
+import com.silentcircle.api.web.model.json.JSONObjectParser;
+import com.silentcircle.api.web.model.json.JSONObjectWriter;
+import com.silentcircle.http.client.AbstractHTTPClient;
+import com.silentcircle.http.client.CachingHTTPClient;
+import com.silentcircle.http.client.HTTPResponseCache;
+import com.silentcircle.http.client.TrustStoreCertificateVerifier;
+import com.silentcircle.http.client.apache.ApacheHTTPClient;
+import com.silentcircle.http.client.apache.HttpClient;
+import com.silentcircle.http.client.apache.SSLSocketFactory;
+import com.silentcircle.http.client.dns.AndroidNameserverProvider;
+import com.silentcircle.http.client.exception.NetworkException;
+import com.silentcircle.http.client.exception.http.HTTPException;
+import com.silentcircle.http.client.exception.http.client.HTTPClientForbiddenException;
+import com.silentcircle.http.client.exception.http.client.HTTPClientUnauthorizedException;
+import com.silentcircle.http.client.exception.http.client.HTTPClientUnknownResourceException;
 import com.silentcircle.scimp.KeyGenerator;
 import com.silentcircle.scimp.NamedKeyPair;
 import com.silentcircle.scimp.NamedKeyPairRepositoryHelper;
 import com.silentcircle.scimp.NativeKeyGenerator;
 import com.silentcircle.silentstorage.UnixSecureRandom;
+import com.silentcircle.silentstorage.io.AESWithCBCAndPKCS7PaddingCipherFactory;
+import com.silentcircle.silentstorage.io.BufferedBlockCipherFactory;
+import com.silentcircle.silentstorage.io.HMacSHA256Factory;
+import com.silentcircle.silentstorage.io.MacFactory;
+import com.silentcircle.silentstorage.io.Serializer;
+import com.silentcircle.silentstorage.repository.Repository;
+import com.silentcircle.silentstorage.repository.file.FileRepository;
+import com.silentcircle.silentstorage.repository.file.RepositoryLockedException;
 import com.silentcircle.silentstorage.repository.file.SecureFileRepository;
+import com.silentcircle.silentstorage.repository.helper.RepositoryHelper;
+import com.silentcircle.silentstorage.repository.lazy.LazyList;
 import com.silentcircle.silenttext.Action;
 import com.silentcircle.silenttext.Extra;
 import com.silentcircle.silenttext.Manifest;
-import com.silentcircle.silenttext.NativeBridge;
 import com.silentcircle.silenttext.R;
+import com.silentcircle.silenttext.SCimpBridge;
 import com.silentcircle.silenttext.ServiceConfiguration;
 import com.silentcircle.silenttext.activity.UnlockActivity;
-import com.silentcircle.silenttext.client.AccountCreationClient;
-import com.silentcircle.silenttext.client.AuthenticatedClientSession;
-import com.silentcircle.silenttext.client.JabberClient;
-import com.silentcircle.silenttext.client.JabberClient.OnDisconnectedListener;
+import com.silentcircle.silenttext.client.LegacyAccountCreationClient;
 import com.silentcircle.silenttext.client.SCloudBroker;
-import com.silentcircle.silenttext.client.SimpleHTTPClient;
-import com.silentcircle.silenttext.client.model.SensitiveKey;
-import com.silentcircle.silenttext.client.model.SensitiveUser;
+import com.silentcircle.silenttext.client.XMPPSocketFactory;
+import com.silentcircle.silenttext.client.XMPPTransport;
+import com.silentcircle.silenttext.client.dns.CachingSRVResolver;
+import com.silentcircle.silenttext.client.model.DownloadManagerEntry;
 import com.silentcircle.silenttext.client.model.ServiceEndpoint;
-import com.silentcircle.silenttext.client.model.json.JSONSensitiveKeySerializer;
+import com.silentcircle.silenttext.client.model.UUIDEntry;
+import com.silentcircle.silenttext.client.model.repository.helper.DownloadManagerHelper;
 import com.silentcircle.silenttext.client.model.repository.helper.ServiceEndpointHelper;
-import com.silentcircle.silenttext.client.model.repository.helper.UserHelper;
+import com.silentcircle.silenttext.client.model.repository.helper.UUIDHelper;
 import com.silentcircle.silenttext.crypto.CryptoUtils;
-import com.silentcircle.silenttext.crypto.EphemeralKeySpec;
+import com.silentcircle.silenttext.crypto.EncryptedStorage;
 import com.silentcircle.silenttext.crypto.Hash;
 import com.silentcircle.silenttext.crypto.StorageKeySpec;
-import com.silentcircle.silenttext.listener.SilentLocationListener;
+import com.silentcircle.silenttext.fragment.ChatsFragment;
 import com.silentcircle.silenttext.listener.TransportListener;
 import com.silentcircle.silenttext.log.Log;
+import com.silentcircle.silenttext.migration.Base64SHA1PasscodeMigration;
+import com.silentcircle.silenttext.migration.MigrationRegistry;
+import com.silentcircle.silenttext.migration.OneShotPBKDF2Migration;
+import com.silentcircle.silenttext.model.Attachment;
 import com.silentcircle.silenttext.model.Contact;
 import com.silentcircle.silenttext.model.Conversation;
 import com.silentcircle.silenttext.model.Credential;
 import com.silentcircle.silenttext.model.MessageState;
+import com.silentcircle.silenttext.model.MigrationTask;
 import com.silentcircle.silenttext.model.Server;
+import com.silentcircle.silenttext.model.Siren;
+import com.silentcircle.silenttext.model.UserPreferences;
 import com.silentcircle.silenttext.model.event.ErrorEvent;
 import com.silentcircle.silenttext.model.event.Event;
+import com.silentcircle.silenttext.model.event.IncomingMessage;
 import com.silentcircle.silenttext.model.event.Message;
 import com.silentcircle.silenttext.model.event.OutgoingMessage;
-import com.silentcircle.silenttext.model.event.ResourceChangeEvent;
+import com.silentcircle.silenttext.model.io.json.JSONSirenSerializer;
+import com.silentcircle.silenttext.model.repository.helper.AttachmentHelper;
 import com.silentcircle.silenttext.receiver.LockApplicationOnReceive;
 import com.silentcircle.silenttext.receiver.NotificationBroadcaster;
 import com.silentcircle.silenttext.repository.ContactRepository;
@@ -117,61 +163,202 @@ import com.silentcircle.silenttext.repository.ConversationRepository;
 import com.silentcircle.silenttext.repository.CredentialRepository;
 import com.silentcircle.silenttext.repository.EventRepository;
 import com.silentcircle.silenttext.repository.ServerRepository;
+import com.silentcircle.silenttext.repository.file.FileTransportQueue;
 import com.silentcircle.silenttext.repository.file.encrypted.EncryptedFileConversationRepository;
 import com.silentcircle.silenttext.repository.file.encrypted.EncryptedFileCredentialRepository;
 import com.silentcircle.silenttext.repository.file.encrypted.EncryptedFileServerRepository;
-import com.silentcircle.silenttext.repository.file.encrypted.EncryptedFileTransportQueue;
-import com.silentcircle.silenttext.repository.resolver.AndroidContactRepository;
-import com.silentcircle.silenttext.repository.resolver.SilentContactRepository;
+import com.silentcircle.silenttext.repository.remote.RemoteContactRepository;
+import com.silentcircle.silenttext.repository.resolver.SilentContactRepositoryV1;
+import com.silentcircle.silenttext.repository.resolver.SilentContactRepositoryV2;
+import com.silentcircle.silenttext.repository.resolver.SystemContactRepository;
 import com.silentcircle.silenttext.service.GCMService;
-import com.silentcircle.silenttext.thread.NewJabberClient;
+import com.silentcircle.silenttext.service.SysNetObserverService;
+import com.silentcircle.silenttext.task.GetDeviceChangedTask;
+import com.silentcircle.silenttext.task.RevokeKeyPairTask;
+import com.silentcircle.silenttext.thread.Deactivation;
+import com.silentcircle.silenttext.thread.NamedThread;
+import com.silentcircle.silenttext.thread.NamedThread.HasThreadName;
+import com.silentcircle.silenttext.thread.NewXMPPTransport;
 import com.silentcircle.silenttext.thread.RemoveKeyPair;
-import com.silentcircle.silenttext.thread.SessionValidator;
-import com.silentcircle.silenttext.thread.UploadPublicKey;
+import com.silentcircle.silenttext.thread.SynchronizePublicKeysWithServer;
+import com.silentcircle.silenttext.transport.Envelope;
 import com.silentcircle.silenttext.transport.TransportQueue;
+import com.silentcircle.silenttext.util.AsyncUtils;
+import com.silentcircle.silenttext.util.Constants;
+import com.silentcircle.silenttext.util.ExternalKeyManager;
+import com.silentcircle.silenttext.util.ExternalKeyManagerFactory;
+import com.silentcircle.silenttext.util.ExternalKeyManagerV1;
+import com.silentcircle.silenttext.util.ExternalKeyManagerV2;
 import com.silentcircle.silenttext.util.IOUtils;
+import com.silentcircle.silenttext.util.Locker;
 import com.silentcircle.silenttext.util.StringUtils;
 import com.silentcircle.silenttext.view.OptionsDrawer;
 
-public class SilentTextApplication extends Application {
+public class SilentTextApplication extends Application implements HasSession {
 
-	private static final String CIPHER_ALGORITHM = "AES/CBC/PKCS5Padding";
-	private static final String KEY_ALGORITHM = "AES";
-	private static final String APPLICATION_KEY_ALIAS = "___DEFAULT___";
-	private static final String TRUST_STORE_FILE = "silentcircle.bks.keystore";
+	public static class CharSequenceHelper extends com.silentcircle.silentstorage.repository.helper.RepositoryHelper<CharSequence> {
+
+		public CharSequenceHelper() {
+			super( new CharSequenceSerializer() );
+		}
+
+		@Override
+		public char [] identify( CharSequence arg0 ) {
+			return arg0.toString().toCharArray();
+		}
+	}
+
+	public static class CharSequenceSerializer extends com.silentcircle.silentstorage.io.Serializer<CharSequence> {
+
+		@Override
+		public CharSequence read( DataInputStream in ) throws IOException {
+			return read( in, new String() );
+		}
+
+		@Override
+		public CharSequence read( DataInputStream in, CharSequence out ) throws IOException {
+			char [] seq = readChars( in );
+			return new String( seq );
+		}
+
+		@Override
+		public CharSequence write( CharSequence in, DataOutputStream out ) throws IOException {
+			writeChars( in.toString().toCharArray(), out );
+			return in;
+		}
+	}
+
+	public static class SilentTextApplicationLocker implements Locker, Runnable, HasThreadName {
+
+		private final SilentTextApplication application;
+		private final Log log = new Log( getThreadName() );
+
+		private char [] hashedPassPhrase;
+
+		public SilentTextApplicationLocker( SilentTextApplication application ) {
+			this.application = application;
+		}
+
+		@Override
+		public String getThreadName() {
+			return "ExternalUnlockRequest";
+		}
+
+		@Override
+		public void lock() {
+			application.lock();
+		}
+
+		@Override
+		public void run() {
+			try {
+				application.unlockWithHashedPassPhrase( hashedPassPhrase );
+			} catch( Throwable exception ) {
+				log.warn( exception, "#run" );
+			} finally {
+				CryptoUtils.randomize( hashedPassPhrase );
+				hashedPassPhrase = null;
+			}
+		}
+
+		@Override
+		public void unlock( char [] hashedPassPhrase ) {
+			this.hashedPassPhrase = hashedPassPhrase;
+			new NamedThread( this ).start();
+		}
+
+	}
+
+	private static final String TRUST_STORE_FILE = "silentcircle.bks.pubcerts";
+
 	private static final String TRUST_STORE_PASSWORD = "silence";
-	private static final long XMPP_PING_INTERVAL = 60000;
-	private static final String ACCOUNT_CREATION_CLIENT_BASE_URL = "https://sccps.silentcircle.com";
 
-	private static final long DELAY_RESPOND_TO_NETWORK_STATE_CHANGE = 5000;
+	private SecureFileRepository<DownloadManagerEntry> downloadManagerRepository;
+
+	private SecureFileRepository<UUIDEntry> UUIDRepository;
+
+	private static final NamedKeyPair [] EMPTY_ARRAY_NAMED_KEY_PAIR = new NamedKeyPair [0];
+
+	private static final String UTF16 = "UTF-16";
+
+	private static final String KEY_ALGORITHM = "AES";
+
+	private static final String APPLICATION_PREFERENCES_KEY = "(default)";
+
+	private static final long DELAY_RESPOND_TO_NETWORK_STATE_CHANGE = 2500;
+
+	private static final MigrationRegistry MIGRATIONS = new MigrationRegistry();
+
+	private static final JSONSirenSerializer SIREN = new JSONSirenSerializer();
+
+	public static final String ACCOUNT_CREATION_CLIENT_BASE_URL = "https://sccps.silentcircle.com";
+
+	private static final String HARDCODED_VOICEMAIL_ID = "scvoicemail@silentcircle.com";
+
+	static {
+		MIGRATIONS.register( new Base64SHA1PasscodeMigration() );
+		MIGRATIONS.register( new OneShotPBKDF2Migration() );
+	}
+
+	private static final AttachmentHelper ATTACHMENT_HELPER = new AttachmentHelper();
 
 	protected static com.silentcircle.api.model.Key extractPublicKey( NamedKeyPair keyPair ) {
 		if( keyPair == null || keyPair.getPublicKey() == null || keyPair.getPublicKey().length <= 0 ) {
 			return null;
 		}
-		try {
-			ByteArrayInputStream in = new ByteArrayInputStream( keyPair.getPublicKey() );
-			DataInputStream inData = new DataInputStream( in );
-			return JSON_KEY_SERIALIZER.read( inData );
-		} catch( IOException exception ) {
-			throw new RuntimeException( exception );
-		}
+		return parsePublicKey( keyPair.getPublicKey() );
 	}
 
 	public static SilentTextApplication from( Context context ) {
 		return context == null ? null : (SilentTextApplication) context.getApplicationContext();
 	}
 
+	public static String getDisplayName( User user, ContactRepository repository ) {
+
+		if( user == null || user.getID() == null || repository == null ) {
+			return null;
+		}
+
+		String partner = user.getID().toString();
+		String displayName = repository.getDisplayName( partner );
+
+		if( !StringUtils.isMinimumLength( displayName, 1 ) ) {
+			displayName = RemoteContactRepository.getDisplayName( user );
+		}
+
+		if( StringUtils.equals( displayName, "scvoicemail" ) ) {
+			displayName = "Voice Mail";
+		}
+
+		return displayName;
+
+	}
+
 	private static String getDomain() {
-		return ServiceConfiguration.getInstance().xmpp.serviceName;
+		return ServiceConfiguration.getInstance().getXMPPServiceName();
+	}
+
+	private static String getLocator( byte [] publicKey ) {
+		if( publicKey == null || publicKey.length <= 0 ) {
+			return null;
+		}
+		return parsePublicKey( publicKey ).getLocator().toString();
+	}
+
+	private static String getLogTag() {
+		return "SilentTextApplication";
 	}
 
 	private static boolean isExpired( NamedKeyPair keyPair ) {
+		Key key = parsePublicKey( keyPair.getPublicKey() );
+		return isPublicKeyExpired( key );
+	}
+
+	public static boolean isOutgoingResendRequest( Message message ) {
 		try {
-			SensitiveKey key = parsePublicKey( keyPair.getPublicKey() );
-			return isPublicKeyExpired( key );
-		} catch( IOException exception ) {
-			return true;
+			return message instanceof OutgoingMessage && new JSONObject( message.getText() ).has( "request_resend" );
+		} catch( JSONException exception ) {
+			return false;
 		}
 	}
 
@@ -188,7 +375,7 @@ public class SilentTextApplication extends Application {
 
 	public static boolean isResendRequest( Message message ) {
 		try {
-			return message instanceof OutgoingMessage && new JSONObject( message.getText() ).has( "request_resend" );
+			return new JSONObject( message.getText() ).has( "request_resend" );
 		} catch( JSONException exception ) {
 			return false;
 		}
@@ -196,6 +383,20 @@ public class SilentTextApplication extends Application {
 
 	public static boolean isRunningInDalvikVM() {
 		return "Dalvik".equals( System.getProperty( "java.vm.name" ) );
+	}
+
+	private static Key parsePublicKey( byte [] publicKey ) {
+		return JSONObjectParser.parseKey( JSONParser.parse( publicKey ) );
+	}
+
+	private static Siren parseSiren( String text ) {
+		try {
+			return SIREN.parse( text );
+		} catch( IOException exception ) {
+			return null;
+		} catch( IllegalFormatException exception ) {
+			return null;
+		}
 	}
 
 	private static com.silentcircle.api.model.Key pick( List<com.silentcircle.api.model.Key> keys ) {
@@ -214,82 +415,52 @@ public class SilentTextApplication extends Application {
 		return best;
 	}
 
-	private final SilentLocationListener locationListener = new SilentLocationListener();
-	private final Map<String, StorageKeySpec> storageKeys = new HashMap<String, StorageKeySpec>();
 	protected boolean connected;
-	protected NativeBridge _native;
-	protected JabberClient jabber;
+
+	protected SCimpBridge scimpBridge;
+
+	protected XMPPTransport xmppTransport;
+
 	protected SCloudBroker broker;
+
 	protected ConversationRepository conversations;
+
 	protected ServerRepository servers;
 	protected CredentialRepository credentials;
 	protected ContactRepository contacts;
-	protected TransportQueue outgoingMessageQueue;
-	protected Key userKey;
-	protected Key applicationKey;
+	protected FileTransportQueue outgoingMessageQueue;
+	protected byte [] userKey;
+	protected byte [] applicationKey;
 	private Log log;
 	private long timeOfMostRecentActivity;
-	protected String onlineStatus;
+	protected String xmppTransportConnectionStatus;
 	private Thread xmppConnectionThread;
-	private final Timer timer = new Timer();
+	private final Timer timer = new Timer( "silent-text-application" );
 	private TimerTask autoLock;
 	private String license;
-	private String privacyPolicy;
-	private long keyManagerToken;
-
 	private TimerTask respondToNetworkStateChange;
-
 	protected TimerTask autoDisconnect;
-
-	private AccountCreationClient accountCreationClient;
-
-	private SecureFileRepository<SensitiveUser> users;
-
+	private SecureFileRepository<User> users;
 	private SecureFileRepository<NamedKeyPair> keyPairs;
-
 	private KeyGenerator keyGenerator;
-	private SecureFileRepository<ServiceEndpoint> networks;
+	private SecureFileRepository<ServiceEndpoint> serviceEndpointRepository;
+	private FileRepository<UserPreferences> applicationPreferencesRepository;
+	private FileRepository<MigrationTask> migrationTasks;
+	private SecureFileRepository<UserPreferences> userPreferencesRepository;
+	private ContactRepository silentContacts;
+	private ContactRepository systemContacts;
+	private boolean foreground;
+	private final HTTPResponseCache httpResponseCache = new HTTPResponseCache();
+	private ExternalKeyManagerFactory externalKeyManagerFactory;
+	private CachingSRVResolver cachingSRVResolver;
 
-	private void createNetworks() {
-		if( networks == null ) {
-			networks = new SecureFileRepository<ServiceEndpoint>( getFilesDir( "networks" ), new ServiceEndpointHelper(), CIPHER_ALGORITHM, KEY_ALGORITHM );
-		}
-		if( applicationKey == null ) {
-			networks.lock();
-		} else {
-			networks.unlock( applicationKey.getEncoded() );
-		}
-	}
+	private LegacyAccountCreationClient accountCreationClient;
 
-	protected File getFilesDir( String... names ) {
-		return new File( getFilesDir(), Hash.sha1( names ) );
-	}
+	private SecureFileRepository<CharSequence> licenseCodeRepository;
 
-	protected File getCacheDir( String... names ) {
-		return new File( getCacheDir(), Hash.sha1( names ) );
-	}
+	private List<String> deletedUsers = new ArrayList<String>();
 
-	public SecureFileRepository<ServiceEndpoint> getNetworks() {
-		createNetworks();
-		return networks;
-	}
-
-	private static final JSONSensitiveKeySerializer JSON_KEY_SERIALIZER = new JSONSensitiveKeySerializer();
-
-	private static String getLocator( byte [] publicKey ) {
-		if( publicKey == null || publicKey.length <= 0 ) {
-			return null;
-		}
-		try {
-			return parsePublicKey( publicKey ).getLocator().toString();
-		} catch( IOException exception ) {
-			throw new RuntimeException( exception );
-		}
-	}
-
-	private static SensitiveKey parsePublicKey( byte [] publicKey ) throws IOException {
-		return JSON_KEY_SERIALIZER.read( new DataInputStream( new ByteArrayInputStream( publicKey ) ) );
-	}
+	private final static String TAG = "SilentTextApplication";
 
 	public void adviseReconnect() {
 		adviseReconnect( false );
@@ -304,10 +475,8 @@ public class SilentTextApplication extends Application {
 			if( xmppConnectionThread != null && xmppConnectionThread.isAlive() ) {
 				xmppConnectionThread.interrupt();
 			}
-			server.setURL( null );
-			getServers().save( server );
 		}
-		setJabberServer( server );
+		createXMPPTransportAsync( server.getCredential() );
 	}
 
 	public void cancelAutoDisconnect() {
@@ -345,33 +514,42 @@ public class SilentTextApplication extends Application {
 
 	}
 
+	private void clearUserData( String username ) {
+		for( File file : getUserDirs( username ) ) {
+			IOUtils.delete( file );
+		}
+	}
+
+	private void createApplicationPreferencesRepository() {
+		if( applicationPreferencesRepository == null ) {
+			applicationPreferencesRepository = UserPreferences.repository( getFilesDir( "application_preferences" ) );
+		}
+	}
+
 	private void createBroker() {
-		if( broker != null ) {
-			return;
+		Session session = getSession();
+		if( session != null ) {
+			broker = new SCloudBroker( session.getAccessToken(), createHTTPClient(), getCachingSRVResolver() );
 		}
-		Server server = getServer( "broker" );
-		if( server == null ) {
-			server = new Server( "broker" );
-			Credential credential = new Credential();
-			credential.setDomain( getDomain() );
-			server.setCredential( credential );
-			getServers().save( server );
+	}
+
+	private CachingSRVResolver createCachingSRVResolver() {
+		if( cachingSRVResolver == null ) {
+			cachingSRVResolver = new CachingSRVResolver( getServiceEndpointRepository(), new AndroidNameserverProvider() );
 		}
-		if( !getDomain().equals( server.getCredential().getDomain() ) ) {
-			server.getCredential().setDomain( getDomain() );
-			getServers().save( server );
-		}
-		broker = new SCloudBroker( server.getCredential(), createHTTPClient(), getNetworks() );
+		return cachingSRVResolver;
 	}
 
 	private void createContactRepository() {
 		if( contacts != null ) {
 			return;
 		}
-		if( SilentContactRepository.supports( this ) ) {
-			contacts = new SilentContactRepository( getContentResolver() );
+		if( SilentContactRepositoryV2.supports( this ) ) {
+			contacts = new SilentContactRepositoryV2( getContentResolver() );
+		} else if( SilentContactRepositoryV1.supports( this ) ) {
+			contacts = new SilentContactRepositoryV1( getContentResolver() );
 		} else {
-			contacts = new AndroidContactRepository( getContentResolver() );
+			contacts = new SystemContactRepository( getContentResolver() );
 		}
 	}
 
@@ -380,8 +558,8 @@ public class SilentTextApplication extends Application {
 			return;
 		}
 		String username = getServer( "xmpp" ).getCredential().getUsername();
-		File file = new File( getFilesDir(), Hash.sha1( username + ".conversations" ) );
-		conversations = new EncryptedFileConversationRepository( userKey, file, getCacheDir() );
+		File file = getUserConversationsDir( username );
+		conversations = new EncryptedFileConversationRepository( new SecretKeySpec( userKey, KEY_ALGORITHM ), file, getCacheDir() );
 	}
 
 	private void createCredentialRepository() {
@@ -389,29 +567,70 @@ public class SilentTextApplication extends Application {
 			return;
 		}
 		String username = getServer( "xmpp" ).getCredential().getUsername();
-		File file = new File( getFilesDir(), Hash.sha1( username + ".credentials" ) );
-		credentials = new EncryptedFileCredentialRepository( userKey, file );
+		File file = getUserCredentialsDir( username );
+		credentials = new EncryptedFileCredentialRepository( new SecretKeySpec( userKey, KEY_ALGORITHM ), file );
 	}
 
-	private SimpleHTTPClient createHTTPClient() {
-		if( ServiceConfiguration.getInstance().shouldValidateCertificates ) {
-			return new SimpleHTTPClient( getTrustStore() );
+	public UserPreferences createDefaultApplicationPreferences() {
+		return createDefaultUserPreferences( APPLICATION_PREFERENCES_KEY );
+	}
+
+	public UserPreferences createDefaultUserPreferences() {
+		return createDefaultUserPreferences( getUsername() );
+	}
+
+	public UserPreferences createDefaultUserPreferences( String username ) {
+
+		UserPreferences preferences = new UserPreferences();
+
+		preferences.userName = username == null ? null : username.toCharArray();
+		preferences.deviceName = new String( getLocalResourceNameLegacy() ).toCharArray();
+
+		preferences.notifications = NotificationBroadcaster.isEnabledLegacy( this );
+		preferences.notificationSound = NotificationBroadcaster.isSoundEnabledLegacy( this );
+		preferences.notificationVibrate = NotificationBroadcaster.isVibrateEnabledLegacy( this );
+
+		preferences.passcodeUnlockValidityPeriod = OptionsDrawer.getInactivityTimeoutLegacy( this );
+		preferences.isPasscodeSet = !OptionsDrawer.isEmptyPasscodeLegacy( this );
+		preferences.sendDeliveryAcknowledgments = OptionsDrawer.isSendReceiptsEnabledLegacy( this );
+
+		return preferences;
+
+	}
+
+	private void createDownloadManagerRepository() {
+		if( downloadManagerRepository == null ) {
+			File baseDirectory = getFilesDir( "downloadmanager" );
+			DownloadManagerHelper helper = new DownloadManagerHelper();
+			BufferedBlockCipherFactory cipherFactory = new AESWithCBCAndPKCS7PaddingCipherFactory();
+			MacFactory macFactory = new HMacSHA256Factory();
+			downloadManagerRepository = new SecureFileRepository<DownloadManagerEntry>( baseDirectory, helper, cipherFactory, macFactory );
 		}
-		return new SimpleHTTPClient();
+		if( applicationKey == null ) {
+			downloadManagerRepository.lock();
+		} else {
+			downloadManagerRepository.unlock( applicationKey );
+		}
 	}
 
-	public String getAPIURL() {
-		return ServiceConfiguration.getInstance().api.getURL( getNetworks() );
+	private void createExternalKeyManagerFactory() {
+		Locker locker = new SilentTextApplicationLocker( this );
+		externalKeyManagerFactory = new ExternalKeyManagerFactory( new ExternalKeyManagerV2( this, locker ), new ExternalKeyManagerV1( this, locker ) );
 	}
 
-	public String getXMPPURL() {
-		return ServiceConfiguration.getInstance().xmpp.getURL( getNetworks() );
-	}
+	private AbstractHTTPClient createHTTPClient() {
 
-	public boolean hasSharedSession() {
-		CharSequence apiKey = getSharedDataFromKeyManagerAsCharSequence( KeyManagerSupport.DEV_AUTH_DATA_TAG );
-		CharSequence deviceID = getSharedDataFromKeyManagerAsCharSequence( KeyManagerSupport.DEV_UNIQUE_ID_TAG );
-		return apiKey != null && deviceID != null;
+		ServiceConfiguration config = ServiceConfiguration.getInstance();
+
+		if( !config.api.requireStrongCiphers ) {
+			if( !config.shouldValidateCertificates ) {
+				return new CachingHTTPClient( new ApacheHTTPClient( new HttpClient() ), httpResponseCache );
+			}
+			return new CachingHTTPClient( new ApacheHTTPClient( new HttpClient( getTrustStore() ) ), httpResponseCache );
+		}
+
+		return new CachingHTTPClient( new ApacheHTTPClient( new HttpClient( getHTTPSocketFactory() ) ), httpResponseCache );
+
 	}
 
 	private NamedKeyPair createKeyPair() {
@@ -428,35 +647,67 @@ public class SilentTextApplication extends Application {
 		keyPair.setPublicKey( getKeyGenerator().getPublicKey( keyPair.getPrivateKey(), storageKey ) );
 		keyPair.locator = getLocator( keyPair.getPublicKey() );
 
+		if( keyPair.locator == null ) {
+			return null;
+		}
+
 		save( keyPair );
 
 		return keyPair;
 
 	}
 
+	private void createLicenseCodeRepository() {
+		if( licenseCodeRepository == null ) {
+			File baseDirectory = getFilesDir( "license" );
+			BufferedBlockCipherFactory cipherFactory = new AESWithCBCAndPKCS7PaddingCipherFactory();
+			MacFactory macFactory = new HMacSHA256Factory();
+			licenseCodeRepository = new SecureFileRepository<CharSequence>( baseDirectory, new CharSequenceHelper(), cipherFactory, macFactory );
+			// this repo stays unlocked
+			// String deviceID = DeviceUtils.getDeviceID( this.getApplicationContext() );
+			// deviceID = ((deviceID != null) && (deviceID.length() >= 16)) ? deviceID.substring( 0,
+			// 16 ) : "B8CJ8AXHA89DACHD";
+			licenseCodeRepository.unlock( "B8CJ8AXHA89DACHD".getBytes() );
+		}
+	}
+
 	private void createLog() {
 		if( log != null ) {
 			return;
 		}
-		log = new Log( getClass().getSimpleName() );
+		log = new Log( getLogTag() );
 	}
 
 	private void createNamedKeyPairRepository() {
 		if( keyPairs == null ) {
-			keyPairs = new SecureFileRepository<NamedKeyPair>( new File( getFilesDir(), Hash.sha1( getUsername(), ".key_pairs" ) ), new NamedKeyPairRepositoryHelper(), CIPHER_ALGORITHM, KEY_ALGORITHM );
+			String baseDirectoryName = Hash.sha1( getUsername(), ".key_pairs" );
+			File baseDirectory = new File( getFilesDir(), baseDirectoryName );
+			NamedKeyPairRepositoryHelper helper = new NamedKeyPairRepositoryHelper();
+			BufferedBlockCipherFactory cipherFactory = new AESWithCBCAndPKCS7PaddingCipherFactory();
+			MacFactory macFactory = new HMacSHA256Factory();
+			keyPairs = new SecureFileRepository<NamedKeyPair>( baseDirectory, helper, cipherFactory, macFactory );
 		}
 		if( userKey == null ) {
 			keyPairs.lock();
 		} else {
-			keyPairs.unlock( userKey.getEncoded() );
+			keyPairs.unlock( userKey );
 		}
 	}
 
 	private void createOutgoingMessageQueue() {
-		if( outgoingMessageQueue != null || userKey == null ) {
-			return;
+
+		if( outgoingMessageQueue == null ) {
+			BufferedBlockCipherFactory cipherFactory = new AESWithCBCAndPKCS7PaddingCipherFactory();
+			MacFactory macFactory = new HMacSHA256Factory();
+			outgoingMessageQueue = new FileTransportQueue( this, getTransportQueueDir(), cipherFactory, macFactory );
 		}
-		outgoingMessageQueue = new EncryptedFileTransportQueue( userKey, getTransportQueueDir() );
+
+		if( userKey == null ) {
+			outgoingMessageQueue.lock();
+		} else {
+			outgoingMessageQueue.unlock( userKey );
+		}
+
 	}
 
 	private void createServerRepository() {
@@ -464,36 +715,171 @@ public class SilentTextApplication extends Application {
 			return;
 		}
 		File file = new File( getFilesDir(), Hash.sha1( "servers" ) );
-		servers = new EncryptedFileServerRepository( applicationKey, file );
+		servers = new EncryptedFileServerRepository( new SecretKeySpec( applicationKey, KEY_ALGORITHM ), file );
+	}
+
+	private void createServiceEndpointRepository() {
+		if( serviceEndpointRepository == null ) {
+			File baseDirectory = getFilesDir( "networks" );
+			ServiceEndpointHelper helper = new ServiceEndpointHelper();
+			BufferedBlockCipherFactory cipherFactory = new AESWithCBCAndPKCS7PaddingCipherFactory();
+			MacFactory macFactory = new HMacSHA256Factory();
+			serviceEndpointRepository = new SecureFileRepository<ServiceEndpoint>( baseDirectory, helper, cipherFactory, macFactory );
+		}
+		if( applicationKey == null ) {
+			serviceEndpointRepository.lock();
+		} else {
+			serviceEndpointRepository.unlock( applicationKey );
+		}
+	}
+
+	private void createUserPreferencesRepository() {
+		if( userPreferencesRepository == null ) {
+			BufferedBlockCipherFactory cipherFactory = new AESWithCBCAndPKCS7PaddingCipherFactory();
+			MacFactory macFactory = new HMacSHA256Factory();
+			userPreferencesRepository = UserPreferences.repository( getFilesDir( "user_preferences" ), cipherFactory, macFactory );
+		}
+		if( applicationKey == null ) {
+			userPreferencesRepository.lock();
+		} else {
+			userPreferencesRepository.unlock( applicationKey );
+		}
+	}
+
+	private void createUUIDRepository() {
+		if( UUIDRepository == null ) {
+			File baseDirectory = getFilesDir( "UUID" );
+			UUIDHelper helper = new UUIDHelper();
+			BufferedBlockCipherFactory cipherFactory = new AESWithCBCAndPKCS7PaddingCipherFactory();
+			MacFactory macFactory = new HMacSHA256Factory();
+			UUIDRepository = new SecureFileRepository<UUIDEntry>( baseDirectory, helper, cipherFactory, macFactory );
+		}
+		if( applicationKey == null ) {
+			UUIDRepository.lock();
+		} else {
+			UUIDRepository.unlock( applicationKey );
+		}
+	}
+
+	public void createXMPPTransportAsync( Credential credential ) {
+
+		if( xmppConnectionThread != null && xmppConnectionThread.isAlive() ) {
+			return;
+		}
+
+		xmppTransportConnectionStatus = getString( R.string.not_connected );
+		sendBroadcast( Action.XMPP_STATE_CHANGED.intent(), Manifest.permission.READ );
+
+		if( credential == null ) {
+			setXMPPTransport( (XMPPTransport) null );
+			return;
+		}
+
+		xmppConnectionThread = new NamedThread( new NewXMPPTransport( this, getXMPPTransport(), credential, getOrCreateUUID(), getOutgoingMessageQueue(), getCachingSRVResolver(), getXMPPSocketFactory() ) {
+
+			@Override
+			protected void onClientConnected( XMPPTransport transport ) {
+				if( transport != null && transport.isConnected() ) {
+					getLog().debug( "XMPP #onClientConnected host:%s port:%d", transport.getServerHost(), Integer.valueOf( transport.getServerPort() ) );
+					connected = true;
+					xmppTransportConnectionStatus = getString( R.string.connected );
+					setXMPPTransport( transport );
+					sendBroadcast( Action.XMPP_STATE_CHANGED.intent(), Manifest.permission.READ );
+				}
+			}
+
+			@Override
+			protected void onClientInitialized( XMPPTransport transport ) {
+				getLog().debug( "XMPP #onClientInitialized" );
+				xmppTransportConnectionStatus = getString( R.string.connecting );
+				sendBroadcast( Action.XMPP_STATE_CHANGED.intent(), Manifest.permission.READ );
+				// setJabber( client );
+			}
+
+			@Override
+			protected void onError( Throwable throwable ) {
+				getLog().warn( throwable, "XMPP #onError" );
+				if( throwable.getMessage() != null && !"".equals( throwable.getMessage() ) ) {
+					xmppTransportConnectionStatus = throwable.getMessage();
+				} else {
+					xmppTransportConnectionStatus = getString( R.string.not_connected );
+				}
+				setXMPPTransport( (XMPPTransport) null ); // we do not have a valid client!
+				ServiceConfiguration.getInstance().removeXMPPFromCache( getCachingSRVResolver() );
+				sendBroadcast( Action.XMPP_STATE_CHANGED.intent(), Manifest.permission.READ );
+
+				if( throwable instanceof IllegalStateException ) {
+					AsyncUtils.execute( new GetDeviceChangedTask( getApplicationContext() ) {
+
+						@Override
+						protected void onPostExecute( Void result ) {
+							if( deviceChanged ) {
+								deactivate();
+							}
+						}
+
+					}, getUsername() );
+				}
+			}
+
+			@Override
+			protected void onLookupServiceRecord( String domain ) {
+				getLog().debug( "XMPP #onLookupServiceRecord domain:%s", domain );
+				xmppTransportConnectionStatus = getString( R.string.performing_srv_lookup );
+				sendBroadcast( Action.XMPP_STATE_CHANGED.intent(), Manifest.permission.READ );
+			}
+
+			@Override
+			protected void onServiceRecordReceived( CharSequence host, int port ) {
+				getLog().debug( "XMPP #onServiceRecordReceived host:%s port:%d", host, Integer.valueOf( port ) );
+				xmppTransportConnectionStatus = getString( R.string.connecting );
+				sendBroadcast( Action.XMPP_STATE_CHANGED.intent(), Manifest.permission.READ );
+			}
+
+		} );
+
+		xmppConnectionThread.start();
+
 	}
 
 	public void deactivate() {
+		deactivate( false );
+	}
 
+	public void deactivate( boolean removeUserData ) {
+
+		Action.BEGIN_DEACTIVATE.broadcast( this, Manifest.permission.READ );
+
+		final String username = getUsername();
 		removeSharedSession();
+
 		GCMService.unregister( this );
-		getNative().setIdentity( null );
-		getNative().onDestroy();
-		_native = null;
+		getSCimpBridge().setIdentity( null );
+		getSCimpBridge().onDestroy();
+		scimpBridge = null;
 		NotificationBroadcaster.cancel( this );
+		UUIDRepository = null;
 
 		try {
 			Session session = getSession();
 			if( session != null ) {
 				if( session.getID() != null ) {
 					try {
-						session.unregisterPushNotifications( "silent_text" );
+						session.stopReceivingPushNotifications( getPackageName() );
 						session.logout();
+					} catch( HTTPClientForbiddenException httpException ) {
+						// session is already "deactivated"
 					} catch( Throwable exception ) {
 						getLog().warn( exception, "#deactivate" );
 					}
 				}
 			}
 			getServers().remove( getServer( "broker" ) );
-			if( isOnline() ) {
-				JabberClient jabber = getJabber();
-				if( jabber != null ) {
-					jabber.logout();
-					setJabber( (JabberClient) null );
+			if( isXMPPTransportConnected() ) {
+				XMPPTransport existingJabber = getXMPPTransport();
+				if( existingJabber != null ) {
+					existingJabber.disconnect();
+					setXMPPTransport( (XMPPTransport) null );
 				}
 			}
 			Server xmppServer = getServer( "xmpp" );
@@ -502,7 +888,43 @@ public class SilentTextApplication extends Application {
 				getServers().remove( xmppServer );
 			}
 		} finally {
+			if( removeUserData ) {
+				clearUserData( username );
+			}
 			lock( false );
+			Action.FINISH_DEACTIVATE.broadcast( this, Manifest.permission.READ );
+		}
+
+	}
+
+	protected void enqueue( Message message ) {
+
+		Envelope envelope = new Envelope();
+
+		envelope.id = message.getId();
+
+		if( envelope.id == null ) {
+			envelope.id = UUID.randomUUID().toString();
+		}
+
+		envelope.time = System.currentTimeMillis();
+		envelope.from = getUsername();
+		envelope.to = message.getConversationID();
+		envelope.content = message.getCiphertext();
+		envelope.notifiable = true;
+		envelope.badgeworthy = true;
+		envelope.state = Envelope.State.PENDING;
+
+		XMPPTransport xmpp = getXMPPTransport();
+
+		if( xmpp != null ) {
+			xmpp.sendEncryptedMessage( envelope );
+		} else {
+			try {
+				getOutgoingMessageQueue().add( envelope );
+			} catch( RepositoryLockedException exception ) {
+				getLog().warn( exception, "#onSendPacket id:%s to:%s", envelope.id, envelope.to );
+			}
 		}
 
 	}
@@ -510,14 +932,46 @@ public class SilentTextApplication extends Application {
 	@Override
 	protected void finalize() throws Throwable {
 		super.finalize();
-		getNative().onDestroy();
+		getSCimpBridge().onDestroy();
 	}
 
-	public AccountCreationClient getAccountCreationClient() {
+	protected Event findEventByID( String id ) {
+		ConversationRepository conversations = getConversations();
+		for( Conversation conversation : conversations.list() ) {
+			EventRepository events = conversations.historyOf( conversation );
+			Event event = events.findById( id );
+			if( event != null ) {
+				return event;
+			}
+		}
+		return null;
+	}
+
+	public LegacyAccountCreationClient getAccountCreationClient() {
 		if( accountCreationClient == null ) {
-			accountCreationClient = new AccountCreationClient( this, createHTTPClient(), ACCOUNT_CREATION_CLIENT_BASE_URL );
+			accountCreationClient = new LegacyAccountCreationClient( this, createHTTPClient(), ACCOUNT_CREATION_CLIENT_BASE_URL );
 		}
 		return accountCreationClient;
+	}
+
+	public String getAPIURL() {
+		return ServiceConfiguration.getInstance().getAPIURL( getCachingSRVResolver() );
+	}
+
+	public String getAppVersionName() {
+		try {
+			return getPackageManager().getPackageInfo( getPackageName(), 0 ).versionName;
+		} catch( NameNotFoundException exception ) {
+			return getString( R.string.unknown );
+		}
+	}
+
+	public SecureFileRepository<Attachment> getAttachments() {
+		return getSecureRepository( ATTACHMENT_HELPER, "attachments" );
+	}
+
+	public Authenticator getAuthenticator() {
+		return new AuthenticatorClient( createHTTPClient(), getAPIURL() );
 	}
 
 	public SCloudBroker getBroker() {
@@ -525,32 +979,29 @@ public class SilentTextApplication extends Application {
 		return broker;
 	}
 
-	private int getCalibratedIterationCount( int seconds, int minimumIterations, int maximumIterations ) {
+	protected File getCacheDir( String... names ) {
+		return new File( getCacheDir(), Hash.sha1( names ) );
+	}
 
-		long then = SystemClock.elapsedRealtime();
-		long now = then;
-		long threshold = seconds * 200;
-		int iterations = 0;
-
-		for( long elapsed = 0; elapsed < threshold; elapsed = now - then ) {
-			for( int i = 0; i < 5000; i++ ) {
-				Math.sqrt( 0.123456789 );
-			}
-			now = SystemClock.elapsedRealtime();
-			iterations++;
-		}
-
-		iterations *= 2;
-
-		getLog().debug( "#getCalibratedIterationCount iterations:%d", Integer.valueOf( iterations ) );
-
-		return Math.min( maximumIterations, Math.max( minimumIterations, iterations ) );
-
+	public CachingSRVResolver getCachingSRVResolver() {
+		createCachingSRVResolver();
+		return cachingSRVResolver;
 	}
 
 	public ContactRepository getContacts() {
 		createContactRepository();
 		return contacts;
+	}
+
+	public Conversation getConversation( String partner ) {
+		if( partner == null ) {
+			return null;
+		}
+		ConversationRepository conversations = getConversations();
+		if( conversations == null ) {
+			return null;
+		}
+		return conversations.findByPartner( partner );
 	}
 
 	public ConversationRepository getConversations() {
@@ -566,6 +1017,75 @@ public class SilentTextApplication extends Application {
 	public CredentialRepository getCredentials() {
 		createCredentialRepository();
 		return credentials;
+	}
+
+	public List<String> getDeletedUsers() {
+		if( deletedUsers.size() > 0 ) {
+			return deletedUsers;
+		}
+		SharedPreferences prefs = getSharedPreferences( ChatsFragment.DELETED_USER_FROM_CONVERSATION_LIST, Context.MODE_PRIVATE );
+		String serialized = prefs.getString( ChatsFragment.DELETED_USER_FROM_CONVERSATION_LIST, null );
+		if( serialized != null ) {
+			deletedUsers = new ArrayList<String>( Arrays.asList( TextUtils.split( serialized, "," ) ) );
+		}
+		return deletedUsers;
+	}
+
+	public String getDisplayName( String username ) {
+		return getDisplayName( username, getContacts() );
+	}
+
+	public String getDisplayName( String username, ContactRepository repository ) {
+		try {
+			return getDisplayName( getUser( username ), repository );
+		} catch( RepositoryLockedException exception ) {
+			return null;
+		}
+	}
+
+	public String getDisplayName( User user ) {
+		return getDisplayName( user, getContacts() );
+	}
+
+	public SecureFileRepository<DownloadManagerEntry> getDownloadManagerRepository() {
+		createDownloadManagerRepository();
+		return downloadManagerRepository;
+	}
+
+	private char [] getEncryptionPassPhraseForUserKey( Credential credential ) {
+		if( credential == null ) {
+			return null;
+		}
+		return getEncryptionPassPhraseForUserKey( credential.getPassword() );
+	}
+
+	protected char [] getEncryptionPassPhraseForUserKey( Server server ) {
+		if( server == null ) {
+			return null;
+		}
+		return getEncryptionPassPhraseForUserKey( server.getCredential() );
+	}
+
+	private char [] getEncryptionPassPhraseForUserKey( String password ) {
+		if( password == null ) {
+			return null;
+		}
+		char [] applicationKeyChars = CryptoUtils.toCharArray( applicationKey );
+		char [] passcode = new char [applicationKeyChars.length + password.length()];
+		for( int i = 0; i < applicationKeyChars.length; i++ ) {
+			passcode[i] = applicationKeyChars[i];
+		}
+		password.getChars( 0, password.length(), passcode, applicationKeyChars.length );
+		CryptoUtils.randomize( applicationKeyChars );
+		return passcode;
+	}
+
+	private ExternalKeyManager getExternalKeyManager() {
+		return externalKeyManagerFactory.getExternalKeyManager();
+	}
+
+	protected File getFilesDir( String... names ) {
+		return new File( getFilesDir(), Hash.sha1( names ) );
 	}
 
 	public CharSequence getFullJIDForUsername( CharSequence username ) {
@@ -585,56 +1105,48 @@ public class SilentTextApplication extends Application {
 		return CharBuffer.wrap( out.toCharArray() );
 	}
 
-	public JabberClient getJabber() {
-		return jabber;
+	public UserPreferences getGlobalPreferences() {
+
+		createApplicationPreferencesRepository();
+
+		UserPreferences preferences = null;
+		try {
+			preferences = applicationPreferencesRepository.findByID( APPLICATION_PREFERENCES_KEY.toCharArray() );
+		} catch( RuntimeException exception ) {
+			getLog().info( exception, "#getGlobalPreferences #load" );
+		}
+
+		if( preferences == null ) {
+			preferences = createDefaultApplicationPreferences();
+			try {
+				applicationPreferencesRepository.save( preferences );
+			} catch( RuntimeException exception ) {
+				getLog().warn( exception.getCause(), "#getGlobalPreferences #save" );
+			}
+		}
+
+		return preferences;
+
 	}
 
-	/**
-	 * @param alias
-	 * @param passcode
-	 * @return
-	 */
-	private Key getKey( String alias, char [] passcode ) {
+	public HTTPResponseCache getHTTPResponseCache() {
+		return httpResponseCache;
+	}
 
-		File file = new File( getFilesDir(), Hash.sha1( alias ) + ".key" );
-
-		if( file.exists() ) {
-			InputStream in = null;
-			try {
-				in = new FileInputStream( file );
-				StorageKeySpec storageKey = new StorageKeySpec( in, passcode );
-				storageKeys.put( alias, storageKey );
-				return storageKey.key;
-			} catch( IOException exception ) {
-				throw new RuntimeException( exception );
-			} finally {
-				IOUtils.close( in );
-			}
-		}
-
-		EphemeralKeySpec ephemeralKey = new EphemeralKeySpec( KEY_ALGORITHM, "PBKDF2WithHmacSHA1", CIPHER_ALGORITHM, getCalibratedIterationCount( 2, 1024, 10240 ), 256, 16, 16 );
+	protected org.apache.http.conn.ssl.SSLSocketFactory getHTTPSocketFactory() {
+		Resources resources = getResources();
+		String [] protocols = resources.getStringArray( R.array.security_strict_network_protocols );
+		String [] ciphers = resources.getStringArray( R.array.security_strict_cipher_suites );
 		try {
-			StorageKeySpec storageKey = new StorageKeySpec( passcode, KEY_ALGORITHM, CIPHER_ALGORITHM, ephemeralKey );
-			OutputStream out = null;
-			try {
-				out = new FileOutputStream( file, false );
-				storageKey.write( out );
-				storageKeys.put( alias, storageKey );
-				return storageKey.key;
-			} catch( IOException exception ) {
-				throw new RuntimeException( exception );
-			} finally {
-				IOUtils.close( out );
-			}
-		} catch( NoSuchAlgorithmException exception ) {
-			throw new RuntimeException( exception );
+			return new SSLSocketFactory( getTrustStore(), protocols, ciphers );
+		} catch( Throwable exception ) {
+			return null;
 		}
-
 	}
 
 	public KeyGenerator getKeyGenerator() {
 		if( keyGenerator == null ) {
-			getNative();
+			getSCimpBridge();
 			keyGenerator = new NativeKeyGenerator();
 		}
 		return keyGenerator;
@@ -657,31 +1169,46 @@ public class SilentTextApplication extends Application {
 		return license;
 	}
 
-	public String getLocalResourceName() {
-		Credential credential = getCredential( getUsername() );
-		if( credential == null ) {
-			Server server = getServer( "xmpp" );
-			if( server == null ) {
-				return JabberClient.getDefaultResourceName();
-			}
-			credential = server.getCredential();
-			if( credential == null ) {
-				return JabberClient.getDefaultResourceName();
-			}
+	public CharSequence getLicenseCode() {
+		createLicenseCodeRepository();
+		LazyList<CharSequence> list = licenseCodeRepository.list();
+		if( list == null || list.size() == 0 ) {
+			return null;
 		}
-		String resource = credential.getResource();
+		return list.get( 0 );
+	}
+
+	public String getLocalResourceName() {
+		String defaultResourceName = Build.MODEL;
+		try {
+			UserPreferences preferences = getUserPreferences();
+			return preferences == null || preferences.deviceName == null ? defaultResourceName : new String( preferences.deviceName );
+		} catch( RuntimeException exception ) {
+			getLog().error( exception, "#getLocalResourceName" );
+			return defaultResourceName;
+		}
+	}
+
+	private byte [] getLocalResourceNameLegacy() {
+		try {
+			return getLocalResourceNameLegacyOrThrowException();
+		} catch( Throwable exception ) {
+			return StringUtils.toByteArray( Build.MODEL );
+		}
+	}
+
+	private byte [] getLocalResourceNameLegacyOrThrowException() {
+		Server server = getServer( "xmpp" );
+		Credential credential = server.getCredential();
+		byte [] resource = credential.getResourceAsByteArray();
 		if( resource == null ) {
-			return JabberClient.getDefaultResourceName();
+			throw new NullPointerException();
 		}
 		return resource;
 	}
 
 	public byte [] getLocalStorageKey() {
-		return userKey == null ? null : CryptoUtils.copyOf( userKey.getEncoded(), 32 );
-	}
-
-	public Location getLocation() {
-		return locationListener.getLocation();
+		return userKey == null ? null : CryptoUtils.copyOf( userKey, 32 );
 	}
 
 	protected Log getLog() {
@@ -689,16 +1216,62 @@ public class SilentTextApplication extends Application {
 		return log;
 	}
 
-	public NativeBridge getNative() {
-		if( _native == null ) {
-			_native = new NativeBridge( this );
-			_native.onCreate();
+	public FileRepository<MigrationTask> getMigrationTasks() {
+		if( migrationTasks == null ) {
+			migrationTasks = new FileRepository<MigrationTask>( getFilesDir( "migrations" ), new MigrationTask.Helper() );
 		}
-		return _native;
+		return migrationTasks;
 	}
 
-	public String getOnlineStatus() {
-		return onlineStatus;
+	public Repository<NamedKeyPair> getNamedKeyPairs() {
+		createNamedKeyPairRepository();
+		return keyPairs;
+	}
+
+	public Conversation getOrCreateConversation( CharSequence partner ) {
+		User user = getUser( partner );
+		if( user == null ) {
+			BasicUser u = new BasicUser();
+			u.setID( partner );
+			user = u;
+		}
+		return getOrCreateConversation( user );
+	}
+
+	public Conversation getOrCreateConversation( User user ) {
+
+		if( user == null ) {
+			return null;
+		}
+
+		// String partner = user.getID().toString();
+		// Conversation conversation = getConversation( partner );
+
+		String partner = null;
+		Conversation conversation = null;
+		if( user.getID() != null ) {
+			partner = user.getID().toString();
+			conversation = getConversation( partner );
+		}
+
+		if( conversation == null ) {
+
+			conversation = new Conversation();
+			conversation.setStorageKey( CryptoUtils.randomBytes( 64 ) );
+			conversation.setPartner( new Contact( partner ) );
+			conversation.getPartner().setAlias( getDisplayName( user ) );
+
+			if( isSelf( partner ) ) {
+				conversation.getPartner().setDevice( getLocalResourceName() );
+				getConversations().save( conversation );
+			} else {
+				getConversations().save( conversation );
+			}
+
+		}
+
+		return conversation;
+
 	}
 
 	public NamedKeyPair getOrCreateKeyPair() {
@@ -721,44 +1294,52 @@ public class SilentTextApplication extends Application {
 		return server;
 	}
 
+	public String getOrCreateUUID() {
+
+		List<UUIDEntry> UUIDs = null;
+
+		try {
+			UUIDs = getUUIDs();
+		} catch( RepositoryLockedException e ) {
+			log.error( e, "Repository locked error" );
+
+			return null;
+		}
+
+		if( UUIDs != null && !UUIDs.isEmpty() && UUIDs.get( 0 ) != null && UUIDs.get( 0 ).getUUID() != null ) {
+			return UUIDs.get( 0 ).getUUID();
+		}
+
+		UUIDEntry UUIDEntry = new UUIDEntry( UUID.randomUUID().toString() );
+
+		UUIDRepository.save( UUIDEntry );
+
+		return UUIDEntry.getUUID();
+	}
+
 	public TransportQueue getOutgoingMessageQueue() {
 		createOutgoingMessageQueue();
 		return outgoingMessageQueue;
 	}
 
-	private char [] getPasscodeForUserKey( Credential credential ) {
-		if( credential == null ) {
-			return null;
+	public PackageInfo getPackageInfo() {
+		try {
+			return getPackageManager().getPackageInfo( getPackageName(), 0 );
+		} catch( NameNotFoundException exception ) {
+			throw new RuntimeException( exception );
 		}
-		return getPasscodeForUserKey( credential.getPassword() );
-	}
-
-	protected char [] getPasscodeForUserKey( Server server ) {
-		if( server == null ) {
-			return null;
-		}
-		return getPasscodeForUserKey( server.getCredential() );
-	}
-
-	private char [] getPasscodeForUserKey( String password ) {
-		if( password == null ) {
-			return null;
-		}
-		char [] applicationKeyChars = CryptoUtils.toCharArray( applicationKey.getEncoded() );
-		char [] passcode = new char [applicationKeyChars.length + password.length()];
-		for( int i = 0; i < applicationKeyChars.length; i++ ) {
-			passcode[i] = applicationKeyChars[i];
-		}
-		password.getChars( 0, password.length(), passcode, applicationKeyChars.length );
-		CryptoUtils.randomize( applicationKeyChars );
-		return passcode;
 	}
 
 	public String getPrivacyPolicy() {
-		if( privacyPolicy == null ) {
-			privacyPolicy = readAssetAsString( "PRIVACY" );
+		return readRawResourceAsString( R.raw.privacy );
+	}
+
+	private byte [] getPrivateKey() {
+		NamedKeyPair pair = getOrCreateKeyPair();
+		if( pair != null ) {
+			return pair.getPrivateKey();
 		}
-		return privacyPolicy;
+		return null;
 	}
 
 	public byte [] getPublicKey( String partner ) {
@@ -781,15 +1362,14 @@ public class SilentTextApplication extends Application {
 
 		com.silentcircle.api.model.Key key = pick( keys );
 
-		if( !( key instanceof SensitiveKey ) ) {
+		if( !( key instanceof BasicKey ) ) {
 			return null;
 		}
 
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 
 		try {
-			JSON_KEY_SERIALIZER.write( (SensitiveKey) key, new DataOutputStream( out ) );
-			getNative().testSCKeyDeserialize( out.toString() );
+			JSONObjectWriter.writeKey( (BasicKey) key, new DataOutputStream( out ) );
 			return out.toByteArray();
 		} catch( IOException exception ) {
 			return null;
@@ -799,6 +1379,26 @@ public class SilentTextApplication extends Application {
 
 	public String getPushNotificationToken() {
 		return getSharedPreferences( "gcm", MODE_PRIVATE ).getString( "token", null );
+	}
+
+	public SCimpBridge getSCimpBridge() {
+		if( scimpBridge == null ) {
+			scimpBridge = new SCimpBridge( this );
+			scimpBridge.onCreate();
+		}
+		return scimpBridge;
+	}
+
+	public <T> SecureFileRepository<T> getSecureRepository( RepositoryHelper<T> helper, String... path ) {
+		BufferedBlockCipherFactory cipherFactory = new AESWithCBCAndPKCS7PaddingCipherFactory();
+		MacFactory macFactory = new HMacSHA256Factory();
+		SecureFileRepository<T> repository = new SecureFileRepository<T>( getFilesDir( path ), helper, cipherFactory, macFactory );
+		if( userKey == null ) {
+			repository.lock();
+		} else {
+			repository.unlock( userKey );
+		}
+		return repository;
 	}
 
 	public Server getServer( String name ) {
@@ -811,25 +1411,36 @@ public class SilentTextApplication extends Application {
 		return servers;
 	}
 
+	public SecureFileRepository<ServiceEndpoint> getServiceEndpointRepository() {
+		createServiceEndpointRepository();
+		return serviceEndpointRepository;
+	}
+
+	@Override
 	public Session getSession() {
-		Server server = getServer( "broker" );
-		if( server == null ) {
-			return null;
+		try {
+			Credential credential = getServer( "broker" ).getCredential();
+			AbstractHTTPClient http = createHTTPClient();
+			String url = getAPIURL();
+			CharBuffer apiKey = CharBuffer.wrap( credential.getPassword() );
+			CharBuffer deviceID = CharBuffer.wrap( credential.getUsername() );
+			if( http == null || url == null ) {
+				throw new NullPointerException();
+			}
+			return new AuthenticatedSessionClient( http, url, apiKey, deviceID );
+		} catch( NullPointerException exception ) {
+			return getSharedSession();
 		}
-		Credential credential = server.getCredential();
-		if( credential == null ) {
-			return null;
-		}
-		return new AuthenticatedClientSession( createHTTPClient(), getAPIURL(), credential.getPassword(), credential.getUsername() );
 	}
 
 	public byte [] getSharedDataFromKeyManagerAsByteArray( String id ) {
-		return isKeyManagerSupported() ? KeyManagerSupport.getSharedKeyData( getContentResolver(), id ) : null;
+		ExternalKeyManager externalKeyManager = getExternalKeyManager();
+		return externalKeyManager != null ? externalKeyManager.getSharedKeyData( id ) : null;
 	}
 
 	public char [] getSharedDataFromKeyManagerAsCharArray( String id ) {
 		byte [] array = getSharedDataFromKeyManagerAsByteArray( id );
-		return array == null ? null : CryptoUtils.toCharArray( array, true );
+		return array == null ? null : CryptoUtils.toCharArraySafe( array );
 	}
 
 	public CharSequence getSharedDataFromKeyManagerAsCharSequence( String id ) {
@@ -838,13 +1449,54 @@ public class SilentTextApplication extends Application {
 	}
 
 	public Session getSharedSession() {
-		CharSequence apiKey = getSharedDataFromKeyManagerAsCharSequence( KeyManagerSupport.DEV_AUTH_DATA_TAG );
-		CharSequence deviceID = getSharedDataFromKeyManagerAsCharSequence( KeyManagerSupport.DEV_UNIQUE_ID_TAG );
-		return apiKey != null && deviceID != null ? new AuthenticatedClientSession( createHTTPClient(), getAPIURL(), apiKey, deviceID ) : null;
+		ExternalKeyManager externalKeyManager = getExternalKeyManager();
+
+		if( externalKeyManager == null ) {
+			return null;
+		}
+		CharSequence apiKey = getSharedDataFromKeyManagerAsCharSequence( externalKeyManager.getDeviceAuthDataTag() );
+		CharSequence deviceID = getSharedDataFromKeyManagerAsCharSequence( externalKeyManager.getDeviceUniqueIDTag() );
+		CharSequence baseURL = getAPIURL();
+
+		if( baseURL != null && apiKey != null && deviceID != null ) {
+			Session session = new AuthenticatedSessionClient( createHTTPClient(), baseURL, apiKey, deviceID );
+			save( session );
+			return session;
+		}
+
+		// save apiKey for directory search.
+		if( apiKey != null ) {
+			Constants.mApiKey = apiKey.toString();
+		}
+
+		return null;
+
 	}
 
-	public long getTimeUntilInactive( int threshold ) {
-		if( threshold < 0 ) {
+	public ContactRepository getSilentContacts() {
+		if( silentContacts == null ) {
+			if( SilentContactRepositoryV2.supports( this ) ) {
+				silentContacts = new SilentContactRepositoryV2( getContentResolver() );
+			} else if( SilentContactRepositoryV1.supports( this ) ) {
+				silentContacts = new SilentContactRepositoryV1( getContentResolver() );
+			}
+		}
+		return silentContacts;
+	}
+
+	private File getStorageKeyFile( String username ) {
+		return new File( getFilesDir(), Hash.sha1( username ) + ".key" );
+	}
+
+	public ContactRepository getSystemContacts() {
+		if( systemContacts == null ) {
+			systemContacts = new SystemContactRepository( getContentResolver() );
+		}
+		return systemContacts;
+	}
+
+	public long getTimeRemainingUntilInactive( int threshold ) {
+		if( threshold <= 0 ) {
 			return Long.MAX_VALUE;
 		}
 		long timeOfBecomingInactive = timeOfMostRecentActivity + threshold * 1000L;
@@ -855,7 +1507,7 @@ public class SilentTextApplication extends Application {
 	}
 
 	private File getTransportQueueDir() {
-		File file = new File( getFilesDir(), Hash.sha1( getServer( "xmpp" ).getCredential().getUsername() + ".queue" ) );
+		File file = getUserTransportQueueDir( getUsername() );
 		file.mkdirs();
 		return file;
 	}
@@ -897,45 +1549,123 @@ public class SilentTextApplication extends Application {
 	}
 
 	public User getUser( CharSequence username ) {
+		return getUser( username, false );
+	}
+
+	public User getUser( CharSequence username, boolean forceUpdate ) {
 
 		if( username == null ) {
 			return null;
 		}
 
-		try {
-			User user = getUsers().findByID( CryptoUtils.copyAsCharArray( username ) );
-			if( user instanceof SensitiveUser ) {
-				( (SensitiveUser) user ).setID( username );
+		if( !forceUpdate ) {
+			User user = getUserFromCache( username );
+
+			if( user != null ) {
 				return user;
 			}
-		} catch( IllegalStateException exception ) {
+
+		}
+
+		BasicUser updatedUser = getUserFromServer( username );
+
+		if( updatedUser != null ) {
+			try {
+				getUsers().save( updatedUser );
+			} catch( IllegalStateException exception ) {
+				getLog().warn( exception, "#save user:%s", username );
+			}
+		}
+
+		return updatedUser;
+
+	}
+
+	private File getUserConversationsDir( String username ) {
+		return new File( getFilesDir(), Hash.sha1( username + ".conversations" ) );
+	}
+
+	private File getUserCredentialsDir( String username ) {
+		return new File( getFilesDir(), Hash.sha1( username + ".credentials" ) );
+	}
+
+	public File [] getUserDirs( String username ) {
+		return new File [] {
+			getUserCredentialsDir( username ),
+			getUserConversationsDir( username ),
+			getUserKeyPairsDir( username ),
+			getUserTransportQueueDir( username ),
+			getStorageKeyFile( username )
+		};
+	}
+
+	public User getUserFromCache( CharSequence username ) {
+		if( username == null ) {
+			return null;
+		}
+
+		char [] usernameAsArray = CryptoUtils.copyAsCharArray( username );
+
+		try {
+			User user = getUsers().findByID( usernameAsArray );
+			if( user instanceof BasicUser ) {
+				( (BasicUser) user ).setID( username );
+				return user;
+			}
+		} catch( RuntimeException exception ) {
 			getLog().warn( exception, "#findByID user:%s", username );
 		}
 
-		Session session = getSession();
+		return null;
+	}
 
-		if( session == null ) {
-			return null;
-		}
+	private BasicUser getUserFromServer( CharSequence username ) {
 
-		User u = session.getUser( username );
-
-		if( !( u instanceof SensitiveUser ) ) {
-			return null;
-		}
-
-		SensitiveUser user = (SensitiveUser) u;
-
-		user.setID( username );
+		User u = null;
 
 		try {
-			getUsers().save( user );
-		} catch( IllegalStateException exception ) {
-			getLog().warn( exception, "#save user:%s", username );
+
+			Session session = getSession();
+			if( session != null ) {
+				u = session.findUser( username );
+			}
+
+		} catch( HTTPClientUnknownResourceException exception ) {
+			getLog().info( "#getUserFromServer username:%s %s", username, exception.getLocalizedMessage() );
+			return null;
+		} catch( HTTPClientForbiddenException exception ) {
+			getLog().error( exception, "#getUserFromServer" );
+			deactivate();
+		} catch( HTTPException exception ) {
+			ServiceConfiguration.getInstance().api.removeFromCache( getCachingSRVResolver() );
+			getLog().error( exception, "#getUserFromServer" );
+		} catch( NetworkException exception ) {
+			ServiceConfiguration.getInstance().api.removeFromCache( getCachingSRVResolver() );
+			getLog().info( exception, "#getUserFromServer" );
+		} catch( RuntimeException exception ) {
+			if( NetworkException.isNetworkOnMainThread( exception ) ) {
+				getLog().warn( exception, "#getUserFromServer" );
+			} else {
+				throw exception;
+			}
 		}
 
+		if( !( u instanceof BasicUser ) ) {
+			return null;
+		}
+
+		BasicUser user = (BasicUser) u;
+		user.setID( username );
 		return user;
 
+	}
+
+	private File getUserKeyPairsDir( String username ) {
+		return new File( getFilesDir(), Hash.sha1( username, ".key_pairs" ) );
+	}
+
+	public UserManager getUserManager() {
+		return new UserManagerClient( createHTTPClient(), getAPIURL() );
 	}
 
 	public String getUsername() {
@@ -945,37 +1675,132 @@ public class SilentTextApplication extends Application {
 		return username;
 	}
 
-	public SecureFileRepository<SensitiveUser> getUsers() {
+	public UserPreferences getUserPreferences() {
+		return getUserPreferences( getUsername() );
+	}
+
+	public UserPreferences getUserPreferences( String username ) {
+
+		if( username == null ) {
+			return null;
+		}
+
+		createUserPreferencesRepository();
+
+		if( userPreferencesRepository == null ) {
+			return null;
+		}
+
+		UserPreferences preferences = null;
+
+		preferences = userPreferencesRepository.findByID( username.toCharArray() );
+
+		if( preferences == null ) {
+			preferences = createDefaultUserPreferences( username );
+			userPreferencesRepository.save( preferences );
+		}
+
+		return preferences;
+
+	}
+
+	public SecureFileRepository<User> getUsers() {
+
 		if( users == null ) {
-			users = new SecureFileRepository<SensitiveUser>( new File( getFilesDir(), Hash.sha1( "users" ) ), new UserHelper(), CIPHER_ALGORITHM, KEY_ALGORITHM );
+
+			File baseDirectory = getFilesDir( "users" );
+
+			RepositoryHelper<User> helper = new RepositoryHelper<User>( new Serializer<User>() {
+
+				@Override
+				public User read( DataInputStream in ) throws IOException {
+					return BasicUser.from( in );
+				}
+
+				@Override
+				public User read( DataInputStream in, User out ) throws IOException {
+					if( out instanceof BasicUser ) {
+						( (BasicUser) out ).load( in );
+						return out;
+					}
+					return BasicUser.from( in );
+				}
+
+				@Override
+				public User write( User in, DataOutputStream out ) throws IOException {
+					if( in instanceof BasicUser ) {
+						( (BasicUser) in ).save( out );
+					}
+					return in;
+				}
+
+			} ) {
+
+				@Override
+				public char [] identify( User user ) {
+					return CryptoUtils.toCharArraySafe( CharBuffer.wrap( user.getID() ) );
+				}
+
+			};
+			BufferedBlockCipherFactory cipherFactory = new AESWithCBCAndPKCS7PaddingCipherFactory();
+			MacFactory macFactory = new HMacSHA256Factory();
+			users = new SecureFileRepository<User>( baseDirectory, helper, cipherFactory, macFactory );
 		}
 		if( applicationKey != null ) {
-			users.unlock( applicationKey.getEncoded() );
+			users.unlock( applicationKey );
 		} else {
 			users.lock();
 		}
 		return users;
 	}
 
-	public String getVersion() {
-		try {
-			return getPackageManager().getPackageInfo( getPackageName(), 0 ).versionName;
-		} catch( NameNotFoundException exception ) {
-			return getString( R.string.unknown );
+	private File getUserTransportQueueDir( String username ) {
+		return new File( getFilesDir(), Hash.sha1( username + ".queue" ) );
+	}
+
+	public List<UUIDEntry> getUUIDs() {
+		createUUIDRepository();
+		return UUIDRepository.list().toLazierList();
+	}
+
+	protected SocketFactory getXMPPSocketFactory() {
+		return new XMPPSocketFactory( new TrustStoreCertificateVerifier( getTrustStore() ) );
+	}
+
+	public XMPPTransport getXMPPTransport() {
+		return xmppTransport;
+	}
+
+	public String getXMPPTransportConnectionStatus() {
+		return xmppTransportConnectionStatus;
+	}
+
+	public boolean hasSharedSession() {
+		ExternalKeyManager externalKeyManager = getExternalKeyManager();
+		if( externalKeyManager == null ) {
+			return false;
 		}
+		CharSequence apiKey = getSharedDataFromKeyManagerAsCharSequence( externalKeyManager.getDeviceAuthDataTag() );
+		CharSequence deviceID = getSharedDataFromKeyManagerAsCharSequence( externalKeyManager.getDeviceUniqueIDTag() );
+
+		return apiKey != null && deviceID != null;
 	}
 
-	public boolean isActivated() {
-		return userKey != null;
+	public boolean hasValidSharedSession() {
+		if( isUnlocked() && isUserKeyUnlocked() && isExternalKeyManagerAvailable() && !hasSharedSession() ) {
+			return false;
+		}
+
+		return true;
 	}
 
-	public boolean isConnected() {
-		checkNetworkState();
-		return connected;
+	public boolean isApplicationInForeground() {
+		return foreground;
 	}
 
-	public boolean isDebugModeEnabled() {
-		return 0 != ( getApplicationInfo().flags &= ApplicationInfo.FLAG_DEBUGGABLE );
+	public boolean isExternalKeyManagerAvailable() {
+		ExternalKeyManager externalKeyManager = getExternalKeyManager();
+		return externalKeyManager != null && externalKeyManager.isRegistered();
 	}
 
 	private boolean isIdentical( File file, String assetName ) {
@@ -993,19 +1818,12 @@ public class SilentTextApplication extends Application {
 	}
 
 	public boolean isInactive( int threshold ) {
-		return getTimeUntilInactive( threshold ) <= 0;
+		return getTimeRemainingUntilInactive( threshold ) <= 0;
 	}
 
-	public boolean isKeyManagerSupported() {
-		return KeyManagerSupport.hasKeyManager( getPackageManager() ) && KeyManagerSupport.signaturesMatch( getPackageManager(), getPackageName() );
-	}
-
-	public boolean isListeningForLocationUpdates() {
-		return locationListener.isRegistered();
-	}
-
-	public boolean isOnline() {
-		return connected && getJabber() != null && getJabber().isOnline();
+	public boolean isNetworkConnected() {
+		checkNetworkState();
+		return connected;
 	}
 
 	public boolean isSelf( String username ) {
@@ -1020,21 +1838,36 @@ public class SilentTextApplication extends Application {
 		return applicationKey != null;
 	}
 
+	public boolean isUserEntitledToSilentText() {
+		AuthenticatedSessionClient session = (AuthenticatedSessionClient) getSession();
+		User user = session.getSelf();
+		Set<Entitlement> entitlements = user.getEntitlements();
+		return entitlements.contains( Entitlement.SILENT_TEXT );
+	}
+
+	public boolean isUserKeyUnlocked() {
+		return userKey != null;
+	}
+
+	public boolean isXMPPTransportConnected() {
+		return connected && getXMPPTransport() != null && getXMPPTransport().isConnected();
+	}
+
 	public void lock() {
 		lock( true );
 	}
 
 	public void lock( boolean logout ) {
 
-		if( logout && isOnline() ) {
-			new Thread() {
+		if( logout && isXMPPTransportConnected() ) {
+			new Thread( "xmpp-logout" ) {
 
 				@Override
 				public void run() {
-					JabberClient jabber = getJabber();
+					XMPPTransport jabber = getXMPPTransport();
 					if( jabber != null ) {
-						jabber.logout();
-						setJabber( (JabberClient) null );
+						jabber.disconnect();
+						setXMPPTransport( (XMPPTransport) null );
 					}
 				}
 
@@ -1043,8 +1876,10 @@ public class SilentTextApplication extends Application {
 
 		LockApplicationOnReceive.cancel( this );
 
-		storageKeys.clear();
+		CryptoUtils.randomize( userKey );
 		userKey = null;
+
+		CryptoUtils.randomize( applicationKey );
 		applicationKey = null;
 
 		if( keyPairs != null ) {
@@ -1052,9 +1887,9 @@ public class SilentTextApplication extends Application {
 			keyPairs = null;
 		}
 
-		if( networks != null ) {
-			networks.lock();
-			networks = null;
+		if( serviceEndpointRepository != null ) {
+			serviceEndpointRepository.lock();
+			serviceEndpointRepository = null;
 		}
 
 		if( users != null ) {
@@ -1062,6 +1897,14 @@ public class SilentTextApplication extends Application {
 			users = null;
 		}
 
+		if( userPreferencesRepository != null ) {
+			userPreferencesRepository.lock();
+			userPreferencesRepository = null;
+		}
+
+		httpResponseCache.clear();
+
+		applicationPreferencesRepository = null;
 		broker = null;
 		servers = null;
 		conversations = null;
@@ -1072,9 +1915,16 @@ public class SilentTextApplication extends Application {
 	}
 
 	public void logout() {
-		JabberClient jabber = getJabber();
+		XMPPTransport jabber = getXMPPTransport();
 		if( jabber != null ) {
-			jabber.logout();
+			jabber.disconnect();
+		}
+	}
+
+	private void migrateUserKey() {
+		String username = getUsername();
+		if( username != null ) {
+			EncryptedStorage.saveUserKey( this, applicationKey, username, userKey );
 		}
 	}
 
@@ -1087,8 +1937,11 @@ public class SilentTextApplication extends Application {
 			getLog().warn( exception, "UnixSecureRandom#register" );
 		}
 		ServiceConfiguration.refresh( this );
-		ping();
+		sendToBackground();
 		startService( new Intent( this, GCMService.class ) );
+		startService( new Intent( this, SysNetObserverService.class ) );
+		MIGRATIONS.migrate( this );
+		createExternalKeyManagerFactory();
 	}
 
 	public void onNetworkStateChanged() {
@@ -1100,24 +1953,20 @@ public class SilentTextApplication extends Application {
 		getLog().debug( "#onNewPushNotificationToken token:%s", token );
 		SharedPreferences preferences = getSharedPreferences( "gcm", MODE_PRIVATE );
 		preferences.edit().putString( "token", token ).commit();
-		new Thread() {
+		new Thread( "push-registration" ) {
 
 			@Override
 			public void run() {
-				if( !isConnected() ) {
+				if( !isNetworkConnected() ) {
 					return;
 				}
-				Session session = getSession();
-				if( session != null ) {
-					try {
-						session.registerPushNotifications( "silent_text", "gcm", token );
-					} catch( Throwable exception ) {
-						getLog().warn( exception, "#registerPushNotifications" );
+				try {
+					Session session = getSession();
+					if( session != null ) {
+						session.startReceivingPushNotifications( getPackageName(), "gcm", ServiceConfiguration.getInstance().gcm.target, token );
 					}
-				}
-				JabberClient jabber = getJabber();
-				if( jabber != null && jabber.isOnline() ) {
-					jabber.registerPushNotificationToken( getPackageName(), token );
+				} catch( Throwable exception ) {
+					getLog().warn( exception, "#registerPushNotifications" );
 				}
 			}
 
@@ -1128,97 +1977,108 @@ public class SilentTextApplication extends Application {
 	 * @param message
 	 */
 	public void onPushNotification() {
-		// getLog().debug( "#onPushNotification" );
+		if( isApplicationInForeground() ) {
+			getLog().debug( "#onPushNotification app in foreground (ignoring)" );
+			return;
+		}
+		if( !NotificationBroadcaster.isReadyForNextNotification() ) {
+			getLog().debug( "#onPushNotification already broadcasting notification (ignoring)" );
+			return;
+		}
 		sendBroadcast( Action.NOTIFY.intent(), Manifest.permission.READ );
 	}
 
-	public void ping() {
-		timeOfMostRecentActivity = System.currentTimeMillis();
-		rescheduleAutoDisconnect();
-		rescheduleAutoLock();
+	private void onUserKeyUnlocked() {
+		Server server = getServer( "xmpp" );
+		if( server != null ) {
+			Credential credential = server.getCredential();
+			if( credential != null ) {
+				createXMPPTransportAsync( credential );
+				getSCimpBridge().setIdentity( credential.getUsername() );
+				getOrCreateKeyPair();
+				validateSession();
+			}
+		}
 	}
 
 	private String readAssetAsString( String path ) {
 		InputStream in = null;
-		ByteArrayOutputStream out = null;
 		try {
 			in = getAssets().open( path );
-			out = new ByteArrayOutputStream();
-			IOUtils.pipe( in, out );
-			return out.toString();
+			return IOUtils.readAsString( in );
 		} catch( IOException exception ) {
+			getLog().warn( exception, "#readAssetAsString path:%s", path );
 			return null;
 		} finally {
-			IOUtils.close( in, out );
+			IOUtils.close( in );
+		}
+	}
+
+	private String readRawResourceAsString( int rawResourceID ) {
+		InputStream in = null;
+		try {
+			in = getResources().openRawResource( rawResourceID );
+			return IOUtils.readAsString( in, UTF16 );
+		} finally {
+			IOUtils.close( in );
 		}
 	}
 
 	public void registerKeyManagerIfNecessary() {
-		if( keyManagerToken != 0 ) {
-			return;
-		}
-		if( isKeyManagerSupported() ) {
-
-			keyManagerToken = KeyManagerSupport.registerWithKeyManager( getContentResolver(), getPackageName(), getString( R.string.silent_text ) );
-
-			KeyManagerSupport.addListener( new KeyManagerListener() {
-
-				@Override
-				public void onKeyDataRead() {
-					// Ignore.
-				}
-
-				@Override
-				public void onKeyManagerLockRequest() {
-					lock();
-				}
-
-				@Override
-				public void onKeyManagerUnlockRequest() {
-					byte [] unlockCode = KeyManagerSupport.getPrivateKeyData( getContentResolver(), Extra.PASSWORD.getName() );
-					try {
-						if( unlockCode != null ) {
-							char [] hashedUnlockCode = CryptoUtils.toCharArray( unlockCode );
-							try {
-								unlockWithHashedPasscode( hashedUnlockCode );
-							} finally {
-								CryptoUtils.randomize( hashedUnlockCode );
-							}
-						}
-					} finally {
-						CryptoUtils.randomize( unlockCode );
-					}
-				}
-
-			} );
-
+		ExternalKeyManager externalKeyManager = getExternalKeyManager();
+		if( externalKeyManager != null ) {
+			externalKeyManager.register();
 		}
 	}
 
-	private List<NamedKeyPair> removeExpired( List<NamedKeyPair> pairs ) {
-		for( int i = 0; i < pairs.size(); i++ ) {
-			NamedKeyPair pair = pairs.get( i );
-			if( isExpired( pair ) ) {
-				new Thread( new RemoveKeyPair( getSession(), keyPairs, pair.locator ) ).start();
-				pairs.remove( i );
-				i--;
+	public void removeAttachments( Event event ) {
+		if( event instanceof Message ) {
+			Siren siren = parseSiren( event.getText() );
+			if( siren == null ) {
+				return;
+			}
+			byte [] locator = siren.getCloudLocatorAsByteArray();
+			if( locator != null ) {
+				getAttachments().removeByID( new String( locator ).toCharArray() );
 			}
 		}
-		return pairs;
+	}
+
+	private List<NamedKeyPair> removeExpired( LazyList<NamedKeyPair> pairs ) {
+		List<NamedKeyPair> remaining = new ArrayList<NamedKeyPair>();
+		for( int i = 0; i < pairs.size(); i++ ) {
+			NamedKeyPair pair = pairs.get( i );
+			if( pair == null ) {
+				continue;
+			}
+			if( isExpired( pair ) ) {
+				Session session = getSession();
+				if( session != null ) {
+					new NamedThread( new RemoveKeyPair( session, keyPairs, pair.locator ) ).start();
+				}
+			} else {
+				remaining.add( pair );
+			}
+		}
+		return remaining;
 	}
 
 	public void removeSharedDataFromKeyManager( String id ) {
-		if( isKeyManagerSupported() ) {
-			KeyManagerSupport.deleteSharedKeyData( getContentResolver(), id );
+		ExternalKeyManager externalKeyManager = getExternalKeyManager();
+		if( externalKeyManager != null ) {
+			externalKeyManager.deleteSharedKeyData( id );
 		}
 	}
 
 	public void removeSharedSession() {
-		removeSharedDataFromKeyManager( KeyManagerSupport.DEV_AUTH_DATA_TAG );
-		removeSharedDataFromKeyManager( KeyManagerSupport.DEV_UNIQUE_ID_TAG );
+		ExternalKeyManager externalKeyManager = getExternalKeyManager();
+		if( externalKeyManager != null ) {
+			removeSharedDataFromKeyManager( externalKeyManager.getDeviceAuthDataTag() );
+			removeSharedDataFromKeyManager( externalKeyManager.getDeviceUniqueIDTag() );
+		}
 	}
 
-	public void requestUnlockCode() {
+	public void requestEncryptionPassPhrase() {
 		Intent intent = new Intent( this, UnlockActivity.class );
 		intent.addFlags( Intent.FLAG_ACTIVITY_NEW_TASK );
 		startActivity( intent );
@@ -1228,7 +2088,7 @@ public class SilentTextApplication extends Application {
 
 		cancelAutoDisconnect();
 
-		if( !GCMService.isAvailable( this ) ) {
+		if( ServiceConfiguration.getInstance().xmpp.background || !GCMService.isAvailable( this ) ) {
 			return;
 		}
 
@@ -1287,19 +2147,28 @@ public class SilentTextApplication extends Application {
 					return;
 				}
 				if( connected ) {
-					if( isUnlocked() && isActivated() ) {
-						setJabberServer( getServer( "xmpp" ) );
+					if( isUnlocked() && isUserKeyUnlocked() ) {
+						XMPPTransport client = getXMPPTransport();
+						if( client == null ) {
+							Server server = getServer( "xmpp" );
+							createXMPPTransportAsync( server != null ? server.getCredential() : null );
+						}
 					} else {
 						sendBroadcast( Action.CONNECT.intent(), Manifest.permission.READ );
 					}
-				} else {
-					setJabberServer( null );
 				}
 			}
 		};
 
 		return respondToNetworkStateChange;
 
+	}
+
+	public void revokeAllKeyPairs() {
+		List<NamedKeyPair> pairs = getKeyPairs();
+		if( pairs != null ) {
+			AsyncUtils.execute( new RevokeKeyPairTask( getNamedKeyPairs(), this ), pairs.toArray( EMPTY_ARRAY_NAMED_KEY_PAIR ) );
+		}
 	}
 
 	public void save( Credential credential ) {
@@ -1309,25 +2178,83 @@ public class SilentTextApplication extends Application {
 		}
 	}
 
+	public void save( Event event ) {
+		ConversationRepository conversations = getConversations();
+		if( conversations != null ) {
+			Conversation conversation = conversations.findById( event.getConversationID() );
+			if( conversation != null ) {
+				EventRepository events = conversations.historyOf( conversation );
+				if( events != null ) {
+					events.save( event );
+				}
+			}
+		}
+	}
+
 	public void save( NamedKeyPair keyPair ) {
 		createNamedKeyPairRepository();
 		keyPairs.save( keyPair );
-		new Thread( new UploadPublicKey( getSession(), extractPublicKey( keyPair ) ) ).start();
+		Session session = getSession();
+		if( session instanceof AuthenticatedSession ) {
+			new NamedThread( new SynchronizePublicKeysWithServer( (AuthenticatedSession) session, keyPairs ) ).start();
+		}
 	}
 
-	private void save( StorageKeySpec storageKey, String alias, char [] passcode ) {
-		storageKey.ephemeralKey.iterationCount = getCalibratedIterationCount( 2, 1024, 10240 );
-		storageKey.cycle( passcode );
-		File file = new File( getFilesDir(), Hash.sha1( alias ) + ".key" );
-		OutputStream out = null;
-		try {
-			out = new FileOutputStream( file, false );
-			storageKey.write( out );
-		} catch( IOException exception ) {
-			throw new RuntimeException( exception );
-		} finally {
-			IOUtils.close( out );
+	public void save( Server server ) {
+		ServerRepository servers = getServers();
+		if( servers != null && server != null ) {
+			servers.save( server );
 		}
+	}
+
+	public void save( Session session ) {
+		if( session == null ) {
+			return;
+		}
+		Server server = getServer( "broker" );
+		if( server == null ) {
+			server = new Server( "broker" );
+		}
+		if( server.getCredential() == null ) {
+			server.setCredential( new Credential() );
+		}
+		server.getCredential().setUsername( session.getID() );
+		server.getCredential().setPassword( session.getAccessToken() );
+		save( server );
+	}
+
+	public void saveApplicationPreferences( UserPreferences preferences ) {
+		createApplicationPreferencesRepository();
+		if( applicationPreferencesRepository != null ) {
+			applicationPreferencesRepository.save( preferences );
+		}
+	}
+
+	public void saveLicenseCode( CharSequence licenseCode ) {
+		createLicenseCodeRepository();
+		licenseCodeRepository.save( licenseCode );
+	}
+
+	public void saveUserPreferences( UserPreferences preferences ) {
+		createUserPreferencesRepository();
+		if( userPreferencesRepository != null ) {
+			userPreferencesRepository.save( preferences );
+		}
+	}
+
+	public void sendToBackground() {
+		// getLog().debug( "#toBackground" );
+		updateMostRecentActivity();
+		foreground = false;
+		rescheduleAutoDisconnect();
+		rescheduleAutoLock();
+	}
+
+	public void sendToForeground() {
+		// getLog().debug( "#toForeground" );
+		foreground = true;
+		cancelAutoDisconnect();
+		cancelAutoLock();
 	}
 
 	public void setAPIKey( String apiKey ) {
@@ -1336,30 +2263,35 @@ public class SilentTextApplication extends Application {
 		getServers().save( server );
 	}
 
-	public void setJabber( Credential credential ) {
-		Server server = getOrCreateServer( "xmpp" );
-		credential.setDomain( getDomain() );
-		if( server.getCredential() == null ) {
-			server.setCredential( credential );
-		} else {
-			server.getCredential().setUsername( credential.getUsername() );
-			server.getCredential().setPassword( credential.getPassword() );
+	public void setEncryptionPassPhrase( char [] encryptionPassPhrase ) {
+		char [] hashedUnlockCode = Hash.sha1( encryptionPassPhrase );
+		try {
+			EncryptedStorage.saveMasterKey( this, hashedUnlockCode, applicationKey );
+			getMigrationTasks().remove( Base64SHA1PasscodeMigration.TASK );
+		} finally {
+			CryptoUtils.randomize( hashedUnlockCode );
 		}
-		conversations = null;
-		getServers().save( server );
-		unlockUserKey();
 	}
 
-	public void setJabber( JabberClient jabber ) {
+	public void setEncryptionPassPhrase( CharSequence encryptionPassPhrase ) {
+		char [] buffer = CryptoUtils.copyAsCharArray( encryptionPassPhrase );
+		try {
+			setEncryptionPassPhrase( buffer );
+		} finally {
+			CryptoUtils.randomize( buffer );
+		}
+	}
 
-		if( this.jabber != jabber ) {
+	public void setXMPPTransport( XMPPTransport jabber ) {
 
-			if( this.jabber != null ) {
-				this.jabber.onDestroy();
+		if( xmppTransport != jabber ) {
+
+			if( xmppTransport != null ) {
+				xmppTransport.onDestroy();
 			}
 
 			if( jabber != null ) {
-				jabber.setLog( new Log( jabber.getClass().getSimpleName() ) );
+				jabber.setLog( new Log( "XMPP" ) );
 				jabber.getLog().onCreate();
 			} else {
 				sendBroadcast( Action.DISCONNECT.intent(), Manifest.permission.READ );
@@ -1367,32 +2299,50 @@ public class SilentTextApplication extends Application {
 
 		}
 
-		this.jabber = jabber;
-
-		getNative().setIdentity( jabber == null ? null : jabber.getUsername() );
+		xmppTransport = jabber;
 
 		if( jabber == null ) {
 			return;
 		}
 
-		this.jabber.addListener( new TransportListener() {
+		xmppTransport.addListener( new TransportListener() {
 
 			private void broadcastUpdate( Conversation conversation ) {
+				broadcastUpdate( conversation.getPartner().getUsername() );
+			}
+
+			private void broadcastUpdate( String remoteUserID ) {
 				Intent intent = Action.UPDATE_CONVERSATION.intent();
-				Extra.PARTNER.to( intent, conversation.getPartner().getUsername() );
+				Extra.PARTNER.to( intent, remoteUserID );
 				sendBroadcast( intent, Manifest.permission.READ );
 			}
 
 			@Override
-			public void onInsecureMessageReceived( String id, String sender, String message ) {
-				getLog().info( "INSECURE MESSAGE [%s] %s: %s", id, sender, message );
+			public void onInsecureMessageReceived( Envelope envelope ) {
+				getLog().info( "INSECURE MESSAGE [%s] %s: %s", envelope.id, envelope.from, envelope.content );
 			}
 
 			@Override
-			public void onMessageReturned( String id, String recipient, String reason ) {
+			public void onMessageAcknowledged( Envelope envelope ) {
 
-				int index = recipient.indexOf( '/' );
-				String recipientWithoutResource = index >= 0 ? recipient.substring( 0, index ) : recipient;
+				Event event = findEventByID( envelope.id );
+
+				if( event instanceof OutgoingMessage ) {
+					OutgoingMessage message = (OutgoingMessage) event;
+					if( MessageState.SENT.equals( message.getState() ) ) {
+						message.setState( MessageState.ACKNOWLEDGED );
+						save( message );
+						broadcastUpdate( event.getConversationID() );
+					}
+				}
+
+			}
+
+			@Override
+			public void onMessageReturned( Envelope envelope, String reason ) {
+
+				int index = envelope.to.indexOf( '/' );
+				String recipientWithoutResource = index >= 0 ? envelope.to.substring( 0, index ) : envelope.to;
 				ConversationRepository conversations = getConversations();
 				Conversation conversation = conversations.findByPartner( recipientWithoutResource );
 
@@ -1402,12 +2352,13 @@ public class SilentTextApplication extends Application {
 
 				EventRepository events = conversations.historyOf( conversation );
 
-				Event returnedEvent = events.findById( id );
+				Event returnedEvent = events.findById( envelope.id );
 				if( returnedEvent instanceof OutgoingMessage ) {
 					Message message = (OutgoingMessage) returnedEvent;
 					if( MessageState.SENT.equals( message.getState() ) ) {
 						message.setState( MessageState.ENCRYPTED );
 						events.save( message );
+						enqueue( message );
 					}
 				}
 
@@ -1421,23 +2372,23 @@ public class SilentTextApplication extends Application {
 			}
 
 			@Override
-			public void onMessageSent( String id, String recipient, String text ) {
+			public void onMessageSent( Envelope envelope ) {
 
 				ConversationRepository _conversations = getConversations();
-				Conversation conversation = _conversations.findByPartner( recipient );
+				Conversation conversation = _conversations.findByPartner( envelope.to );
 
 				if( conversation == null ) {
 					return;
 				}
 
 				EventRepository events = _conversations.historyOf( conversation );
-				Event event = events.findById( id );
+				Event event = events.findById( envelope.id );
 
 				if( event instanceof Message ) {
 
 					Message message = (Message) event;
 
-					if( isResendRequest( message ) ) {
+					if( isOutgoingResendRequest( message ) ) {
 						events.remove( message );
 						return;
 					}
@@ -1456,155 +2407,57 @@ public class SilentTextApplication extends Application {
 			}
 
 			@Override
-			public void onSecureMessageReceived( String id, String sender, String message, boolean notifiable, boolean badgeworthy ) {
+			public void onSecureMessageReceived( Envelope envelope ) {
 
-				int index = sender.indexOf( '/' );
-				String partner = index >= 0 ? sender.substring( 0, index ) : sender;
-				String resourceName = index >= 0 ? sender.substring( index + 1 ) : null;
+				int index = envelope.from.indexOf( '/' );
+				String partner = index >= 0 ? envelope.from.substring( 0, index ) : envelope.from;
+				String resourceName = index >= 0 ? envelope.from.substring( index + 1 ) : null;
 
 				ConversationRepository conversations = getConversations();
-				Conversation conversation = conversations.findByPartner( partner );
-
-				if( conversation == null ) {
-					conversation = new Conversation();
-					conversation.setStorageKey( CryptoUtils.randomBytes( 64 ) );
-					conversation.setPartner( new Contact( partner ) );
-					conversations.save( conversation );
-				}
-
-				EventRepository events = conversations.historyOf( conversation );
+				Conversation conversation = getOrCreateConversation( partner );
 
 				if( resourceName != null && !resourceName.equals( conversation.getPartner().getDevice() ) ) {
 					conversation.getPartner().setDevice( resourceName );
 					conversations.save( conversation );
-					Event resourceChange = new ResourceChangeEvent( getString( R.string.connected_to, resourceName ) );
-					resourceChange.setConversationID( conversation.getPartner().getUsername() );
-					events.save( resourceChange );
 				}
 
-				getNative().decrypt( conversation.getPartner().getUsername(), id, message, notifiable, badgeworthy );
+				EventRepository events = conversations.historyOf( conversation );
+				if( events != null ) {
+					if( !events.exists( envelope.id ) ) {
+						IncomingMessage message = new IncomingMessage( conversation.getPartner().getUsername(), envelope.id, envelope.content );
+						message.setState( MessageState.RECEIVED );
+						message.setTime( System.currentTimeMillis() );
+						events.save( message );
+					}
+				}
 
+				// EA: At present, the Envelope does not provide any information about public-key
+				// encrypted data such as voicemails. Thus, the only way for us to deal with
+				// voicemail at present is by matching the "from" username. This is an ugly
+				// solution, and it'd be better to pass a flag on the Envelope
+				if( envelope.from.equalsIgnoreCase( HARDCODED_VOICEMAIL_ID ) ) {
+					getSCimpBridge().decryptPublicKey( conversation.getPartner().getUsername(), envelope.id, envelope.content, envelope.notifiable, envelope.badgeworthy );
+				} else {
+					getSCimpBridge().decrypt( conversation.getPartner().getUsername(), envelope.id, envelope.content, envelope.notifiable, envelope.badgeworthy );
+				}
 			}
-
 		} );
 
 		sendBroadcast( Action.CONNECT.intent(), Manifest.permission.READ );
 
 	}
 
-	public void setJabberServer( final Server server ) {
-
-		if( xmppConnectionThread != null && xmppConnectionThread.isAlive() ) {
-			return;
+	public void setXMPPTransportCredential( Credential credential ) {
+		Server server = getOrCreateServer( "xmpp" );
+		if( server.getCredential() == null ) {
+			server.setCredential( credential );
+		} else {
+			server.getCredential().setUsername( credential.getUsername() );
+			server.getCredential().setPassword( credential.getPassword() );
 		}
-
-		onlineStatus = getString( R.string.not_connected );
-		sendBroadcast( Action.XMPP_STATE_CHANGED.intent(), Manifest.permission.READ );
-
-		if( server == null || server.getDomain() == null ) {
-			setJabber( (JabberClient) null );
-			return;
-		}
-
-		xmppConnectionThread = new Thread( new NewJabberClient( getJabber(), server, getLocalResourceName(), getTrustStorePath(), getOutgoingMessageQueue(), new OnDisconnectedListener() {
-
-			@Override
-			public void onDisconnected( Throwable throwable ) {
-				if( throwable.getMessage() != null && !"".equals( throwable.getMessage() ) ) {
-					onlineStatus = throwable.getMessage();
-				} else {
-					onlineStatus = getString( R.string.not_connected );
-				}
-				ServiceConfiguration.getInstance().xmpp.removeFromCache( getNetworks() );
-				sendBroadcast( Action.XMPP_STATE_CHANGED.intent(), Manifest.permission.READ );
-			}
-
-		}, XMPP_PING_INTERVAL, getNetworks() ) {
-
-			@Override
-			protected void onClientConnected( JabberClient client ) {
-				if( client != null && client.isOnline() ) {
-					connected = true;
-					onlineStatus = getString( R.string.connected );
-					getServers().save( server );
-					sendBroadcast( Action.XMPP_STATE_CHANGED.intent(), Manifest.permission.READ );
-					String pushToken = getPushNotificationToken();
-					if( pushToken != null ) {
-						client.registerPushNotificationToken( getPackageName(), pushToken );
-					}
-				}
-			}
-
-			@Override
-			protected void onClientInitialized( JabberClient client ) {
-				onlineStatus = getString( R.string.connecting );
-				sendBroadcast( Action.XMPP_STATE_CHANGED.intent(), Manifest.permission.READ );
-				setJabber( client );
-			}
-
-			@Override
-			protected void onError( Throwable throwable ) {
-				getLog().warn( throwable, "XMPP #onError" );
-				if( throwable.getMessage() != null && !"".equals( throwable.getMessage() ) ) {
-					onlineStatus = throwable.getMessage();
-				} else {
-					onlineStatus = getString( R.string.not_connected );
-				}
-				sendBroadcast( Action.XMPP_STATE_CHANGED.intent(), Manifest.permission.READ );
-			}
-
-			@Override
-			protected void onLookupServiceRecord( String domain ) {
-				onlineStatus = getString( R.string.performing_srv_lookup );
-				sendBroadcast( Action.XMPP_STATE_CHANGED.intent(), Manifest.permission.READ );
-			}
-
-			@Override
-			protected void onServiceRecordReceived( String host, int port ) {
-				onlineStatus = getString( R.string.connecting );
-				sendBroadcast( Action.XMPP_STATE_CHANGED.intent(), Manifest.permission.READ );
-			}
-
-		} );
-
-		xmppConnectionThread.start();
-
-	}
-
-	public void setLocalResourceName( final String resourceName ) {
-		Credential credential = getCredential( getUsername() );
-		String r = resourceName.length() <= 0 ? null : resourceName;
-		if( credential == null ) {
-			credential = new Credential();
-			credential.setUsername( getUsername() );
-			credential.setDomain( getDomain() );
-		}
-		String previousValue = credential.getResource();
-		if( StringUtils.equals( r, previousValue ) ) {
-			return;
-		}
-		credential.setResource( r );
-		save( credential );
-		setJabberServer( getServer( "xmpp" ) );
-	}
-
-	public void setUnlockCode( char [] unlockCode ) {
-		char [] hashedUnlockCode = Hash.sha1( unlockCode );
-		try {
-			StorageKeySpec storageKey = storageKeys.get( APPLICATION_KEY_ALIAS );
-			save( storageKey, APPLICATION_KEY_ALIAS, hashedUnlockCode );
-		} finally {
-			CryptoUtils.randomize( hashedUnlockCode );
-		}
-	}
-
-	public void setUnlockCode( CharSequence unlockCode ) {
-		char [] buffer = CryptoUtils.copyAsCharArray( unlockCode );
-		try {
-			setUnlockCode( buffer );
-		} finally {
-			CryptoUtils.randomize( buffer );
-		}
+		conversations = null;
+		getServers().save( server );
+		unlockUserKeyAndMigrate();
 	}
 
 	public void shareSession() {
@@ -1615,21 +2468,12 @@ public class SilentTextApplication extends Application {
 	}
 
 	public void shareSession( AuthenticatedSession session ) {
-		if( session != null && isKeyManagerSupported() ) {
-			KeyManagerSupport.storeSharedKeyData( getContentResolver(), CryptoUtils.toByteArray( session.getAccessToken() ), KeyManagerSupport.DEV_AUTH_DATA_TAG );
-			KeyManagerSupport.storeSharedKeyData( getContentResolver(), CryptoUtils.toByteArray( session.getID() ), KeyManagerSupport.DEV_UNIQUE_ID_TAG );
-		}
-	}
-
-	public void startListeningForLocationUpdates() {
-		if( !locationListener.isRegistered() ) {
-			locationListener.register( this );
-		}
-	}
-
-	public void stopListeningForLocationUpdates() {
-		if( locationListener.isRegistered() ) {
-			locationListener.unregister( this );
+		if( session != null ) {
+			ExternalKeyManager externalKeyManager = getExternalKeyManager();
+			if( externalKeyManager != null ) {
+				externalKeyManager.storeSharedKeyData( externalKeyManager.getDeviceAuthDataTag(), CryptoUtils.toByteArraySafe( (CharBuffer) session.getAccessToken() ) );
+				externalKeyManager.storeSharedKeyData( externalKeyManager.getDeviceUniqueIDTag(), CryptoUtils.toByteArraySafe( (CharBuffer) session.getID() ) );
+			}
 		}
 	}
 
@@ -1640,29 +2484,21 @@ public class SilentTextApplication extends Application {
 		sendBroadcast( intent, Manifest.permission.READ );
 	}
 
-	protected void unlockWithHashedPasscode( char [] unlockCode ) {
+	public void unlock( char [] encryptionPassPhrase ) {
+		char [] hashedUnlockCode = Hash.sha1( encryptionPassPhrase );
 		try {
-			applicationKey = getKey( APPLICATION_KEY_ALIAS, unlockCode );
-			if( isKeyManagerSupported() ) {
-				KeyManagerSupport.storePrivateKeyData( getContentResolver(), CryptoUtils.toByteArray( unlockCode ), Extra.PASSWORD.getName() );
+			unlockWithHashedPassPhrase( hashedUnlockCode );
+		} catch( Throwable exception ) {
+			if( getMigrationTasks().exists( Base64SHA1PasscodeMigration.TASK.id ) ) {
+				unlockLegacy( encryptionPassPhrase );
 			}
-			unlockUserKey();
-		} finally {
-			CryptoUtils.randomize( unlockCode );
-		}
-	}
-
-	public void unlock( char [] unlockCode ) {
-		char [] hashedUnlockCode = Hash.sha1( unlockCode );
-		try {
-			unlockWithHashedPasscode( hashedUnlockCode );
 		} finally {
 			CryptoUtils.randomize( hashedUnlockCode );
 		}
 	}
 
-	public void unlock( CharSequence unlockCode ) {
-		char [] buffer = CryptoUtils.toCharArray( unlockCode );
+	public void unlock( CharSequence encryptionPassPhrase ) {
+		char [] buffer = CryptoUtils.toCharArray( encryptionPassPhrase );
 		try {
 			unlock( buffer );
 		} finally {
@@ -1670,53 +2506,182 @@ public class SilentTextApplication extends Application {
 		}
 	}
 
-	protected void unlockUserKey() {
+	@Deprecated
+	private void unlockLegacy( char [] encryptionPassPhrase ) {
+
+		char [] encryptionPassPhraseHash = Hash.sha1Legacy( encryptionPassPhrase );
+
+		try {
+			unlockWithHashedPassPhrase( encryptionPassPhraseHash );
+			setEncryptionPassPhrase( encryptionPassPhrase );
+			unlock( encryptionPassPhrase );
+		} finally {
+			CryptoUtils.randomize( encryptionPassPhraseHash );
+		}
+
+	}
+
+	private void unlockUserKey() {
+		userKey = EncryptedStorage.loadUserKey( this, applicationKey, getUsername() );
+	}
+
+	private void unlockUserKeyAndMigrate() {
+		if( getMigrationTasks().exists( OneShotPBKDF2Migration.TASK.id ) ) {
+			unlockUserKeyLegacy();
+			migrateUserKey();
+			getMigrationTasks().remove( OneShotPBKDF2Migration.TASK );
+		} else {
+			unlockUserKey();
+		}
+		onUserKeyUnlocked();
+	}
+
+	protected void unlockUserKeyLegacy() {
+
 		Server server = getServer( "xmpp" );
+
 		if( server == null ) {
 			return;
 		}
+
 		Credential credential = server.getCredential();
+
 		if( credential == null ) {
 			return;
 		}
+
 		String username = credential.getUsername();
+
 		if( username == null ) {
 			return;
 		}
-		char [] passcode = getPasscodeForUserKey( credential );
-		userKey = getKey( username, passcode );
+
+		char [] passcode = getEncryptionPassPhraseForUserKey( credential );
+
+		File file = getStorageKeyFile( username );
+
+		if( file.exists() && file.length() > 0 ) {
+			InputStream in = null;
+			try {
+				in = new FileInputStream( file );
+				StorageKeySpec storageKey = new StorageKeySpec( in, passcode );
+				if( storageKey.key == null ) {
+					Log.d( TAG, "storageKey.key is null" );
+				}
+				userKey = storageKey.key.getEncoded();
+			} catch( IOException exception ) {
+				Log.e( TAG, "Exception: " + exception.getMessage() );
+				throw new RuntimeException( exception );
+			} finally {
+				IOUtils.close( in );
+			}
+		}
+
 		CryptoUtils.randomize( passcode );
-		setJabberServer( server );
-		getOrCreateKeyPair();
-		validateSession();
+
 	}
 
-	private void validateSession() {
+	protected void unlockWithHashedPassPhrase( char [] passcode ) {
+		applicationKey = EncryptedStorage.loadMasterKey( this, passcode );
+		if( applicationKey == null ) {
+			throw new IllegalArgumentException( "Invalid passcode" );
+		}
+		ExternalKeyManager externalKeyManager = getExternalKeyManager();
+		if( externalKeyManager != null ) {
+			externalKeyManager.storePrivateKeyData( Extra.PASSWORD.getName(), CryptoUtils.toByteArraySafe( passcode ) );
+		}
+		unlockUserKeyAndMigrate();
+	}
 
-		new Thread( new SessionValidator( (AuthenticatedClientSession) getSession(), getNetworks() ) {
+	public void updateMostRecentActivity() {
+		timeOfMostRecentActivity = System.currentTimeMillis();
+		getLog().debug( "#updateMostRecentActivity resetTime:%d", Long.valueOf( timeOfMostRecentActivity ) );
+	}
+
+	public boolean userSupportsPKI( String username ) {
+		if( !ServiceConfiguration.getInstance().scimp.enablePKI ) {
+			return false;
+		}
+		byte [] privateKey = getPrivateKey();
+		if( privateKey != null ) {
+			byte [] publicKey = getPublicKey( username );
+			if( publicKey != null ) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public void validateAnySession() {
+
+		new AsyncTask<Void, Void, Void>() {
 
 			@Override
-			protected void onSessionInvalid() {
-				super.onSessionInvalid();
-				deactivate();
-			}
+			protected Void doInBackground( Void... params ) {
 
-		} ).start();
+				if( hasSharedSession() && hasValidSharedSession() ) {
+					getLog().info( "Valid shared session." );
+				} else if( hasSharedSession() ) {
+					validateSharedSession();
+				} else {
+					validateSession();
+				}
+
+				return null;
+			}
+		}.execute();
+
+	}
+
+	public void validateSession() {
+
+		AuthenticatedSessionClient session = (AuthenticatedSessionClient) getSession();
+
+		if( session != null ) {
+
+			new NamedThread( new SynchronizePublicKeysWithServer( session, getNamedKeyPairs() ) {
+
+				@Override
+				protected void onException( Throwable exception ) {
+					if( exception instanceof HTTPClientUnauthorizedException || exception instanceof HTTPClientForbiddenException ) {
+						JSONObject exceptionJSON = null;
+
+						try {
+							exceptionJSON = new JSONObject( ( (HTTPException) exception ).getBody() );
+						} catch( JSONException e ) {
+							return;
+						}
+
+						try {
+							if( exceptionJSON.has( "error_code" ) && exceptionJSON.getInt( "error_code" ) == -2 ) {
+								// Ignore backwards compatibility of retaining past device sessions
+								// (i.e., the newest device should always have priority).
+							} else {
+								onSessionInvalid();
+							}
+						} catch( JSONException e ) {
+							return;
+						}
+					}
+				}
+
+				@Override
+				protected void onSessionInvalid() {
+					super.onSessionInvalid();
+					deactivate();
+				}
+
+			} ).start();
+
+		}
 
 	}
 
 	public void validateSharedSession() {
 
-		if( isUnlocked() && isActivated() && isKeyManagerSupported() && !hasSharedSession() ) {
+		if( isUnlocked() && isUserKeyUnlocked() && isExternalKeyManagerAvailable() && !hasSharedSession() ) {
 
-			new Thread( new Runnable() {
-
-				@Override
-				public void run() {
-					deactivate();
-				}
-
-			} ).start();
+			new Thread( new Deactivation( this ), "deactivation" ).start();
 
 		}
 

@@ -1,60 +1,53 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version='1.0' encoding='UTF-8'?>
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-	<string name="silent_circle"><xliff:g id="company_name">Silent Circle</xliff:g></string>
-	<string name="silent_text"><xliff:g id="application_name">Silent Text</xliff:g></string>
-	<string name="label_push_notifications"><xliff:g id="application_name">Silent Text</xliff:g> GCM Push Notifications</string>
+	<string name="label_push_notifications"><xliff:g id="application_name">Silent Text</xliff:g> GCM Push-Benachrichtigungen</string>
 	<string name="new_message">Neue Nachricht</string>
 	<string name="copy">Kopieren</string>
-	<string name="status">Status</string>
 	<string name="notifications">Benachrichtigungen</string>
 	<string name="privacy">Datenschutz</string>
-	<string name="license">Lizenz</string>
 	<string name="about">Über</string>
+	<string name="encryption">Verschlüsselung</string>
 	<string name="privacy_statement">Datenschutzerklärung</string>
 	<string name="license_information">Lizenzinformation</string>
 	<string name="terms_and_conditions">Allgemeine Geschäftsbedingungen</string>
-	<string name="advanced">Erweitert</string>
-	<string name="compose_hint">Hier Ihre Nachricht eingeben</string>
-	<string name="default_hint">(Standard)</string>
-	<string name="empty_conversation_list">Sie haben keine Konversationen.</string>
-	<string name="empty_contacts">Sie haben keine Kontakte.</string>
+	<string name="compose_hint">Nachricht hier eingeben</string>
+	<string name="security_rating">Sicherheitsbeurteilung</string>
+	<string name="empty_conversation_list">Sie haben keine Unterhaltungen.</string>
 	<string name="burn_notice">Nachricht löschen</string>
 	<string name="burn">Löschen</string>
-	<string name="current_passcode">Aktuelles Passwort zum Fortfahren eingeben.</string>
-	<string name="passcode_warning">Wichtig! Ihr Passwort kann bei Verlust nicht wiederhergestellt werden. Vergessen Sie es nicht.</string>
+	<string name="current_passcode">Aktuelle Passphrase zum Fortfahren eingeben.</string>
+	<string name="passcode_warning">Wichtig! Ihre Passphrase kann bei Verlust nicht wiederhergestellt werden. Vergessen Sie sie nicht.</string>
 	<string name="are_you_sure">Sind Sie sicher?</string>
 	<string name="cannot_be_undone">Diese Aktion kann nicht rückgängig gemacht werden.</string>
-	<string name="save_will_expose_data">Das Speichern dieser Konversation macht alle enthaltenen Nachrichten anderen Anwendungen Ihrer Wahl zugänglich. Nachrichten mit Anhang oder Löschungsvermerk werden NICHT exportiert.</string>
+	<string name="save_will_expose_data">Das Speichern dieser Unterhaltung macht alle enthaltenen Nachrichten anderen Anwendungen Ihrer Wahl zugänglich. Nachrichten mit Anhang oder Löschungsvermerk werden NICHT exportiert.</string>
+	<string name="reset_keys_warning">Bis die neuen Schlüssel eingerichtet sind, können Nachrichten weder gesendet noch empfangen werden. Dieser Vorgang könnte einige Zeit dauern.</string>
 	<string name="yes">Ja</string>
-	<string name="cannot_open_file_not_saved"><xliff:g id="application_name">Silent Text</xliff:g> kann diese Datei nicht öffnen. Zum Anzeigen oder Teilen mit anderen Anwendungen muss sie erst im Download-Ordner gespeichert werden.</string>
-	<string name="cannot_open_file_saved"><xliff:g id="application_name">Silent Text</xliff:g> kann diese Datei nicht öffnen. Sie haben sie im Download-Ordner gespeichert und können sie jetzt mit externen Anwendungen anzeigen oder teilen.</string>
-	<string name="conversation">Konversation</string>
+	<string name="no">Nein</string>
+	<string name="cannot_open_file"><xliff:g id="application_name">Silent Text</xliff:g> kann diese Datei nicht öffnen. Wenn Sie diese Datei betrachten, teilen oder speichern, können andere Apps auf Ihrem Gerät auf diese Datei zugreifen.</string>
 	<string name="album_artwork">Albumbilder</string>
 	<string name="activate">Aktivieren</string>
 	<string name="reset_keys">Schlüssel zurücksetzen</string>
 	<string name="unverified">Unbestätigt</string>
 	<string name="verified">Bestätigt</string>
-	<string name="verified">Bestätigt</string>
 	<string name="cancel">Abbrechen</string>
 	<string name="save">Speichern</string>
 	<string name="settings">Einstellungen</string>
-	<string name="securing">Sichern<xliff:g id="ellipsis" example="…">&#8230;</xliff:g></string>
-	<string name="downloading">Herunterladen<xliff:g id="ellipsis" example="…">&#8230;</xliff:g></string>
-	<string name="decrypting">Entschlüsseln<xliff:g id="ellipsis" example="…">&#8230;</xliff:g></string>
-	<string name="waiting_for_connection">Auf Verbindung warten<xliff:g id="ellipsis" example="…">&#8230;</xliff:g></string>
+	<string name="securing">Sichern<xliff:g id="ellipsis" example="…">…</xliff:g></string>
+	<string name="downloading">Herunterladen<xliff:g id="ellipsis" example="…">…</xliff:g></string>
+	<string name="decrypting">Entschlüsseln<xliff:g id="ellipsis" example="…">…</xliff:g></string>
+	<string name="waiting_for_connection">Auf Verbindung warten<xliff:g id="ellipsis" example="…">…</xliff:g></string>
 	<string name="view">Anzeigen</string>
 	<string name="share">Teilen</string>
 	<string name="share_location">Standort teilen</string>
-	<string name="send_to">Senden an<xliff:g id="ellipsis" example="…">&#8230;</xliff:g></string>
+	<string name="send_to">Senden an<xliff:g id="ellipsis" example="…">…</xliff:g></string>
 	<string name="cancelled">Abgebrochen</string>
 	<string name="username_unavailable"><xliff:g id="username">%1$s</xliff:g> ist nicht verfügbar.</string>
-	<string name="conversation_with">Konversation mit <xliff:g id="username">%1$s</xliff:g></string>
-	<string name="refreshing_keys">Schlüssel aktualisieren<xliff:g id="ellipsis" example="…">&#8230;</xliff:g></string>
+	<string name="conversation_with">Unterhaltung mit <xliff:g id="username">%1$s</xliff:g></string>
 	<string name="resend">Erneut senden</string>
-	<string name="resend_requested">Erneutes Senden angefordert</string>
-	<string name="progress_encrypting">Verschlüsseln<xliff:g id="ellipsis" example="…">&#8230;</xliff:g> <xliff:g id="progress_percent" example="32%">%1$d%%</xliff:g></string>
-	<string name="progress_preparing">Vorbereiten<xliff:g id="ellipsis" example="…">&#8230;</xliff:g> <xliff:g id="progress_percent" example="32%">%1$d%%</xliff:g></string>
-	<string name="progress_uploading">Hochladen<xliff:g id="ellipsis" example="…">&#8230;</xliff:g> <xliff:g id="progress_percent" example="32%">%1$d%%</xliff:g></string>
+	<string name="progress_encrypting">Verschlüsseln<xliff:g id="ellipsis" example="…">…</xliff:g><xliff:g id="progress_percent" example="32%">%1$d%%</xliff:g></string>
+	<string name="progress_preparing">Vorbereiten<xliff:g id="ellipsis" example="…">…</xliff:g><xliff:g id="progress_percent" example="32%">%1$d%%</xliff:g></string>
+	<string name="progress_uploading">Hochladen<xliff:g id="ellipsis" example="…">…</xliff:g><xliff:g id="progress_percent" example="32%">%1$d%%</xliff:g></string>
+	<string name="progress_exporting">Exportvorgang läuft<xliff:g id="ellipsis" example="…">…</xliff:g><xliff:g id="progress_percent" example="32%">%1$d%%</xliff:g></string>
 	<string name="location">Standort</string>
 	<string name="unlock">Entsperren</string>
 	<string name="autolock">Automatische Sperre</string>
@@ -68,15 +61,12 @@
 	<string name="never_lock">Nicht automatisch sperren</string>
 	<string name="no_expiration">Nachrichten verfallen nicht</string>
 	<string name="messages_expire">Nachrichten verfallen <xliff:g id="expire_timeout" example="in 1 minute">%1$s</xliff:g></string>
-	<string name="messages">Nachrichten</string>
-	<string name="passcode">Passwort</string>
-	<string name="new_passcode">Neues Passwort</string>
-	<string name="verify_passcode">Bestätigen</string>
-	<string name="notify_new_passcode_set">Ein neues Passwort wurde festgelegt.</string>
-	<string name="notify_passcode_removed">Das Passwort wurde entfernt.</string>
+	<string name="passcode">Passphrase</string>
+	<string name="notify_new_passcode_set">Eine neue Passphrase wurde festgelegt.</string>
+	<string name="notify_passcode_removed">Die Passphrase wurde entfernt.</string>
+	<string name="notify_account_removed">Das Konto wurde entfernt.</string>
 	<string name="activation_code">Aktivierungscode</string>
 	<string name="activation_code_description">Anmelden oder ein Konto erstellen unter <xliff:g id="login_url">https://accounts.silentcircle.com</xliff:g>.</string>
-	<string name="dont_have_an_account">Kein Konto?</string>
 	<string name="review_account_details">Bitte die folgenden Daten vor der Erstellung Ihres Kontos auf Korrektheit überprüfen.</string>
 	<string name="previous">Zurück</string>
 	<string name="next">Weiter</string>
@@ -89,28 +79,19 @@
 	<string name="creating_account">Erstelle Konto<xliff:g id="ellipsis" example="…">...</xliff:g></string>
 	<string name="send">Senden</string>
 	<string name="thumbnail">Vorschau</string>
-	<string name="me">Ich</string>
-	<string name="sent">Gesendet</string>
-	<string name="received">Empfangen</string>
 	<string name="delivered">Zugestellt</string>
 	<string name="send_receipts">Empfangsbestätigung senden</string>
-	<string name="checkmark"><xliff:g id="checkmark">✓</xliff:g></string>
-	<string name="set_passcode">Passwort festlegen</string>
-	<string name="remove_passcode">Passwort entfernen</string>
-	<string name="change_passcode">Passwort ändern</string>
-	<string name="deactivate">Deaktivieren</string>
+	<string name="set_passcode"><xliff:g id="application_name">Silent Text</xliff:g> verschlüsseln</string>
+	<string name="set_passcode_description">Fragt jedes Mal eine Passphrase ab, um <xliff:g id="application_name">Silent Text</xliff:g> bei jeder Verwendung zu entschlüsseln.</string>
+	<string name="remove_passcode">Passphrase entfernen</string>
+	<string name="remove_passcode_description">Sie müssen Ihre aktuelle Passphrase wiederholen, bevor sie entfernt werden kann.</string>
+	<string name="change_passcode">Passphrase ändern</string>
 	<string name="sending">Senden<xliff:g id="ellipsis" example="…">...</xliff:g></string>
 	<string name="clear_history">Verlauf löschen</string>
-	<string name="save_conversation">Konversation speichern</string>
+	<string name="save_conversation">Unterhaltung speichern</string>
 	<string name="share_from">Teilen von</string>
-	<string name="reconnect">Wiederverbinden</string>
 	<string name="search_hint">Benutzername</string>
-	<string name="message_timestamp"><xliff:g id="sent_or_received" example="Sent">%1$s</xliff:g>: <xliff:g id="time_sent_or_received">%2$s</xliff:g> <xliff:g id="delivered" example="Delivered">%3$s</xliff:g></string>
-	<string name="connected_to">Verbunden mit <xliff:g id="device_name" example="Galaxy Nexus">%1$s</xliff:g></string>
-	<string name="online">Online</string>
-	<string name="offline">Offline</string>
-	<string name="warning_format">Warnung: <xliff:g id="warning_message" example="Secrets mismatch">%1$s</xliff:g></string>
-	<string name="unread_messages">Ungelesene Nachrichten</string>
+	<string name="message_timestamp"><xliff:g id="sent_or_received" example="Sent">%1$s</xliff:g>: <xliff:g id="time_sent_or_received">%2$s</xliff:g><xliff:g id="delivered" example="Delivered">%3$s</xliff:g></string>
 	<string name="secure">Sicher</string>
 	<string name="unlocked_title">Entsperrt</string>
 	<string name="unlocked_description">Zum Sperren antippen <xliff:g id="application_name" example="Silent Text">%1$s</xliff:g>.</string>
@@ -118,14 +99,9 @@
 	<string name="unknown">Unbekannt</string>
 	<string name="verify_description_verified">Als zusätzliche Sicherheit haben Sie diese Nachricht mit dem Empfänger bestätigt.</string>
 	<string name="verify_description_unverified">Für zusätzliche Sicherheit bestätigen Sie diese Nachricht mit dem Empfänger.</string>
-	<string name="clear_history_description">Sie können alle Nachrichten aus dieser Konversation auf einmal löschen, ohne die Sicherheit zu verlieren, die Sie mit dieser Person bereits eingegangen sind. Dies löscht sofort alle Nachrichten und Dateianhänge und kann nicht rückgängig gemacht werden.</string>
-	<string name="reset_passcode_description">Durch Festlegen einer Passwortsperre für dieses Gerät können Sie nicht befugte Personen davon abhalten, auf Ihre privaten Konversationen zuzugreifen, da dazu ein Passwort nötig ist und Ihre Daten verschlüsselt werden.</string>
-	<string name="deactivate_description">Dies deaktiviert die <xliff:g id="application_name">Silent Text</xliff:g> anwendung. Ihre Konversationen werden aufbewahrt, falls Sie sich später für eine erneute Aktivierung entscheiden.</string>
-	<string name="enable_notifications">Benachrichtigungen aktivieren</string>
-	<string name="enable_notification_sound">Klang abspielen</string>
+	<string name="ringtone">Klingelton</string>
+	<string name="ringtone_none">Keiner</string>
 	<string name="enable_notification_vibrate">Vibrieren</string>
-	<string name="enable_screenshots">Screenshots aktivieren</string>
-	<string name="restart_required">Ihre Änderungen werden nach dem Neustart übernommen.</string>
 	<string name="someone">jemand</string>
 	<string name="silence">Keine Nachrichten zum Anzeigen.</string>
 	<string name="application_locked">Anwendung gesperrt.</string>
@@ -136,63 +112,84 @@
 	<string name="not_downloaded">Nicht heruntergeladen</string>
 	<string name="create_username">Einen Benutzernamen wählen</string>
 	<string name="create_password">Ein Passwort erstellen</string>
-	<string name="required_email_address">Eine alternative E-Mail Adresse ist zur Kontowiederherstellung notwendig.</string>
+	<string name="required_email_address">Eine alternative E-Mail-Adresse ist notwendig, damit Sie wichtige Updates und Vorteile für Ihr Konto erhalten.</string>
 	<string name="required_username">Ihr Benutzername erlaubt anderen Nutzern, Sie im <xliff:g id="company_name">Silent Circle</xliff:g> Netzwerk zu kontaktieren.</string>
 	<string name="required_password">Wählen Sie ein sicheres Passwort. Dies schützt Ihr Konto gegen unbefugten Zugriff.</string>
 	<string name="optional_personal_information">Diese Informationen sind vollkommen optional und sind für den Anblick Ihres Kontos in Verzeichnissen verantwortlich.</string>
-	<string name="email_address">E-Mail Adresse</string>
-	<string name="alternate_email_address">Alternative E-Mail Adresse</string>
+	<string name="email_address">E-Mail-Adresse</string>
 	<string name="personal_information">Persönliche Informationen</string>
-	<string name="login_information">Anmeldeinformationen</string>
 	<string name="first_name">Vorname</string>
 	<string name="last_name">Nachname</string>
 	<string name="tap_to_reveal">(Zum Anzeigen antippen)</string>
 	<string name="password_not_shown">(Passwort wird nicht angezeigt)</string>
-	<string name="accept_terms">Ich habe die Datenschutzerklärung und die allgemeinen Geschäftsbedingungen gelesen und stimme Ihnen zu.</string>
-	<string name="accept">Ich stimme zu</string>
+	<string name="accept_terms">Ich habe die Datenschutzerklärung und die allgemeinen Geschäftsbedingungen gelesen und stimme diesen zu.</string>
 	<string name="terms">Bestimmungen</string>
 	<string name="permission_read">Sichere Nachrichten lesen</string>
 	<string name="permission_identify_senders">Den Namen des Absenders eingehender sicherer Nachrichten lesen</string>
 	<string name="permission_write">Sichere Nachrichten schreiben</string>
 	<string name="permission_access_accounts">Greifen Sie auf Ihr <xliff:g id="company_name">Silent Circle</xliff:g> Konto zu</string>
-	<string name="device_name">Gerätename</string>
-	<string name="android_version">Android-Version</string>
-	<string name="application_version">Anwendungsversion</string>
-	<string name="build_version_label">Build-Version</string>
-	<string name="environment">Umfeld</string>
-	<string name="xmpp_host_label">XMPP-Host</string>
-	<string name="xmpp_port_label">XMPP-Port</string>
-	<string name="xmpp_status_label">XMPP -Status</string>
 	<string name="not_connected">Nicht verbunden</string>
 	<string name="performing_srv_lookup">SRV nachschlagen</string>
 	<string name="connecting">Verbinden</string>
 	<string name="connected">Verbunden</string>
-	<string name="commit">Übermitteln</string>
-	<string name="date">Datum</string>
 	<string name="error_activity_not_found">Keine Anwendung zum Anzeigen dieser Aktion gefunden.</string>
-	<string name="error_activity_not_found_for_location">Keine Anwendung zum Anzeigen von Kartenstandorten gefunden.</string>
 	<string name="error_format">Fehler: <xliff:g id="error_message" example="Protocol error">%1$s</xliff:g></string>
 	<string name="error_unknown">Ein unerwarteter Fehler ist aufgetreten. Bitte erneut versuchen.</string>
 	<string name="error_username_required">Sie müssen einen Benutzernamen eingeben.</string>
 	<string name="error_password_required">Sie müssen ein Passwort eingeben.</string>
 	<string name="error_accept_terms">Sie müssen unseren Bestimmungen zur Kontoerstellung zustimmen.</string>
 	<string name="error_invalid_activation_code">Der eingegebene Aktivierungscode ist ungültig.</string>
-	<string name="error_incorrect_passcode">Das eingegebene Passwort ist falsch.</string>
-	<string name="error_passcode_mismatch">Die eingegebenen Passwörter stimmen nicht überein.</string>
-	<string name="error_invalid_passcode">Ein Passwort muss mindestens 3 Zeichen enthalten.</string>
+	<string name="error_incorrect_passcode">Die eingegebene Passphrase ist falsch.</string>
+	<string name="error_invalid_passcode">Eine Passphrase muss mindestens 3 Zeichen enthalten.</string>
 	<string name="error_invalid_credentials">Die eingegeben Daten sind ungültig.</string>
-	<string name="error_invalid_api_key">Ihre Daten sind abgelaufen. Bitte geben Sie einen neuen Aktivierungscode ein.</string>
-	<string name="error_not_connected">Nicht verbunden</string>
+	<string name="error_invalid_api_key">Ihre Zugangsdaten sind abgelaufen.</string>
 	<string name="error">Fehler</string>
 	<string name="error_large_file">Die gewählte Datei ist zu groß.</string>
 	<string name="warning">Warnung</string>
 	<string name="warning_large_file">Das Senden dieser Datei dauert zu lange und kann evtl. scheitern. Trotzdem fortfahren?</string>
+	<string name="account_welcome">Willkommen bei <xliff:g id="company_name">Silent Circle</xliff:g>.</string>
+	<string name="account_creation_prologue">Wir sind die revolutionäre, globale Peer-to-Peer-Plattform der verschlüsselten Kommunikationsdienste für Verbraucher und Unternehmen.</string>
 	<string name="partner_welcome">Willkommen bei <xliff:g id="company_name" example="Silent Circle">%1$s</xliff:g> in Zusammenarbeit mit <xliff:g id="partner" example="ACME">%2$s</xliff:g>.</string>
 	<string name="partner_account_creation_prologue">Als <xliff:g id="partner" example="ACME">%2$s</xliff:g> Kunde genießen Sie <xliff:g id="free_trial_period" example="12 months">%3$s</xliff:g> zusätzlichen Zugang zu <xliff:g id="company_name" example="Silent Circle">%1$s</xliff:g>s verschlüsselten Kommunikationsdiensten.</string>
 	<string name="partner_free_trial_period">12 Monate</string>
 	<string name="call">Anruf</string>
-	<string name="incoming_call">Eingehender Anruf</string>
-	<string name="outgoing_call">Ausgehender Anruf</string>
-	<string name="missed_call">Verpasster Anruf</string>
 	<string name="show_password">Passwort anzeigen</string>
+	<string name="welcome_greeting">Willkommen bei <xliff:g id="application_name">Silent Text</xliff:g>!</string>
+	<string name="welcome_tips_header">Hier einige Tipps, um den Schutz Ihrer Daten noch weiter zu verbessern:</string>
+	<string name="welcome_tip_passcode">Legen Sie ein sicheres Passwort für <xliff:g id="application_name">Silent Text</xliff:g> fest.</string>
+	<string name="welcome_tip_encrypt_device">Aktivieren Sie die Datenträgerverschlüsselung auf Ihrem Gerät.</string>
+	<string name="welcome_no_tips">Sie können jetzt loslegen!</string>
+	<string name="encrypt_device">Gerät verschlüsseln</string>
+	<string name="warning_weak_disk_encryption_title">Ihre Daten sind gefährdet.</string>
+	<string name="warning_weak_disk_encryption_description">Die Sperrmethode für <xliff:g id="application_name">Silent Text</xliff:g> lässt sich leicht erraten.</string>
+	<string name="warning_weak_disk_encryption_action_encrypt_application">Legen Sie eine Passphrase fest</string>
+	<string name="warning_weak_disk_encryption_action_encrypt_device">Verschlüsseln Sie dieses Gerät</string>
+	<string name="feedback">Feedback</string>
+	<string name="current_passcode_hint">Aktuelle Passphrase</string>
+	<string name="new_passcode_hint">Neue Passphrase</string>
+	<string name="show_passcode">Passphrase anzeigen</string>
+	<string name="_continue">Weiter</string>
+	<string name="n_selected"><xliff:g id="count">%1$d</xliff:g> ausgewählt</string>
+	<string name="security_rating_description">Die Anzahl der Sterne neben einem Benutzernamen zeigen an, wie sicher Ihre Kommunikationen mit dieser Person sind.</string>
+	<string name="security_rating_0">Es wurde noch keine Sicherheit eingerichtet.</string>
+	<string name="security_rating_1">Kommunikationen werden durch ein asymmetrisches Kryptosystem gesichert.</string>
+	<string name="security_rating_2">Kommunikationen werden per Peer-to-Peer-Schlüsselaustausch gesichert.</string>
+	<string name="security_rating_3">Die Identitäten der einzelnen Peers in der Konversation wurden bestätigt.</string>
+	<string name="send_feedback">Feedback senden</string>
+	<string name="developer_options">Entwickleroptionen</string>
+	<string name="accounts">Konten</string>
+	<string name="tap_to_remove">Zum Entfernen antippen</string>
+	<string name="remove">Entfernen</string>
+	<string name="preserve_user_data">Nutzerdaten behalten</string>
+	<string name="confirm_account_removal">Sie sind gerade dabei, das folgende Konto von diesem Gerät zu entfernen:<xliff:g example="alice@silentcircle.com" id="account_name">\n\n%1$s</xliff:g></string>
+	<string name="debug_information">Fehlerbehebungsinformationen</string>
+	<string name="optional">(fakultativ)</string>
+	<string name="license_code">Lizenzcode</string>
+	<string name="undisclosed_location">(unbekannter Ort)</string>
+	<string name="record_voice_memo">Sprachnotiz aufnehmen</string>
+	<string name="notify_resend_request">Der Empfänger hat gebeten, dass diese Nachricht erneut gesendet wird.</string>
+	<string name="security_warning">Sicherheitswarnung</string>
+	<string name="dont_ask_again">Nicht erneut anzeigen</string>
+	<string name="verify_ok_media_to_be_decrypted">Diese Mediendatei ist derzeit verschlüsselt. Um sie betrachten zu können, muss sie von <xliff:g id="application_name">Silent Text</xliff:g> vorübergehend entschlüsselt und auf der Speicherkarte gespeichert werden.</string>
+	<string name="verify_ok_media_to_be_exported">Diese Mediendatei ist derzeit privat. Um den Vorgang fortsetzen zu können, muss <xliff:g id="application_name">Silent Text</xliff:g> anderen Apps den Zugriff auf die entschlüsselte Datei gewähren.</string>
 </resources>

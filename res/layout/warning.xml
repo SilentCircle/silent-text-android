@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<com.silentcircle.silenttext.view.WarningView xmlns:android="http://schemas.android.com/apk/res/android" style="@style/Widget.Silence.Warning">
+	<ImageView android:id="@+id/warning_cancel" style="@style/Widget.Silence.ImageView.ActionButton.Cancel" android:contentDescription="@string/cancel"/>
+	<TextView android:id="@+id/warning_title" style="@style/Widget.Silence.TextView.Warning" android:textSize="@dimen/text_large" android:layout_alignTop="@+id/warning_cancel" android:layout_alignBottom="@+id/warning_cancel" android:text="@string/warning_weak_disk_encryption_title"/>
+	<LinearLayout android:id="@+id/warning_details" style="@style/Widget.Silence.LinearLayout.Vertical" android:layout_below="@+id/warning_title">
+		<TextView android:id="@+id/warning_description" style="@style/Widget.Silence.TextView" android:textSize="@dimen/text_large" android:layout_marginTop="@dimen/spacing_normal" android:layout_marginBottom="@dimen/spacing_normal" android:text="@string/warning_weak_disk_encryption_description"/>
+		<LinearLayout android:id="@+id/warning_actions" style="@style/Widget.Silence.LinearLayout.Vertical" android:orientation="vertical"/>
+	</LinearLayout>
+</com.silentcircle.silenttext.view.WarningView>

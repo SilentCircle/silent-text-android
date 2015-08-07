@@ -6,12 +6,14 @@
 		<LinearLayout android:id="@+id/form" android:layout_above="@+id/buttons" style="@style/Widget.Silence.LinearLayout.Vertical" android:padding="@dimen/spacing_large">
 			<EditText android:id="@+id/username" style="@style/Widget.Silence.EditText" android:hint="@string/username" android:inputType="textNoSuggestions|textEmailAddress" android:layout_marginBottom="0dp"/>
 			<EditText android:id="@+id/password" style="@style/Widget.Silence.EditText.Password" android:hint="@string/password"/>
+			<CheckBox android:id="@+id/show_password" style="@style/Widget.Silence.CheckBox" android:text="@string/show_password"/>
 		</LinearLayout>
 		<View android:layout_above="@+id/buttons" android:layout_width="fill_parent" android:layout_height="1dp" android:background="@color/silent_dark_orange"/>
 		<LinearLayout android:id="@+id/buttons" android:layout_alignParentBottom="true" style="@style/Widget.Silence.LinearLayout.Horizontal" android:layout_width="fill_parent" android:gravity="center_vertical" android:background="@color/silent_black">
-			<Button android:id="@+id/button_new_account" style="@style/Widget.Silence.SubtleButton" android:drawableLeft="@drawable/ic_action_about" android:text="@string/create_account" android:drawableBottom="@null" android:layout_weight="1"/>
-			<Button android:id="@+id/button_login" style="@style/Widget.Silence.SubtleButton" android:drawableRight="@drawable/ic_action_send" android:text="@string/login" android:gravity="center_vertical|right" android:drawableBottom="@null" android:layout_weight="1"/>
+			<Button android:id="@+id/button_new_account" style="@style/Widget.Silence.SubtleButton.About" android:text="@string/create_account" android:drawableBottom="@null" android:layout_weight="1"/>
+			<Button android:id="@+id/button_login" style="@style/Widget.Silence.SubtleButton.Login" android:text="@string/login" android:gravity="center_vertical|right" android:drawableBottom="@null" android:layout_weight="1"/>
 		</LinearLayout>
+		<ImageView android:id="@+id/action_settings" style="@style/Widget.Silence.ImageView.ActionButton" android:src="@drawable/ic_action_settings" android:contentDescription="@string/settings" android:layout_margin="@dimen/spacing_large" android:layout_alignParentEnd="true"/>
 		<TextView style="@style/Widget.Silence.TextView.Error" android:id="@+id/error" android:layout_width="fill_parent" android:layout_height="wrap_content" android:gravity="center_horizontal"/>
 	</RelativeLayout>
 	<include layout="@layout/indeterminate_progress" android:visibility="gone" android:id="@+id/progress"/>

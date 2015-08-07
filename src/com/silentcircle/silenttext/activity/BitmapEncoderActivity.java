@@ -1,9 +1,9 @@
 /*
-Copyright © 2012-2013, Silent Circle, LLC.  All rights reserved.
+Copyright (C) 2013-2015, Silent Circle, LLC. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
-    * Any redistribution, use, or modification is done solely for personal 
+    * Any redistribution, use, or modification is done solely for personal
       benefit and not for any commercial purpose or for monetary gain
     * Redistributions of source code must retain the above copyright
       notice, this list of conditions and the following disclaimer.
@@ -27,6 +27,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package com.silentcircle.silenttext.activity;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -34,14 +35,13 @@ import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
 import android.widget.Toast;
 
-import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.silentcircle.silenttext.Extra;
 import com.silentcircle.silenttext.log.Log;
 import com.silentcircle.silenttext.util.BitmapEncoder;
 
-public class BitmapEncoderActivity extends SherlockFragmentActivity {
+public class BitmapEncoderActivity extends Activity {
 
-	protected final Log log = new Log( getClass().getSimpleName() );
+	protected final Log log = new Log( "BitmapEncoderActivity" );
 
 	@Override
 	protected void onCreate( Bundle savedInstanceState ) {

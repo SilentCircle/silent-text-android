@@ -1,0 +1,195 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+	<string name="label_push_notifications"><xliff:g id="application_name">Silent Text</xliff:g> إعلامات GCM</string>
+	<string name="new_message">رسالة جديدة</string>
+	<string name="copy">نسخ</string>
+	<string name="notifications">الإعلامات</string>
+	<string name="privacy">الخصوصية</string>
+	<string name="about">حول</string>
+	<string name="encryption">تشفير</string>
+	<string name="privacy_statement">بيان الخصوصية</string>
+	<string name="license_information">معلومات الترخيص</string>
+	<string name="terms_and_conditions">الأحكام والشروط</string>
+	<string name="compose_hint">اكتب رسالتك هنا</string>
+	<string name="security_rating">التقييم الأمني</string>
+	<string name="empty_conversation_list">ليس لديك أية محادثات.</string>
+	<string name="burn_notice">إشعار النسخ على الأقراص المضغوطة</string>
+	<string name="burn">النسخ على الأقراص المضغوطة</string>
+	<string name="current_passcode">أدخل عبارة المرور الحالية الخاصة بك للمتابعة.</string>
+	<string name="passcode_warning">هام! لا يمكن استرداد عبارة المرور الخاصة بك حال فقدانها؛ لذا تذكرها جيدًا.</string>
+	<string name="are_you_sure">هل أنت متأكد؟</string>
+	<string name="cannot_be_undone">لا يمكن التراجع عن هذا الإجراء.</string>
+	<string name="save_will_expose_data">حفظ هذه المحادثة سيؤدي إلى عرض كافة رسائلها على تطبيق آخر من اختيارك. لن يتم تصدير الرسائل التي تحتوي على مرفقات أو إشعار نسخ على أقراص مضغوطة.</string>
+	<string name="reset_keys_warning">لا يمكن إرسال الرسائل أو تلقيها قبل وضع مفاتيح جديدة، وهذا قد يستغرق بعض الوقت.</string>
+	<string name="yes">نعم</string>
+	<string name="no">لا</string>
+	<string name="cannot_open_file">لا يستطيع تطبيق <xliff:g id="application_name">Silent Text</xliff:g> فتح هذا الملف. إذا اخترت عرضه أو مشاركته أو حفظه، فإن التطبيقات الأخرى على هذا الجهاز ستتمكن من الوصول إليه.</string>
+	<string name="album_artwork">ألبوم الأعمال الفنية</string>
+	<string name="activate">تنشيط</string>
+	<string name="reset_keys">مفاتيح إعادة التعيين</string>
+	<string name="unverified">مُحَقّق</string>
+	<string name="verified">غير مُحَقّق</string>
+	<string name="cancel">إلغاء</string>
+	<string name="save">حفظ</string>
+	<string name="settings">إعدادات</string>
+	<string name="securing">تأمين<xliff:g id="ellipsis" example="…">…</xliff:g></string>
+	<string name="downloading">تنزيل<xliff:g id="ellipsis" example="…">…</xliff:g></string>
+	<string name="decrypting">فك التشفير<xliff:g id="ellipsis" example="…">…</xliff:g></string>
+	<string name="waiting_for_connection">انتظار الاتصال<xliff:g id="ellipsis" example="…">…</xliff:g></string>
+	<string name="view">عرض</string>
+	<string name="share">مشاركة</string>
+	<string name="share_location">مشاركة الموقع</string>
+	<string name="send_to">إرسال إلى<xliff:g id="ellipsis" example="…">…</xliff:g></string>
+	<string name="cancelled">تم الإلغاء</string>
+	<string name="username_unavailable"><xliff:g id="username">%1$s</xliff:g> غير متاح.</string>
+	<string name="conversation_with">محادثة مع <xliff:g id="username">%1$s</xliff:g></string>
+	<string name="resend">إعادة إرسال</string>
+	<string name="progress_encrypting">التشفير<xliff:g id="ellipsis" example="…">…</xliff:g><xliff:g id="progress_percent" example="32%">%1$d%%</xliff:g></string>
+	<string name="progress_preparing">التحضير<xliff:g id="ellipsis" example="…">…</xliff:g><xliff:g id="progress_percent" example="32%">%1$d%%</xliff:g></string>
+	<string name="progress_uploading">التحميل<xliff:g id="ellipsis" example="…">…</xliff:g><xliff:g id="progress_percent" example="32%">%1$d%%</xliff:g></string>
+	<string name="progress_exporting">يتم تصدير<xliff:g id="ellipsis" example="…">…</xliff:g><xliff:g id="progress_percent" example="32%">%1$d%%</xliff:g></string>
+	<string name="location">الموقع</string>
+	<string name="unlock">إلغاء القفل</string>
+	<string name="autolock">القفل التلقائي</string>
+	<string name="lock_application">قفل التطبيق</string>
+	<string name="options">الخيارات</string>
+	<string name="view_with">فتح <xliff:g id="file_name">%1$s</xliff:g></string>
+	<string name="share_with">مشاركة <xliff:g id="file_name">%1$s</xliff:g></string>
+	<string name="none">(لا يوجد)</string>
+	<string name="saved_to">تم الحفظ في <xliff:g id="file_path">%1$s</xliff:g></string>
+	<string name="lock_after">القفل تلقائيًا <xliff:g id="lock_timeout" example="in 30 seconds">%1$s</xliff:g></string>
+	<string name="never_lock">لا تقم  بالقفل تلقائيًا</string>
+	<string name="no_expiration">لا تنتهي صلاحية الرسائل</string>
+	<string name="messages_expire">تنتهي صلاحية الرسائل <xliff:g id="expire_timeout" example="in 1 minute">%1$s</xliff:g></string>
+	<string name="passcode">عبارة المرور</string>
+	<string name="notify_new_passcode_set">تم تعيين عبارة مرور جديدة.</string>
+	<string name="notify_passcode_removed">تمت إزالة عبارة المرور.</string>
+	<string name="notify_account_removed">تمت إزالة الحساب.</string>
+	<string name="activation_code">رمز التنشيط</string>
+	<string name="activation_code_description">قم بتسجيل الدخول أو إنشاء حساب على الموقع الإلكتروني الآتي: <xliff:g id="login_url">https://accounts.silentcircle.com</xliff:g>.</string>
+	<string name="review_account_details">يرجى مراجعة المعلومات الآتية للتأكد من صحتها قبل إنشاء حسابك.</string>
+	<string name="previous">السابق</string>
+	<string name="next">التالي</string>
+	<string name="finish">إنهاء</string>
+	<string name="username">اسم المستخدم</string>
+	<string name="password">كلمة المرور</string>
+	<string name="login">تسجيل الدخول</string>
+	<string name="create_account">إنشاء حساب</string>
+	<string name="create_an_account">إنشاء حساب</string>
+	<string name="creating_account">إنشاء حساب<xliff:g id="ellipsis" example="…">…</xliff:g></string>
+	<string name="send">إرسال</string>
+	<string name="thumbnail">صورة مصغرة</string>
+	<string name="delivered">تم التسليم</string>
+	<string name="send_receipts">إرسال إعلامات بالقراءة</string>
+	<string name="set_passcode">تشفير <xliff:g id="application_name">Silent Text</xliff:g></string>
+	<string name="set_passcode_description">اطلب عبارة مرور لإلغاء تشفير <xliff:g id="application_name">Silent Text</xliff:g> في كل مرة تستخدمه فيها.</string>
+	<string name="remove_passcode">إزالة عبارة مرور</string>
+	<string name="remove_passcode_description">يجب أن تؤكد عبارة مرورك الحالية قبل أن تتمكن من إزالتها.</string>
+	<string name="change_passcode">تغيير عبارة مرور</string>
+	<string name="sending">إرسال<xliff:g id="ellipsis" example="…">…</xliff:g></string>
+	<string name="clear_history">مسح المحفوظات</string>
+	<string name="save_conversation">حفظ المحادثة</string>
+	<string name="share_from">مشاركة من</string>
+	<string name="search_hint">اسم المستخدم</string>
+	<string name="message_timestamp"><xliff:g id="sent_or_received" example="Sent">%1$s</xliff:g>: <xliff:g id="time_sent_or_received">%2$s</xliff:g><xliff:g id="delivered" example="Delivered">%3$s</xliff:g></string>
+	<string name="secure">تأمين</string>
+	<string name="unlocked_title">تم إلغاء القفل</string>
+	<string name="unlocked_description">انقر للقفل <xliff:g id="application_name" example="Silent Text">%1$s</xliff:g>.</string>
+	<string name="attachment">المُرفق</string>
+	<string name="unknown">غير معروف</string>
+	<string name="verify_description_verified">لمزيدٍ من الأمان، قمت بالتحقق من هذه الرسالة مع المتلقي.</string>
+	<string name="verify_description_unverified">لمزيد من الأمان، قم بالتحقق من هذه الرسالة مع المتلقي.</string>
+	<string name="ringtone">نغمة الرنين</string>
+	<string name="ringtone_none">لا شيء</string>
+	<string name="enable_notification_vibrate">اهتزاز</string>
+	<string name="someone">شخص ما</string>
+	<string name="silence">لا توجد رسائل لعرضها.</string>
+	<string name="application_locked">تم قفل التطبيق.</string>
+	<string name="copied_to_clipboard">تم النسخ إلى الحافظة</string>
+	<string name="expires_n">انتهاء مدة الصلاحية <xliff:g id="time_remaining" example="in 23 seconds">%1$s</xliff:g></string>
+	<string name="unable_to_display_file">تعذر عرض هذا الملف</string>
+	<string name="unable_to_display_image">تعذر عرض هذه الصورة</string>
+	<string name="not_downloaded">لم يتم التنزيل</string>
+	<string name="create_username">اختيار اسم مستخدم</string>
+	<string name="create_password">إنشاء كلمة مرور</string>
+	<string name="required_email_address">يلزم وجود عنوان بريد إلكتروني بديل لاستقبال التحديثات المهمة والمزايا الخاصة بحسابك.</string>
+	<string name="required_username">اسم المستخدم الخاص بك هو الطريقة التي من خلالها سيتصل بك الآخرون على شبكة <xliff:g id="company_name">Silent Circle</xliff:g>.</string>
+	<string name="required_password">اختر كلمة مرور قوية؛ إذ يعمل هذا الأمر على حماية  حسابك من الاستخدام غير المصرح به.</string>
+	<string name="optional_personal_information">هذه المعلومات اختيارية تمامًا، وتتحكم في كيفية ظهور حسابك في قوائم الدليل.</string>
+	<string name="email_address">عنوان البريد الإلكتروني</string>
+	<string name="personal_information">المعلومات الشخصية</string>
+	<string name="first_name">الاسم الأول</string>
+	<string name="last_name">الاسم الأخير</string>
+	<string name="tap_to_reveal">(انقر للكشف)</string>
+	<string name="password_not_shown">(كلمة المرور ليست معروضة)</string>
+	<string name="accept_terms">لقد قرأت بيان الخصوصية والأحكام والشروط وأوافق عليها.</string>
+	<string name="terms">الشروط</string>
+	<string name="permission_read">قراءة الرسائل الآمنة</string>
+	<string name="permission_identify_senders">قراءة اسم راسل الرسائل الآمنة الواردة</string>
+	<string name="permission_write">كتابة الرسائل الآمنة</string>
+	<string name="permission_access_accounts">الوصول إلى حساب <xliff:g id="company_name">Silent Circle</xliff:g></string>
+	<string name="not_connected">غير متصل</string>
+	<string name="performing_srv_lookup">إجراء بحث SRV</string>
+	<string name="connecting">اتصال</string>
+	<string name="connected">مُتصل</string>
+	<string name="error_activity_not_found">لم يتم العثور على أي تطبيق لعرض هذا الإجراء.</string>
+	<string name="error_format">خطأ: <xliff:g id="error_message" example="Protocol error">%1$s</xliff:g></string>
+	<string name="error_unknown">حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى.</string>
+	<string name="error_username_required">يجب إدخال اسم مستخدم.</string>
+	<string name="error_password_required">يجب إدخال كلمة مرور.</string>
+	<string name="error_accept_terms">يجب عليك قبول شروطنا لإنشاء حساب.</string>
+	<string name="error_invalid_activation_code">رمز التنشيط الذي أدخلته غير صالح.</string>
+	<string name="error_incorrect_passcode">عبارة المرور التي أدخلتها غير صحيحة.</string>
+	<string name="error_invalid_passcode">يجب أن تحتوي عبارة المرور على ثلاثة أحرف على الأقل.</string>
+	<string name="error_invalid_credentials">بيانات الاعتماد التي أدخلتها غير صالحة.</string>
+	<string name="error_invalid_api_key">انتهت صلاحية بيانات الاعتماد الخاصة بك.</string>
+	<string name="error">خطأ</string>
+	<string name="error_large_file">الملف الذي حددته كبير جدًا.</string>
+	<string name="warning">تحذير</string>
+	<string name="warning_large_file">قد يستغرق إرسال هذا الملف بعض الوقت، ومن الممكن أن يفشل هذا الأمر. هل ترغب في المتابعة على أية حال؟</string>
+	<string name="account_welcome">مرحبًا في <xliff:g id="company_name">Silent Circle</xliff:g>.</string>
+	<string name="account_creation_prologue">نحن النظام العالمي الثوري لخدمات الاتصالات المشفرة من نظير لنظير للمستهلكين والأعمال.</string>
+	<string name="partner_welcome">مرحبًا بك في <xliff:g id="company_name" example="Silent Circle">%1$s</xliff:g> بالشراكة مع <xliff:g id="partner" example="ACME">%2$s</xliff:g>.</string>
+	<string name="partner_account_creation_prologue">وبصفتك عميل <xliff:g id="partner" example="ACME">%2$s</xliff:g>،يمكنك الاستمتاع <xliff:g id="free_trial_period" example="12 months">%3$s</xliff:g> بالوصول المجاني إلى <xliff:g id="company_name" example="Silent Circle">%1$s</xliff:g>\'s خدمات الاتصالات المشفرة.</string>
+	<string name="partner_free_trial_period">12 شهرًا</string>
+	<string name="call">اتصال</string>
+	<string name="show_password">عرض كلمة المرور</string>
+	<string name="welcome_greeting">مرحبًا في تطبيق <xliff:g id="application_name">Silent Text</xliff:g>!</string>
+	<string name="welcome_tips_header">ها هي بعض التلميحات لمساعدتك على تحسين أمان بياناتك بشكل أكبر:</string>
+	<string name="welcome_tip_passcode">ضع قفلاً برمز مرور قوي على تطبيق <xliff:g id="application_name">Silent Text</xliff:g>.</string>
+	<string name="welcome_tip_encrypt_device">قم بتمكين تشفير القرص بالكامل على جهازك.</string>
+	<string name="welcome_no_tips">أنت جاهز تمامًا!</string>
+	<string name="encrypt_device">تشفير الجهاز</string>
+	<string name="warning_weak_disk_encryption_title">بياناتك معرضة للخطر.</string>
+	<string name="warning_weak_disk_encryption_description">يمكن استنتاج المادة الأساسية التي تحمي تطبيق <xliff:g id="application_name">Silent Text</xliff:g> بسهولة.</string>
+	<string name="warning_weak_disk_encryption_action_encrypt_application">تعيين عبارة مرور</string>
+	<string name="warning_weak_disk_encryption_action_encrypt_device">تشفير هذا الجهاز</string>
+	<string name="feedback">التعليق</string>
+	<string name="current_passcode_hint">عبارة المرور الحالية</string>
+	<string name="new_passcode_hint">عبارة المرور الجديدة</string>
+	<string name="show_passcode">عرض عبارة المرور</string>
+	<string name="_continue">متابعة</string>
+	<string name="n_selected">تم تحديد <xliff:g id="count">%1$d</xliff:g></string>
+	<string name="security_rating_description">يوضح عدد النجوم المجاور لاسم المستخدم مدى الثقة التي يمكن أن تشعر بها في أمان اتصالاتك.</string>
+	<string name="security_rating_0">لم يتم بعد إنشاء أمان.</string>
+	<string name="security_rating_1">الاتصالات آمنة بتشفير المفتاح العام.</string>
+	<string name="security_rating_2">الاتصالات آمنة بتبادل مفتاح من النظير للنظير.</string>
+	<string name="security_rating_3">لقد تم التحقق من هوية كل نظير في المحادثة.</string>
+	<string name="send_feedback">إرسال تعليق</string>
+	<string name="developer_options">خيارات المطور</string>
+	<string name="accounts">الحسابات</string>
+	<string name="tap_to_remove">اضغط للإزالة</string>
+	<string name="remove">إزالة</string>
+	<string name="preserve_user_data">الحفاظ على بيانات المستخدم</string>
+	<string name="confirm_account_removal">أنت على وشك إزالة الحساب التالي من هذا الجهاز:<xliff:g example="alice@silentcircle.com" id="account_name">\n\n%1$s</xliff:g></string>
+	<string name="debug_information">معلومات التصحيح</string>
+	<string name="optional">(اختياري)</string>
+	<string name="license_code">رمز الترخيص</string>
+	<string name="undisclosed_location">(موقع لم يتم الكشف عنه)</string>
+	<string name="record_voice_memo">تسجيل مذكرة صوتية</string>
+	<string name="notify_resend_request">لقد طلب المتلقي إعادة إرسال هذه الرسالة</string>
+	<string name="security_warning">تحذير أمني</string>
+	<string name="dont_ask_again">لا تعرض هذا مرة أخرى</string>
+	<string name="verify_ok_media_to_be_decrypted">هذ الوسيط مشفر حاليًا. لكي نسمح لك باستعراضه، يجب أن يقوم تطبيق <xliff:g id="application_name">Silent Text</xliff:g> بإلغاء تشفيره مؤقتًا وحفظه على القرص.</string>
+	<string name="verify_ok_media_to_be_exported">هذا الوسيط خاص حاليًا. لنواصل، يجب أن يقوم تطبيق <xliff:g id="application_name">Silent Text</xliff:g> بمنح التطبيقات الأخرى إمكانية الوصول إلى الملف غير المشفر.</string>
+</resources>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+	<string-array name="security_strict_network_protocols">
+		<item>TLSv1.2</item>
+	</string-array>
+	<string-array name="security_strict_cipher_suites">
+		<item>TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384</item>
+		<item>TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384</item>
+		<item>TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256</item>
+		<item>TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256</item>
+		<item>TLS_DHE_RSA_WITH_AES_256_CBC_SHA256</item>
+		<item>TLS_DHE_RSA_WITH_AES_128_CBC_SHA256</item>
+	</string-array>
+</resources>

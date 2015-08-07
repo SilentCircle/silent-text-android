@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android" style="@style/Widget.Silence.RelativeLayout">
+<com.silentcircle.silenttext.view.RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android" style="@style/Widget.Silence.RelativeLayout">
 	<ScrollView style="@style/Widget.Silence.ScrollView" android:layout_above="@+id/navigation">
 		<LinearLayout style="@style/Widget.Silence.LinearLayout.Vertical">
 			<TextView style="@style/Widget.Silence.TextView" android:text="@string/review_account_details" android:layout_marginLeft="@dimen/spacing_xlarge" android:layout_marginRight="@dimen/spacing_xlarge" android:layout_marginTop="@dimen/spacing_large"/>
@@ -35,12 +35,12 @@
 					<TextView android:id="@+id/last_name" style="@style/Widget.Silence.TextView" android:text="@string/sample_last_name" android:layout_weight="1" android:gravity="right|center_vertical"/>
 				</LinearLayout>
 			</LinearLayout>
-			<CheckBox android:id="@+id/accept_terms" style="@style/Widget.Silence.CheckBox" android:text="@string/accept_terms" android:layout_margin="@dimen/spacing_normal"/>
+			<CheckBox android:id="@+id/accept_terms" style="@style/Widget.Silence.CheckBox" android:text="@string/accept_terms"/>
 			<LinearLayout style="@style/Widget.Silence.LinearLayout.Horizontal">
-				<Button android:id="@+id/button_privacy" style="@style/Widget.Silence.SubtleButton" android:text="@string/privacy" android:drawableLeft="@drawable/ic_action_page" android:layout_weight="1"/>
-				<Button android:id="@+id/button_terms" style="@style/Widget.Silence.SubtleButton" android:text="@string/terms" android:drawableLeft="@drawable/ic_action_page" android:layout_weight="1"/>
+				<Button android:id="@+id/button_privacy" style="@style/Widget.Silence.SubtleButton.Page" android:text="@string/privacy" android:layout_weight="1"/>
+				<Button android:id="@+id/button_terms" style="@style/Widget.Silence.SubtleButton.Page" android:text="@string/terms" android:layout_weight="1"/>
 			</LinearLayout>
 		</LinearLayout>
 	</ScrollView>
 	<include android:id="@+id/navigation" layout="@layout/account_creation_navigation" android:layout_height="wrap_content" android:layout_width="fill_parent" android:layout_alignParentBottom="true"/>
-</RelativeLayout>			
+</com.silentcircle.silenttext.view.RelativeLayout>			

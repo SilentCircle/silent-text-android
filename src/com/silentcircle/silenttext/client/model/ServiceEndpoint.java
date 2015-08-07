@@ -1,9 +1,9 @@
 /*
-Copyright © 2012-2013, Silent Circle, LLC.  All rights reserved.
+Copyright (C) 2013-2015, Silent Circle, LLC. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
-    * Any redistribution, use, or modification is done solely for personal 
+    * Any redistribution, use, or modification is done solely for personal
       benefit and not for any commercial purpose or for monetary gain
     * Redistributions of source code must retain the above copyright
       notice, this list of conditions and the following disclaimer.
@@ -27,23 +27,68 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package com.silentcircle.silenttext.client.model;
 
-import org.jivesoftware.smack.util.dns.HostAddress;
+import java.io.IOException;
+import java.net.Socket;
+
+import javax.net.SocketFactory;
+
+import com.silentcircle.http.client.dns.SRVResolver.SRVRecord;
+import com.silentcircle.silenttext.util.IOUtils;
 
 public class ServiceEndpoint {
 
-	public static ServiceEndpoint fromHostAddress( String serviceName, HostAddress address ) {
+	public static ServiceEndpoint fromSRVRecord( String serviceName, SRVRecord address ) {
+
 		if( address == null ) {
 			return null;
 		}
+
 		ServiceEndpoint endpoint = new ServiceEndpoint();
+
 		endpoint.serviceName = serviceName;
-		endpoint.host = address.getFQDN();
-		endpoint.port = address.getPort();
+		endpoint.host = address.host;
+		endpoint.port = address.port;
+
 		return endpoint;
+
+	}
+
+	public static boolean isValid( ServiceEndpoint endpoint ) {
+		return endpoint != null && endpoint.host != null && endpoint.port > 0;
 	}
 
 	public String serviceName;
 	public String host;
 	public int port;
+
+	@Override
+	public boolean equals( Object o ) {
+		return o instanceof ServiceEndpoint && hashCode() == o.hashCode();
+	}
+
+	@Override
+	public int hashCode() {
+		return toString().hashCode();
+	}
+
+	public boolean test() {
+		if( !isValid( this ) ) {
+			return false;
+		}
+		Socket socket = null;
+		try {
+			socket = SocketFactory.getDefault().createSocket( host, port );
+			return socket.isConnected();
+		} catch( IOException exception ) {
+			return false;
+		} finally {
+			IOUtils.close( socket );
+		}
+	}
+
+	@Override
+	public String toString() {
+		return String.format( "{\"service_name\":\"%s\",\"host\":\"%s\",\"port\":%d}", serviceName, host, Integer.valueOf( port ) );
+	}
 
 }

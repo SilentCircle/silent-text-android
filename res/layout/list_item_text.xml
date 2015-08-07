@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<com.silentcircle.silenttext.widget.TextView xmlns:android="http://schemas.android.com/apk/res/android" style="@style/Widget.Text.Floating" android:text="@string/sample_title"/>

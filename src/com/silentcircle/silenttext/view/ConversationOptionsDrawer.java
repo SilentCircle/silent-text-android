@@ -1,19 +1,18 @@
 /*
-Copyright © 2013, Silent Circle, LLC.
-All rights reserved.
+Copyright (C) 2013-2015, Silent Circle, LLC. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
-    * Any redistribution, use, or modification is done solely for personal 
+    * Any redistribution, use, or modification is done solely for personal
       benefit and not for any commercial purpose or for monetary gain
     * Redistributions of source code must retain the above copyright
       notice, this list of conditions and the following disclaimer.
     * Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-    * Neither the name Silent Circle nor the names of its contributors may 
-      be used to endorse or promote products derived from this software 
-      without specific prior written permission.
+    * Neither the name Silent Circle nor the
+      names of its contributors may be used to endorse or promote products
+      derived from this software without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -34,6 +33,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.Checkable;
@@ -50,9 +50,10 @@ import com.silentcircle.silenttext.Extra;
 import com.silentcircle.silenttext.Manifest;
 import com.silentcircle.silenttext.R;
 import com.silentcircle.silenttext.application.SilentTextApplication;
+import com.silentcircle.silenttext.dialog.InformationalDialog;
 import com.silentcircle.silenttext.listener.ClearHistoryOnConfirm;
 import com.silentcircle.silenttext.listener.LaunchConfirmDialogOnClick;
-import com.silentcircle.silenttext.listener.ResetKeysOnClick;
+import com.silentcircle.silenttext.listener.ResetKeysOnConfirm;
 import com.silentcircle.silenttext.listener.SaveConversationHistoryOnConfirm;
 import com.silentcircle.silenttext.model.Conversation;
 import com.silentcircle.silenttext.repository.ConversationRepository;
@@ -162,10 +163,13 @@ public class ConversationOptionsDrawer extends ScrollView {
 			Conversation conversation = conversations.findByPartner( partner );
 			if( conversation != null ) {
 
-				if( conversation.hasBurnNotice() ) {
-					seeker.setProgress( BurnDelay.Defaults.getLevel( conversation.getBurnDelay() ) );
-				} else {
-					seeker.setProgress( 0 );
+				if( !seeker.isPressed() ) {
+					seeker.setMax( BurnDelay.Defaults.numLevels() - 1 );
+					if( conversation.hasBurnNotice() ) {
+						seeker.setProgress( BurnDelay.Defaults.getLevel( conversation.getBurnDelay() ) );
+					} else {
+						seeker.setProgress( 0 );
+					}
 				}
 
 				burnNotice.setChecked( conversation.hasBurnNotice() );
@@ -179,14 +183,46 @@ public class ConversationOptionsDrawer extends ScrollView {
 
 		}
 
+		seeker.setOnTouchListener( new OnTouchListener() {
+
+			@Override
+			public boolean onTouch( View v, MotionEvent event ) {
+
+				int action = event.getAction();
+
+				switch( action ) {
+					case MotionEvent.ACTION_DOWN:
+						v.getParent().requestDisallowInterceptTouchEvent( true );
+						break;
+
+					case MotionEvent.ACTION_UP:
+						v.getParent().requestDisallowInterceptTouchEvent( false );
+						break;
+				}
+
+				v.onTouchEvent( event );
+
+				return true;
+
+			}
+
+		} );
+
 		seeker.setOnSeekBarChangeListener( new OnSeekBarChangeListener() {
 
 			@Override
 			public void onProgressChanged( SeekBar seekBar, int progress, boolean fromUser ) {
-				TextView label = (TextView) findViewById( R.id.burn_delay_label );
-				label.setText( BurnDelay.Defaults.getLabel( getContext(), progress ) );
-				CheckBox burnNotice = (CheckBox) findViewById( R.id.burn_notice );
-				burnNotice.setChecked( progress > 0 );
+				Context context = seekBar.getContext();
+				SilentTextApplication application = SilentTextApplication.from( context );
+				ConversationRepository conversations = application.getConversations();
+				Conversation conversation = conversations.findByPartner( partner );
+
+				if( conversation.hasBurnNotice() ) {
+					TextView label = (TextView) findViewById( R.id.burn_delay_label );
+					label.setText( BurnDelay.Defaults.getLabel( getContext(), progress ) );
+					CheckBox burnNotice = (CheckBox) findViewById( R.id.burn_notice );
+					burnNotice.setChecked( progress > 0 );
+				}
 			}
 
 			@Override
@@ -259,8 +295,12 @@ public class ConversationOptionsDrawer extends ScrollView {
 
 	public void prepareVerificationOptions() {
 
-		setVisibleIf( !isTalkingToSelf(), R.id.reset_keys );
-		findViewById( R.id.reset_keys ).setOnClickListener( new ResetKeysOnClick( partner ) );
+		View resetKeysView = findViewById( R.id.reset_keys );
+
+		resetKeysView.setVisibility( isTalkingToSelf() ? GONE : VISIBLE );
+		resetKeysView.setOnClickListener( new LaunchConfirmDialogOnClick( R.string.are_you_sure, R.string.reset_keys_warning, getActivity(), new ResetKeysOnConfirm( resetKeysView, partner ) ) );
+
+		findViewById( R.id.verify_rating ).setOnClickListener( new InformationalDialog( R.string.security_rating, R.layout.security_rating ) );
 
 		CheckBox verify = (CheckBox) findViewById( R.id.verified );
 
@@ -392,7 +432,7 @@ public class ConversationOptionsDrawer extends ScrollView {
 
 				conversation.setBurnNotice( isChecked );
 				if( isChecked && conversation.getBurnDelay() <= 0 ) {
-					conversation.setBurnDelay( BurnDelay.Defaults.getDelay( 1 ) );
+					conversation.setBurnDelay( BurnDelay.getDefaultDelay() );
 				}
 				conversations.save( conversation );
 
@@ -422,12 +462,6 @@ public class ConversationOptionsDrawer extends ScrollView {
 				Intent intent = Action.UPDATE_CONVERSATION.intent();
 				Extra.PARTNER.to( intent, partner );
 				getActivity().sendBroadcast( intent, Manifest.permission.READ );
-
-				if( conversation.isLocationEnabled() ) {
-					application.startListeningForLocationUpdates();
-				} else {
-					application.stopListeningForLocationUpdates();
-				}
 
 			}
 

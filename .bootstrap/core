@@ -1,0 +1,46 @@
+#!/bin/sh
+
+if [ $# -lt 1 -a ! -f Bootfile ]; then
+  printf "Usage: $0 <profile|script> ...\n"
+  exit 1
+fi
+
+[ -z "${MODULE_DIR}" ] && MODULE_DIR=.bootstrap/modules
+[ -z "${PROFILE_DIR}" ] && PROFILE_DIR=.bootstrap/profiles
+
+require_modules() {
+  while [ $# -gt 0 ]; do
+    require_module $1
+    shift
+  done
+}
+
+require_module() {
+  module="${MODULE_DIR}/$1"
+  if [ -f "${module}" ]; then
+    . ${MODULE_DIR}/$1
+  else
+    printf "[ERROR] Required module not found: $1\n\n"
+    exit 1
+  fi
+}
+
+require_module common
+
+use_profile() {
+  profile="${PROFILE_DIR}/$1"
+  if [ -f "${profile}" ]; then
+    shift
+    . "${profile}" $*
+  else
+    . $*
+  fi
+}
+
+printf "\n"
+if [ $# -lt 1 ]; then
+  use_profile Bootfile
+else
+  use_profile $*
+fi
+printf "\n"

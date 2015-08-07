@@ -1,19 +1,18 @@
 /*
-Copyright © 2013, Silent Circle, LLC.
-All rights reserved.
+Copyright (C) 2013-2015, Silent Circle, LLC. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
-    * Any redistribution, use, or modification is done solely for personal 
+    * Any redistribution, use, or modification is done solely for personal
       benefit and not for any commercial purpose or for monetary gain
     * Redistributions of source code must retain the above copyright
       notice, this list of conditions and the following disclaimer.
     * Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-    * Neither the name Silent Circle nor the names of its contributors may 
-      be used to endorse or promote products derived from this software 
-      without specific prior written permission.
+    * Neither the name Silent Circle nor the
+      names of its contributors may be used to endorse or promote products
+      derived from this software without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -43,6 +42,7 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 
+import com.silentcircle.silentstorage.util.IOUtils;
 import com.silentcircle.silenttext.log.Log;
 
 /**
@@ -53,7 +53,6 @@ public class EphemeralKeySpec {
 
 	public static final int VERSION = 1;
 	public static final Random RANDOM = new SecureRandom();
-	private final Log log = new Log( getClass().getSimpleName() );
 
 	public String keyAlgorithm;
 	public String intermediateKeyAlgorithm;
@@ -62,6 +61,10 @@ public class EphemeralKeySpec {
 	public int keyLength;
 	public byte [] salt;
 	public byte [] iv;
+
+	private static final Log LOG = new Log( "EphemeralKeySpec" );
+
+	private static final String TAG = "EphemeralKeySpec";
 
 	/**
 	 * Creates an empty ephemeral key with no parameters set.
@@ -122,12 +125,12 @@ public class EphemeralKeySpec {
 	 * @param iterationCount
 	 *            The number of PBKDF iterations to run.
 	 * @param keyLength
-	 *            The size of this key.
+	 *            The size of this key, in bits.
 	 * @param saltLength
-	 *            The length of the salt to generate and use for the PBKDF.
+	 *            The length of the salt, in bytes, to generate and use for the PBKDF.
 	 * @param ivLength
-	 *            The length of the initialization vector to generate and use for encryption and
-	 *            decryption.
+	 *            The length of the initialization vector, in bytes, to generate and use for
+	 *            encryption and decryption.
 	 */
 	public EphemeralKeySpec( String keyAlgorithm, String intermediateKeyAlgorithm, String cipherAlgorithm, int iterationCount, int keyLength, int saltLength, int ivLength ) {
 		this( keyAlgorithm, intermediateKeyAlgorithm, cipherAlgorithm, iterationCount, keyLength, new byte [saltLength], new byte [ivLength] );
@@ -177,9 +180,14 @@ public class EphemeralKeySpec {
 		try {
 			SecretKeyFactory factory = SecretKeyFactory.getInstance( intermediateKeyAlgorithm );
 			Key key = factory.generateSecret( new PBEKeySpec( passcode, salt, iterationCount, keyLength ) );
+			if( key == null ) {
+				Log.d( TAG, "key is null" );
+				return null;
+			}
 			return new SecretKeySpec( key.getEncoded(), keyAlgorithm );
 		} catch( Exception exception ) {
-			log.error( exception, "#getKey(char[%d])", Integer.valueOf( passcode.length ) );
+			Log.e( TAG, exception.getMessage() );
+			LOG.error( exception, "#getKey" );
 			return null;
 		}
 	}
@@ -217,10 +225,10 @@ public class EphemeralKeySpec {
 				keyLength = meta.readInt();
 
 				salt = new byte [meta.readInt()];
-				in.read( salt );
+				IOUtils.fill( in, salt );
 
 				iv = new byte [meta.readInt()];
-				in.read( iv );
+				IOUtils.fill( in, iv );
 
 				break;
 
@@ -234,7 +242,7 @@ public class EphemeralKeySpec {
 			cipher.init( cipherMode, getKey( passcode ), new IvParameterSpec( iv ) );
 			return cipher.doFinal( data );
 		} catch( Exception exception ) {
-			log.error( exception, "#transform mode:%d", Integer.valueOf( cipherMode ) );
+			LOG.error( exception, "#transform mode:%d", Integer.valueOf( cipherMode ) );
 			return null;
 		}
 	}

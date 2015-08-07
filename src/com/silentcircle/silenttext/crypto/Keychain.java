@@ -1,19 +1,18 @@
 /*
-Copyright © 2013, Silent Circle, LLC.
-All rights reserved.
+Copyright (C) 2013-2015, Silent Circle, LLC. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
-    * Any redistribution, use, or modification is done solely for personal 
+    * Any redistribution, use, or modification is done solely for personal
       benefit and not for any commercial purpose or for monetary gain
     * Redistributions of source code must retain the above copyright
       notice, this list of conditions and the following disclaimer.
     * Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-    * Neither the name Silent Circle nor the names of its contributors may 
-      be used to endorse or promote products derived from this software 
-      without specific prior written permission.
+    * Neither the name Silent Circle nor the
+      names of its contributors may be used to endorse or promote products
+      derived from this software without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -42,6 +41,8 @@ import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 
+import android.util.Log;
+
 import com.silentcircle.silenttext.util.IOUtils;
 
 /**
@@ -67,6 +68,7 @@ public class Keychain {
 	public static final int KEY_LENGTH = 256;
 	public static final String KEY_WRAPPER_ALGORITHM = "AES";
 	public static final String KEY_ALGORITHM = "PBKDF2WithHmacSHA1";
+	private static final String TAG = "Keychain";
 
 	/**
 	 * Creates an encryption key with the given password.
@@ -81,9 +83,14 @@ public class Keychain {
 	 *             if the {@link PBEKeySpec} created in this method is not valid.
 	 */
 	public static Key createKey( char [] password ) throws NoSuchAlgorithmException, InvalidKeySpecException {
-		SecretKeyFactory factory = SecretKeyFactory.getInstance( KEY_ALGORITHM );
-		Key key = factory.generateSecret( new PBEKeySpec( password, salt( 8 ), KEY_ITERATIONS, KEY_LENGTH ) );
-		return new SecretKeySpec( key.getEncoded(), KEY_WRAPPER_ALGORITHM );
+		try {
+			SecretKeyFactory factory = SecretKeyFactory.getInstance( KEY_ALGORITHM );
+			Key key = factory.generateSecret( new PBEKeySpec( password, salt( 8 ), KEY_ITERATIONS, KEY_LENGTH ) );
+			return new SecretKeySpec( key.getEncoded(), KEY_WRAPPER_ALGORITHM );
+		} catch( Exception e ) {
+			Log.e( TAG, e.getMessage() );
+			return null;
+		}
 	}
 
 	/**

@@ -1,19 +1,18 @@
 /*
-Copyright © 2013, Silent Circle, LLC.
-All rights reserved.
+Copyright (C) 2013-2015, Silent Circle, LLC. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
-    * Any redistribution, use, or modification is done solely for personal 
+    * Any redistribution, use, or modification is done solely for personal
       benefit and not for any commercial purpose or for monetary gain
     * Redistributions of source code must retain the above copyright
       notice, this list of conditions and the following disclaimer.
     * Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-    * Neither the name Silent Circle nor the names of its contributors may 
-      be used to endorse or promote products derived from this software 
-      without specific prior written permission.
+    * Neither the name Silent Circle nor the
+      names of its contributors may be used to endorse or promote products
+      derived from this software without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -32,17 +31,68 @@ import com.silentcircle.silenttext.ServiceConfiguration;
 
 public class Log {
 
-	private static final String THROWABLE_FORMAT = "[%s] %s %s";
+	public static void d( String tag, String format, Object... args ) {
+		if( isEnabled() ) {
+			android.util.Log.d( tag, String.format( format, args ) );
+		}
+	}
 
-	private static String format( Throwable throwable, String format ) {
-		if( throwable == null ) {
-			return format;
+	public static void d( String tag, Throwable throwable, String format, Object... args ) {
+		if( isEnabled() ) {
+			android.util.Log.d( tag, String.format( format, args ), throwable );
 		}
-		String message = throwable.getMessage();
-		if( message != null ) {
-			message = message.replaceAll( "%", "%%" );
+	}
+
+	public static void e( String tag, String format, Object... args ) {
+		if( isEnabled() ) {
+			android.util.Log.e( tag, String.format( format, args ) );
 		}
-		return String.format( THROWABLE_FORMAT, throwable.getClass().getSimpleName(), message, format );
+	}
+
+	public static void e( String tag, Throwable throwable, String format, Object... args ) {
+		if( isEnabled() ) {
+			android.util.Log.e( tag, String.format( format, args ), throwable );
+		}
+	}
+
+	public static void i( String tag, String format, Object... args ) {
+		if( isEnabled() ) {
+			android.util.Log.i( tag, String.format( format, args ) );
+		}
+	}
+
+	public static void i( String tag, Throwable throwable, String format, Object... args ) {
+		if( isEnabled() ) {
+			android.util.Log.i( tag, String.format( format, args ), throwable );
+		}
+	}
+
+	public static boolean isEnabled() {
+		return ServiceConfiguration.getInstance().loggingEnabled;
+	}
+
+	public static void v( String tag, String format, Object... args ) {
+		if( isEnabled() ) {
+			android.util.Log.v( tag, String.format( format, args ) );
+		}
+	}
+
+	public static void v( String tag, Throwable throwable, String format, Object... args ) {
+		if( isEnabled() ) {
+			android.util.Log.v( tag, String.format( format, args ), throwable );
+		}
+	}
+
+	public static void w( String tag, String format, Object... args ) {
+		if( isEnabled() ) {
+			android.util.Log.w( tag, String.format( format, args ) );
+		}
+	}
+
+	public static void w( String tag, Throwable throwable, String format, Object... args ) {
+		if( isEnabled() ) {
+			android.util.Log.w( tag, String.format( format, args ), throwable );
+		}
 	}
 
 	private final String tag;
@@ -52,23 +102,19 @@ public class Log {
 	}
 
 	public void debug( String format, Object... args ) {
-		if( ServiceConfiguration.getInstance().loggingEnabled ) {
-			android.util.Log.d( tag, String.format( format, args ) );
-		}
+		d( tag, format, args );
 	}
 
 	public void debug( Throwable throwable, String format, Object... args ) {
-		debug( format( throwable, format ), args );
+		d( tag, throwable, format, args );
 	}
 
 	public void error( String format, Object... args ) {
-		if( ServiceConfiguration.getInstance().loggingEnabled ) {
-			android.util.Log.e( tag, String.format( format, args ) );
-		}
+		e( tag, format, args );
 	}
 
 	public void error( Throwable throwable, String format, Object... args ) {
-		error( format( throwable, format ), args );
+		e( tag, throwable, format, args );
 	}
 
 	public String getTag() {
@@ -76,13 +122,11 @@ public class Log {
 	}
 
 	public void info( String format, Object... args ) {
-		if( ServiceConfiguration.getInstance().loggingEnabled ) {
-			android.util.Log.i( tag, String.format( format, args ) );
-		}
+		i( tag, format, args );
 	}
 
 	public void info( Throwable throwable, String format, Object... args ) {
-		info( format( throwable, format ), args );
+		i( tag, throwable, format, args );
 	}
 
 	public void onCreate() {
@@ -93,14 +137,20 @@ public class Log {
 		// Do nothing.
 	}
 
+	public void verbose( String format, Object... args ) {
+		v( tag, format, args );
+	}
+
+	public void verbose( Throwable throwable, String format, Object... args ) {
+		v( tag, throwable, format, args );
+	}
+
 	public void warn( String format, Object... args ) {
-		if( ServiceConfiguration.getInstance().loggingEnabled ) {
-			android.util.Log.w( tag, String.format( format, args ) );
-		}
+		w( tag, format, args );
 	}
 
 	public void warn( Throwable throwable, String format, Object... args ) {
-		warn( format( throwable, format ), args );
+		w( tag, throwable, format, args );
 	}
 
 }

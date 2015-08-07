@@ -1,13 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.silentcircle.silenttext" android:versionCode="101002000" android:versionName="1.2.0">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.silentcircle.silenttext" android:versionCode="101120201" android:versionName="1.12.2">
 
 	<permission android:name="com.silentcircle.silenttext.permission.C2D_MESSAGE" android:protectionLevel="signature"/>
 	<permission android:name="com.silentcircle.silenttext.permission.READ" android:protectionLevel="signature" android:label="@string/permission_read" android:icon="@drawable/ic_launcher"/>
 	<permission android:name="com.silentcircle.silenttext.permission.WRITE" android:protectionLevel="signature" android:label="@string/permission_write" android:icon="@drawable/ic_launcher"/>
 	<permission android:name="com.silentcircle.silenttext.permission.ACCESS_ACCOUNTS" android:protectionLevel="signature" android:label="@string/permission_access_accounts" android:icon="@drawable/ic_launcher"/>
 	<permission android:name="com.silentcircle.silenttext.permission.IDENTIFY_SENDER" android:protectionLevel="signature" android:label="@string/permission_identify_senders" android:icon="@drawable/ic_launcher"/>
+	<permission android:name="com.silentcircle.keymngr.permission.READ_SC_KEY" android:protectionLevel="signature" android:icon="@drawable/ic_launcher"/>
 	<permission android:name="com.silentcircle.keymngr.permission.WRITE_SC_KEY" android:protectionLevel="signature" android:icon="@drawable/ic_launcher"/>
-	<uses-sdk android:minSdkVersion="7" android:targetSdkVersion="18"/>
+
+	<uses-sdk android:minSdkVersion="14" android:targetSdkVersion="18"/>
+
+	<!-- RECEIVE_BOOT_COMPLETED: Used to listen for push notifications after boot but before initial application launch. -->
+	<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
 
 	<!-- ACCESS_COARSE_LOCATION: Used for opt-in location sharing for individual messages. -->
 	<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
@@ -26,15 +31,12 @@
 
 	<!-- READ_CONTACTS: Used to show real names of people you are talking to by cross-referencing their XMPP credentials with the device's Contacts list. -->
 	<uses-permission android:name="android.permission.READ_CONTACTS"/>
-	
+
 	<!-- READ_PHONE_STATE: Used to authorize known devices for account creation -->
 	<uses-permission android:name="android.permission.READ_PHONE_STATE"/>
 
 	<!-- WRITE_EXTERNAL_STORAGE: For sharing files with other applications. -->
 	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-
-	<!-- GET_ACCOUNTS: For receiving push notifications from the Google Cloud Messaging service. -->
-	<uses-permission android:name="android.permission.GET_ACCOUNTS"/>
 
 	<!-- RECEIVE: For receiving push notifications from the Google Cloud Messaging service. -->
 	<uses-permission android:name="com.google.android.c2dm.permission.RECEIVE"/>
@@ -60,12 +62,24 @@
 	<!-- WRITE: For writing sensitive information controlled by Silent Contacts. -->
 	<uses-permission android:name="com.silentcircle.silentcontacts.permission.WRITE"/>
 
+	<!-- READ_SC_KEY: Required for Silent Contacts support. -->
+	<uses-permission android:name="com.silentcircle.keymngr.permission.READ_SC_KEY"/>
+
 	<!-- WRITE_SC_KEY: Required for Silent Contacts support. -->
 	<uses-permission android:name="com.silentcircle.keymngr.permission.WRITE_SC_KEY"/>
 
-	<application android:allowBackup="false" android:name=".application.SilentTextApplication" android:icon="@drawable/ic_launcher" android:label="@string/silent_text" android:theme="@style/Theme.Silent">
+	<uses-permission android:name="android.permission.WRITE_SETTINGS"/>
+	
+	<application android:allowBackup="false" android:name=".application.SilentTextApplication" 
+	    android:icon="@drawable/ic_launcher" 
+	    android:label="@string/silent_text" 
+	    android:theme="@style/Theme.Silent" 
+	    android:supportsRtl="true">
 
-		<activity android:name=".activity.ConversationListActivity" android:label="@string/silent_text" android:launchMode="singleTop">
+		<activity android:name=".activity.ConversationListActivity" 
+		    android:label="@string/silent_text" 
+		    android:launchMode="singleTop"
+		    android:configChanges="orientation|screenSize">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN"/>
 				<category android:name="android.intent.category.LAUNCHER"/>
@@ -80,26 +94,25 @@
 			</intent-filter>
 		</activity>
 
-		<activity android:name=".activity.ConversationActivity" android:label="@string/conversation" android:parentActivityName=".activity.ConversationListActivity" android:launchMode="singleTop">
+		<activity android:name=".activity.ConversationActivity" android:label="@string/silent_text" android:parentActivityName=".activity.ConversationListActivity" android:launchMode="singleTop" android:hardwareAccelerated="false">
 			<meta-data android:name="android.support.PARENT_ACTIVITY" android:value=".activity.ConversationListActivity"/>
 			<intent-filter>
 				<action android:name="android.intent.action.SENDTO"/>
 				<category android:name="android.intent.category.DEFAULT"/>
 				<data android:scheme="imto" android:host="silentcircle"/>
+				<data android:scheme="imto" android:host="jabber" android:pathPattern=".*@silentcircle.com"/>
 			</intent-filter>
 		</activity>
-		
-		<activity android:name=".activity.LegacySettingsActivity" android:label="@string/settings" android:launchMode="singleTop"/>
-		<activity android:name=".activity.HoneycombSettingsActivity" android:label="@string/settings" android:launchMode="singleTop"/>
+
+		<activity android:name=".activity.SettingsActivity" android:label="@string/settings" android:launchMode="singleTop"/>
 
 		<activity android:name=".activity.LicenseActivity" android:label="@string/license_information" android:launchMode="singleTop"/>
 		<activity android:name=".activity.PrivacyPolicyActivity" android:label="@string/privacy_statement" android:launchMode="singleTop"/>
-		<activity android:name=".activity.AdvancedActivity" android:label="@string/advanced" android:launchMode="singleTop"/>
 		<activity android:name=".activity.SCloudActivity" android:label="@string/silent_text" android:theme="@style/Theme.Silent.Fullscreen" android:immersive="true" android:launchMode="singleTop"/>
 
 		<activity android:name=".activity.LockActivity" android:label="@string/set_passcode" android:noHistory="true" android:launchMode="singleTop"/>
 		<activity android:name=".activity.UnlockActivity" android:label="@string/silent_text" android:noHistory="true" android:launchMode="singleTop"/>
-		<activity android:name=".activity.ActivationActivity" android:label="@string/silent_text" android:noHistory="true" android:launchMode="singleTop" android:theme="@style/Theme.Silent.NoActionBar">
+		<activity android:name=".activity.LoginActivity" android:label="@string/silent_text" android:launchMode="singleTop" android:theme="@style/Theme.Silent.NoActionBar">
 			<intent-filter>
 				<action android:name="android.intent.action.VIEW"/>
 				<category android:name="android.intent.category.DEFAULT"/>
@@ -108,7 +121,14 @@
 			</intent-filter>
 		</activity>
 
-		<activity android:name=".activity.AccountCreationActivity" android:icon="@drawable/ic_silentcircle" android:label="@string/create_an_account" android:launchMode="singleTop"/>
+		<activity android:name=".activity.FileViewerActivity" android:label="@string/silent_text" android:uiOptions="splitActionBarWhenNarrow"/>
+
+		<activity android:name=".activity.AccountCreationActivity" android:icon="@drawable/ic_silentcircle" android:label="@string/create_an_account" android:launchMode="singleTop">
+			<intent-filter>
+				<action android:name="com.silentcircle.intent.action.CREATE_ACCOUNT"/>
+				<category android:name="android.intent.category.DEFAULT"/>
+			</intent-filter>
+		</activity>
 
 		<receiver android:name=".receiver.GCMReceiver" android:permission="com.google.android.c2dm.permission.SEND">
 
@@ -125,11 +145,19 @@
 
 		</receiver>
 
+		<receiver android:name=".receiver.InnerRecevier" />
+		
+		<service android:name=".service.RefreshSelfIntentService" android:exported="false" android:process=":selfrefresh"/>
 		<service android:name=".service.GCMService" android:label="@string/label_push_notifications" android:process=":push"/>
-
+		<service android:name=".service.SysNetObserverService" android:label="@string/label_net_observer" android:process=":observer"/>
+		<service android:name=".service.ScContactSaveService" android:exported="false" />
+		<service android:name=".service.OrgNameService" android:exported="false" />
+		<service android:name=".service.PassphraseIntentService" android:exported="false" />
+		
 		<receiver android:name=".receiver.NetworkStateReceiver" android:exported="false" android:enabled="true">
 			<intent-filter>
 				<action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
+				<action android:name="com.silentcircle.silenttext.action.SYSTEM_NET_CHANGE"/>
 			</intent-filter>
 		</receiver>
 
@@ -171,9 +199,26 @@
 		</receiver>
 
 		<provider android:name=".provider.StatusProvider" android:authorities="com.silentcircle.silenttext" android:initOrder="1" android:enabled="true" android:exported="true"/>
-		<provider android:name=".provider.AccountProvider" android:authorities="com.silentcircle.silenttext.accounts" android:initOrder="2" android:enabled="true" android:exported="true" android:permission="com.silentcircle.silenttext.permission.ACCESS_ACCOUNTS"/>
 		<provider android:name="com.silentcircle.keymngrsupport.SupportProvider" android:authorities="com.silentcircle.silenttext.keymngrsupport" android:initOrder="3" android:enabled="true" android:exported="true" android:permission="com.silentcircle.keymngr.permission.WRITE_SC_KEY"/>
+		<provider android:name="com.silentcircle.keymanagersupport.SupportProvider" android:authorities="com.silentcircle.silenttext.keymanagersupport" android:initOrder="3" android:enabled="true" android:exported="true" android:permission="com.silentcircle.keymngr.permission.WRITE_SC_KEY"/>
 
+		<provider
+            android:name="com.silentcircle.silenttext.provider.PictureProvider"
+            android:authorities="com.silentcircle.silenttext.provider"
+            android:enabled="true"
+            android:exported="true" />
+		
+		<provider
+            android:name="com.silentcircle.silenttext.provider.VideoProvider"
+            android:authorities="com.silentcircle.silenttext.provider.video"
+            android:enabled="true"
+            android:exported="true" />
 	</application>
 
+	
+	<uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    
 </manifest>

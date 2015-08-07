@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<com.silentcircle.silenttext.view.Drawer xmlns:android="http://schemas.android.com/apk/res/android" style="@style/Widget.Silence.Drawer">
-  <TextView android:id="@+id/title" style="@style/Widget.Silence.TextView.Title.ActionBar" android:drawableRight="@drawable/ic_drawer_dark" android:text="@string/options"/>
-  <android.support.v4.view.ViewPager android:id="@+id/pager" android:layout_width="fill_parent" android:layout_height="fill_parent">
-    <android.support.v4.view.PagerTabStrip android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_gravity="top"/>
-  </android.support.v4.view.ViewPager>
-</com.silentcircle.silenttext.view.Drawer>

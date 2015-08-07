@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<com.silentcircle.silenttext.widget.MessageEventView xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="fill_parent" android:layout_height="wrap_content">
+	<com.silentcircle.silenttext.view.CheckableRelativeLayout android:id="@+id/message_content" style="@style/Widget.Silence.MessageContent.Outgoing">
+		<com.silentcircle.silenttext.view.AvatarView android:id="@+id/message_avatar" style="@style/Widget.Silence.ImageView.Avatar.OutgoingMessage" android:contentDescription="@null"/>
+		<com.silentcircle.silenttext.view.CheckableLinearLayout 
+		    android:id="@+id/message_card" style="@style/Widget.Layout.Card.Outgoing.Message">
+		    <LinearLayout 
+		        android:layout_width="match_parent"
+		        android:layout_height="match_parent"
+		        android:paddingRight="7dp"
+		        android:gravity="right"
+		        android:orientation="vertical">
+				<ImageView android:id="@+id/message_preview" style="@style/Widget.Image" android:src="@drawable/ic_attached_photo" android:contentDescription="@string/thumbnail"/>
+				<com.silentcircle.silenttext.widget.TextView android:id="@+id/message_body" style="@style/Widget.Text.Primary" android:text="@string/sample_message"/>
+				<LinearLayout style="@style/Widget.Layout.Linear.Horizontal">
+					<ImageView android:id="@+id/message_delivered" style="@style/Widget.Image.Delivered" android:contentDescription="@string/delivered"/>
+					<com.silentcircle.silenttext.widget.TextView android:id="@+id/message_time" style="@style/Widget.Text.Secondary" android:text="@string/sample_time_relative"/>
+					<com.silentcircle.silenttext.widget.TextView android:id="@+id/message_burn_notice" style="@style/Widget.Text.Secondary.Burn" android:text="@string/sample_burn_notice"/>
+				</LinearLayout>
+			</LinearLayout>
+		</com.silentcircle.silenttext.view.CheckableLinearLayout>
+	</com.silentcircle.silenttext.view.CheckableRelativeLayout>
+	<LinearLayout android:id="@+id/message_actions" style="@style/Widget.Silence.ActionTray.Outgoing">
+		<include layout="@layout/chat_message_actions"/>
+	</LinearLayout>
+	<TextView android:id="@+id/message_action_send" style="@style/Widget.Text.Error.Resend" android:layout_below="@+id/message_content"/>
+</com.silentcircle.silenttext.widget.MessageEventView>

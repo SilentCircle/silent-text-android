@@ -1,19 +1,18 @@
 /*
-Copyright © 2013, Silent Circle, LLC.
-All rights reserved.
+Copyright (C) 2013-2015, Silent Circle, LLC. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
-    * Any redistribution, use, or modification is done solely for personal 
+    * Any redistribution, use, or modification is done solely for personal
       benefit and not for any commercial purpose or for monetary gain
     * Redistributions of source code must retain the above copyright
       notice, this list of conditions and the following disclaimer.
     * Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-    * Neither the name Silent Circle nor the names of its contributors may 
-      be used to endorse or promote products derived from this software 
-      without specific prior written permission.
+    * Neither the name Silent Circle nor the
+      names of its contributors may be used to endorse or promote products
+      derived from this software without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -39,8 +38,7 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.IvParameterSpec;
 
-import org.jivesoftware.smack.util.Base64;
-
+import com.silentcircle.silentstorage.util.Base64;
 import com.silentcircle.silenttext.crypto.CryptoUtils;
 
 public class EncryptingIOFilter implements IOFilter<String> {
@@ -75,8 +73,8 @@ public class EncryptingIOFilter implements IOFilter<String> {
 		if( index < 0 ) {
 			throw new IllegalArgumentException();
 		}
-		byte [] IV = Base64.decode( value.substring( 0, index ) );
-		byte [] ciphertext = Base64.decode( value.substring( index + DELIMITER.length() ) );
+		byte [] IV = Base64.decodeBase64( value.substring( 0, index ) );
+		byte [] ciphertext = Base64.decodeBase64( value.substring( index + DELIMITER.length() ) );
 		try {
 			return new String( decrypt( ciphertext, IV ) );
 		} catch( Exception exception ) {
@@ -92,7 +90,7 @@ public class EncryptingIOFilter implements IOFilter<String> {
 		byte [] IV = CryptoUtils.randomBytes( 16 );
 		try {
 			byte [] encrypted = encrypt( value.getBytes(), IV );
-			return String.format( "%s%s%s", Base64.encodeBytes( IV ), DELIMITER, Base64.encodeBytes( encrypted ) );
+			return String.format( "%s%s%s", Base64.encodeBase64String( IV ), DELIMITER, Base64.encodeBase64String( encrypted ) );
 		} catch( Exception exception ) {
 			throw new RuntimeException( exception );
 		}

@@ -1,0 +1,24 @@
+check_variable "${DEPENDENCY_DIR}" "DEPENDENCY_DIR"
+check_variable "${DOWNLOAD_SITE}" "DOWNLOAD_SITE"
+
+APACHE_ANT_DOWNLOAD_URL="${DOWNLOAD_SITE}/org/apache/ant/1.9.3/ant-1.9.3.tgz"
+
+detect_apache_ant() {
+  detected="${ANT_HOME}"
+  program="ant"
+  target="$(which ${program})"
+  if [ ! -z "${target}" ]; then
+    [ -d "${detected}" ] || detected=$( [ -h "${target}" ] && cd $(dirname "${target}") && cd $(dirname $(ls -l "${program}" | sed -E 's/^.+-> (.+)$/\1/g')) && cd .. && pwd )
+    [ -d "${detected}" ] || detected=$(dirname $(dirname "${target}"))
+  fi
+  [ -d "${detected}" ] && ANT_HOME="${detected}"
+}
+  
+install_apache_ant() {
+  detect_apache_ant
+  [ -z "${ANT_HOME}" ] && export ANT_HOME="$1"
+  install_file "Apache Ant" "${APACHE_ANT_DOWNLOAD_URL}" "z" "apache-ant-1.9.3" "${ANT_HOME}"
+}   
+
+install_apache_ant "${DEPENDENCY_DIR}/apache-ant"
+

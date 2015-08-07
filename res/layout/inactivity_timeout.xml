@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" style="@style/Widget.Silence.LinearLayout.Vertical">
+	<TextView android:id="@+id/inactivity_timeout_label" style="@style/Widget.Silence.TextView" android:text="@string/sample_duration" android:layout_width="fill_parent" android:gravity="center_horizontal" android:layout_marginTop="@dimen/spacing_normal"/>
+	<LinearLayout style="@style/Widget.Silence.LinearLayout.Horizontal" android:layout_width="fill_parent" android:padding="@dimen/spacing_normal">
+		<ImageView android:id="@+id/inactivity_timeout_icon" style="@style/Widget.Silence.ImageView" android:contentDescription="@string/autolock" android:src="@drawable/ic_action_timer"/>
+		<SeekBar android:id="@+id/inactivity_timeout_seeker" android:layout_width="fill_parent" android:layout_height="wrap_content" android:progress="5" android:max="10"/>
+	</LinearLayout>
+</LinearLayout>

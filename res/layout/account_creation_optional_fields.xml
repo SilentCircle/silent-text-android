@@ -1,21 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android" style="@style/Widget.Silence.RelativeLayout">
+<com.silentcircle.silenttext.view.RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android" style="@style/Widget.Silence.RelativeLayout">
 	<ScrollView style="@style/Widget.Silence.ScrollView" android:layout_above="@+id/navigation">
 		<LinearLayout style="@style/Widget.Silence.LinearLayout.Vertical">
 			<LinearLayout style="@style/Widget.Silence.LinearLayout.Vertical" android:padding="@dimen/spacing_large">
-				<TextView style="@style/Widget.Silence.TextView.Title" android:text="@string/alternate_email_address" android:layout_marginLeft="@dimen/spacing_large" android:layout_marginRight="@dimen/spacing_large"/>
+				<TextView style="@style/Widget.Silence.TextView.Title" android:text="@string/email_address" android:layout_marginLeft="@dimen/spacing_large" android:layout_marginRight="@dimen/spacing_large"/>
 				<EditText android:id="@+id/email" style="@style/Widget.Silence.EditText" android:hint="@string/sample_email_address" android:inputType="textNoSuggestions|textEmailAddress">
-				    <requestFocus/>
-			    </EditText>
+					<requestFocus/>
+				</EditText>
 				<TextView style="@style/Widget.Silence.TextView" android:gravity="right" android:text="@string/required_email_address" android:layout_marginRight="@dimen/spacing_large" android:layout_marginLeft="@dimen/spacing_large"/>
 			</LinearLayout>
 			<LinearLayout style="@style/Widget.Silence.LinearLayout.Vertical" android:padding="@dimen/spacing_large">
 				<TextView style="@style/Widget.Silence.TextView.Title" android:text="@string/personal_information" android:layout_marginLeft="@dimen/spacing_large" android:layout_marginRight="@dimen/spacing_large"/>
 				<EditText android:id="@+id/first_name" style="@style/Widget.Silence.EditText" android:hint="@string/first_name" android:inputType="textPersonName|textCapWords|textNoSuggestions"/>
 				<EditText android:id="@+id/last_name" style="@style/Widget.Silence.EditText" android:hint="@string/last_name" android:inputType="textPersonName|textCapWords|textNoSuggestions" android:imeOptions="actionNext|flagNoExtractUi"/>
-				<TextView style="@style/Widget.Silence.TextView" android:gravity="right" android:text="@string/optional_personal_information" android:layout_marginRight="@dimen/spacing_large" android:layout_marginLeft="@dimen/spacing_large"/>
+				<TextView style="@style/Widget.Silence.TextView" android:gravity="right|end" android:text="@string/optional_personal_information" android:layout_marginRight="@dimen/spacing_large" android:layout_marginLeft="@dimen/spacing_large"/>
+			</LinearLayout>
+			<LinearLayout style="@style/Widget.Silence.LinearLayout.Vertical" android:padding="@dimen/spacing_large">
+				<TextView style="@style/Widget.Silence.TextView.Title" android:text="@string/license_code" android:layout_marginLeft="@dimen/spacing_large" android:layout_marginRight="@dimen/spacing_large"/>
+				<EditText android:id="@+id/license_code" style="@style/Widget.Silence.EditText" android:hint="@string/optional" android:inputType="textNoSuggestions"/>
 			</LinearLayout>
 		</LinearLayout>
 	</ScrollView>
 	<include android:id="@+id/navigation" layout="@layout/account_creation_navigation" android:layout_height="wrap_content" android:layout_width="fill_parent" android:layout_alignParentBottom="true"/>
-</RelativeLayout>
+</com.silentcircle.silenttext.view.RelativeLayout>

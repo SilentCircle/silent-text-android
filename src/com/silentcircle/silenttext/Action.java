@@ -1,19 +1,18 @@
 /*
-Copyright © 2013, Silent Circle, LLC.
-All rights reserved.
+Copyright (C) 2013-2015, Silent Circle, LLC. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
-    * Any redistribution, use, or modification is done solely for personal 
+    * Any redistribution, use, or modification is done solely for personal
       benefit and not for any commercial purpose or for monetary gain
     * Redistributions of source code must retain the above copyright
       notice, this list of conditions and the following disclaimer.
     * Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-    * Neither the name Silent Circle nor the names of its contributors may 
-      be used to endorse or promote products derived from this software 
-      without specific prior written permission.
+    * Neither the name Silent Circle nor the
+      names of its contributors may be used to endorse or promote products
+      derived from this software without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -28,32 +27,34 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package com.silentcircle.silenttext;
 
-import java.util.Locale;
-
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 
 public enum Action {
 
-	UPDATE_CONVERSATION,
-	CONVERSATION_EVENT,
-	TRANSITION,
-	VERIFY,
-	SAVE_STATE,
-	ERROR,
-	WARNING,
-	SEND_MESSAGE,
-	RECEIVE_MESSAGE,
-	CONNECT,
-	DISCONNECT,
-	XMPP_STATE_CHANGED,
-	CANCEL,
-	PROGRESS,
-	UPLOAD,
-	ENCRYPT,
-	LOCK,
-	NOTIFY;
+	UPDATE_CONVERSATION( "UPDATE_CONVERSATION" ),
+	BEGIN_DEACTIVATE( "BEGIN_DEACTIVATE" ),
+	FINISH_DEACTIVATE( "FINISH_DEACTIVATE" ),
+	CONVERSATION_EVENT( "CONVERSATION_EVENT" ),
+	TRANSITION( "TRANSITION" ),
+	VERIFY( "VERIFY" ),
+	SAVE_STATE( "SAVE_STATE" ),
+	ERROR( "ERROR" ),
+	WARNING( "WARNING" ),
+	SEND_MESSAGE( "SEND_MESSAGE" ),
+	RECEIVE_MESSAGE( "RECEIVE_MESSAGE" ),
+	CONNECT( "CONNECT" ),
+	DISCONNECT( "DISCONNECT" ),
+	XMPP_STATE_CHANGED( "XMPP_STATE_CHANGED" ),
+	SYSTEM_NET_CHANGE( "SYSTEM_NET_CHANGE" ),
+	CANCEL( "CANCEL" ),
+	PROGRESS( "PROGRESS" ),
+	UPLOAD( "UPLOAD" ),
+	ENCRYPT( "ENCRYPT" ),
+	LOCK( "LOCK" ),
+	NOTIFY( "NOTIFY" ),
+	REFRESH_SELF( "REFRESH_SELF" );
 
 	public static Action from( Intent intent ) {
 		return from( intent.getAction() );
@@ -70,8 +71,8 @@ public enum Action {
 
 	private final String name;
 
-	private Action() {
-		name = String.format( "%s.%s", getClass().getName().toLowerCase( Locale.ENGLISH ), name() );
+	private Action( String name ) {
+		this.name = String.format( "com.silentcircle.silenttext.action.%s", name );
 	}
 
 	public void broadcast( Context context ) {

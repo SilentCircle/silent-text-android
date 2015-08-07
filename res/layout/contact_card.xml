@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<com.silentcircle.silenttext.view.ContactCardView xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="160dp" android:layout_height="160dp">
+	<com.silentcircle.silenttext.view.AvatarView android:id="@+id/avatar" android:src="@drawable/ic_avatar_placeholder" style="@style/Widget.Silence.ImageView" android:contentDescription="@null" android:layout_width="fill_parent" android:layout_height="fill_parent" android:scaleType="centerCrop"/>
+	<LinearLayout android:id="@+id/caption" style="@style/Widget.Silence.LinearLayout.Vertical" android:layout_alignParentBottom="true" android:orientation="vertical" android:background="@color/silent_translucent_black" android:layout_height="wrap_content" android:padding="@dimen/spacing_normal">
+	    <TextView android:id="@+id/display_name" style="@style/Widget.Silence.TextView.Title" android:text="@string/sample_name"/>
+	    <TextView android:id="@+id/unread_message_count" style="@style/Widget.Silence.TextView.MessageCount" android:text="@string/sample_count"/>
+    </LinearLayout>
+</com.silentcircle.silenttext.view.ContactCardView>

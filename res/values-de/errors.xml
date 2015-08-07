@@ -1,0 +1,31 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<resources>
+
+	<string name="SCIMPError_NONE">Kein Fehler</string>
+	<string name="SCIMPError_NOP">k.A.</string>
+	<string name="SCIMPError_UNKNOWN">Es ist ein unbekannter Fehler aufgetreten.</string>
+	<string name="SCIMPError_BAD_PARAMS">Falsche Parameter</string>
+	<string name="SCIMPError_OUT_OF_MEMORY">Kein freier Speicherplatz</string>
+	<string name="SCIMPError_BUFFER_TOO_SMALL">Zwischenspeicher zu klein</string>
+	<string name="SCIMPError_USER_ABORT">Nutzer verworfen</string>
+	<string name="SCIMPError_UNKNOWN_REQUEST">Unbekannte Anfrage</string>
+	<string name="SCIMPError_LAZY_PROGRAMMER">Fauler Programmierer</string>
+	<string name="SCIMPError_ASSERT_FAILED">Bestätigung fehlgeschlagen</string>
+	<string name="SCIMPError_FEATURE_UNAVAILABLE">Funktion nicht verfügbar</string>
+	<string name="SCIMPError_RESOURCE_UNAVAILABLE">Ressource nicht verfügbar</string>
+	<string name="SCIMPError_NOT_CONNECTED">Es wurde versucht, eine Nachricht zu senden, bevor eine sichere Verbindung hergestellt wurde.</string>
+	<string name="SCIMPError_IMPROPER_INITIALIZATION">Unzulässiger Startvorgang</string>
+	<string name="SCIMPError_CORRUPT_DATA">Die sichere Verbindung wurde beschädigt und wird jetzt neu aufgebaut.</string>
+	<string name="SCIMPError_SELF_TEST_FAILED">Selbsttest fehlgeschlagen</string>
+	<string name="SCIMPError_BAD_INTEGRITY">Die Überprüfung der Protokollintegrität ist fehlgeschlagen.</string>
+	<string name="SCIMPError_BAD_HASH_NUMBER">Falsche Raute</string>
+	<string name="SCIMPError_BAD_CIPHER_NUMBER">Es wurde ein Protokollpaket empfangen, in dem ein inkompatibles Codierungssystem gefunden wurde.</string>
+	<string name="SCIMPError_BAD_RANDOM_NUMBER">Es wurde ein Protokollpaket empfangen, in dem ein inkompatibler gefälschter Zufallszahlengenerator gefunden wurde.</string>
+	<string name="SCIMPError_SECRETS_MISMATCH">Fehlende Codierungskonsistenz mit der zuvor übernommenen sicheren Verbindung.</string>
+	<string name="SCIMPError_KEY_NOT_FOUND">Es wurde eine nicht entzifferbare Nachricht empfangen. Eine erneute Übertragung wird angefordert.</string>
+	<string name="SCIMPError_PROTOCOL_ERROR">Es wurde ein fehlerhaftes Protokollpaket empfangen.</string>
+	<string name="SCIMPError_PROTOCOL_CONTENTION">Es wurde ein unerwartetes Protokollpaket empfangen.</string>
+	<string name="SCIMPError_KEY_LOCKED">Code gesperrt</string>
+	<string name="SCIMPError_END_OF_ITERATION">Ende der Wiederholung</string>
+
+</resources>

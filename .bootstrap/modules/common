@@ -1,0 +1,167 @@
+[ -z "${DOWNLOAD_SITE}" ] && DOWNLOAD_SITE="http://localhost"
+[ -z "${BASE_DIR}" ] && BASE_DIR="$(pwd)"
+[ -z "${HTTP_PROXY}" ] || CURL_PROXY_FLAG="-x ${HTTP_PROXY}"
+
+DEPENDENCY_DIR="${BASE_DIR}/.dependencies"
+
+OS_TYPE="$(uname -s)"
+OS_ARCH="$(uname -m)"
+
+check_variable() {
+  if [ -z "$1" ]; then
+    printf "[ERROR] Missing environment variable: $2\n"
+    exit 1
+  fi
+}
+
+# -------------------------------------------------------------
+# download_file(2): Downloads a file from a URL, if necessary.
+#   file: The path to which the downloaded file should be saved.
+#   url: The URL of the file to download.
+# -------------------------------------------------------------
+download_file() {
+
+  TARGET_FILE="$1"
+  SOURCE_URL="$2"
+
+  if [ ! -f "${TARGET_FILE}" ]; then
+    printf "  Downloading: ${SOURCE_URL}\n"
+    [ -d "$(dirname ${TARGET_FILE})" ] || mkdir -p "$(dirname ${TARGET_FILE})"
+    curl ${CURL_PROXY_FLAG} --progress-bar -o "${TARGET_FILE}" "${SOURCE_URL}" || exit 1
+  else
+    printf "  Cached: ${SOURCE_URL}\n"
+  fi
+
+}
+
+# -------------------------------------------------------------
+# extract_file(4): Extracts an archive file, deleting the archive afterwards.
+#   target: The target directory to contain the extracted files.
+#   name: The path to the archive file to extract.
+#   flags: 'tar' flags in addition to "xf" required in order to extract the archive file.
+#   dir: The child directory to use as the archive's root. Optional.
+# -------------------------------------------------------------
+extract_file() {
+
+  EXTRACT_DIR="$1"
+  ARCHIVE_FILE="$2"
+  EXTRACT_FLAGS="$3"
+  SET_CHILD_AS_ROOT="$4"
+
+    printf "  Extracting: ${EXTRACT_DIR}\n"
+
+    if [ -z "${SET_CHILD_AS_ROOT}" ]; then
+      mkdir -p "${EXTRACT_DIR}" || exit 1
+      ( cd "${EXTRACT_DIR}" && tar xf"${EXTRACT_FLAGS}" "${ARCHIVE_FILE}" ) || exit 1
+    else
+      rm -fR "${EXTRACT_DIR}"
+      tar xf"${EXTRACT_FLAGS}" "${ARCHIVE_FILE}" || exit 1
+      mv "${PACKAGE_CHILD_AS_SOURCE_DIR}" "${EXTRACT_DIR}" || exit 1
+    fi
+
+    rm -f "${ARCHIVE_FILE}" || exit 1
+
+}
+
+# -------------------------------------------------------------
+# install_file(5): Utility function used to install dependencies.
+#   name: The canonical name of the package to install.
+#   url: The download URL of the package to install.
+#   flags: 'tar' flags in addition to "xf" required in order to extract the archive file.
+#   dir: The path to the directory within the archive that holds the package contents.
+#   target: The install directory for the package.
+# -------------------------------------------------------------
+install_file() {
+
+  PACKAGE_NAME="$1"
+  PACKAGE_INSTALL_URL="$2"
+  PACKAGE_EXTRACT_FLAGS="$3"
+  PACKAGE_CHILD_AS_SOURCE_DIR="$4"
+  PACKAGE_INSTALL_DIR="$5"
+
+  if [ ! -d "${PACKAGE_INSTALL_DIR}" ]; then
+
+    printf "Installing: ${PACKAGE_NAME}\n"
+
+    PACKAGE_INSTALL_FILE="${PACKAGE_INSTALL_DIR}.download"
+
+    download_file "${PACKAGE_INSTALL_FILE}" "${PACKAGE_INSTALL_URL}"
+    extract_file "${PACKAGE_INSTALL_DIR}" "${PACKAGE_INSTALL_FILE}" "${PACKAGE_EXTRACT_FLAGS}" "${PACKAGE_CHILD_AS_SOURCE_DIR}"
+
+    printf "  Done.\n"
+
+  else
+    printf "${PACKAGE_NAME}: ${PACKAGE_INSTALL_DIR}\n"
+  fi
+
+}
+
+
+# -------------------------------------------------------------
+# dependency(4): Declares a library dependency for the project.
+#   group_id: The conventional group ID for the dependency.
+#   artifact_id: The conventional artifact ID for the dependency.
+#   version: The version number of the dependency.
+#   packaging: The packaging type of the dependency.
+# -------------------------------------------------------------
+dependency() {
+
+  GROUP_ID="$1"
+  ARTIFACT_ID="$2"
+  VERSION="$3"
+  PACKAGING="$4"
+
+  printf "[${GROUP_ID}:${ARTIFACT_ID}:${VERSION}:${PACKAGING}]\n"
+  printf "  Group: ${GROUP_ID}\n"
+  printf "  Artifact: ${ARTIFACT_ID}\n"
+  printf "  Version: ${VERSION}\n"
+  printf "  Packaging: ${PACKAGING}\n"
+
+  case "${PACKAGING}" in
+    so)
+      for abi in armeabi armeabi-v7a mips x86; do
+        TARGET_FILE="libs/${abi}/${ARTIFACT_ID}.${PACKAGING}"
+        SOURCE_URI="$( printf ${GROUP_ID} | sed -E 's|\.|/|g' )/${ARTIFACT_ID}/${VERSION}/${abi}/${ARTIFACT_ID}.${PACKAGING}"
+        SOURCE_URL="${DOWNLOAD_SITE}/${SOURCE_URI}"
+        printf "  Target: ${abi}\n"
+        printf "    URL: ${SOURCE_URL}\n"
+        printf "    File: ${TARGET_FILE}\n"
+        download_file "${TARGET_FILE}" "${SOURCE_URL}"
+      done
+      ;;
+    jar)
+      TARGET_FILE="libs/${ARTIFACT_ID}-${VERSION}.${PACKAGING}"
+      SOURCE_URI="$( printf ${GROUP_ID} | sed -E 's|\.|/|g' )/${ARTIFACT_ID}/${VERSION}/${ARTIFACT_ID}-${VERSION}.${PACKAGING}"
+      SOURCE_URL="${DOWNLOAD_SITE}/${SOURCE_URI}"
+      download_file "${TARGET_FILE}" "${SOURCE_URL}"
+      ;;
+    apklib)
+      ;;
+  esac
+
+  printf "\n"
+
+}
+
+
+# -------------------------------------------------------------
+# build_ndk(*): Builds an NDK project.
+# -------------------------------------------------------------
+ndk_build() {
+  printf "\n"
+  ${ANDROID_NDK_HOME}/ndk-build $*
+  printf "\n"
+}
+
+# -------------------------------------------------------------
+# build_ant(*): Builds an Ant project.
+# -------------------------------------------------------------
+ant_build() {
+  printf "\n"
+  JAVA_HOME="${JAVA_HOME}" \
+  ANT_HOME="${ANT_HOME}" \
+  ANDROID_HOME="${ANDROID_HOME}" \
+  ANDROID_NDK_HOME="${ANDROID_NDK_HOME}" \
+  ${ANT_HOME}/bin/ant $*
+  printf "\n"
+}
